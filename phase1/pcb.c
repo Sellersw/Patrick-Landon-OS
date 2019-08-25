@@ -5,7 +5,7 @@ the Process Control Block struct. */
 
 /******************************ALLOC/DEALLOC PBCS*********************************/
 
-/* Insert the element pointed to by "p" onto the pcbFree list */
+/* Inserts the element pointed to by "p" onto the pcbFree list */
 void freePcb(pcb_t *p){
 
 }
@@ -31,3 +31,40 @@ new process queue. Returns a tail pointer. */
 pcb_t *mkEmptyProcQ(){
 
 }
+
+/* A query method that checks whether a given queue is empty. Returns TRUE if the
+pcb_t pointed to by the tail pointer (*tp) is empty. Returns FALSE otherwise. */
+int emptyProcQ(pcb_t *tp){
+
+}
+
+/* Inserts the process control block pointed to by "p" into the PCB queue whose tail-
+pointer is pointed to by "tp". */
+insertProcQ(pcb_t **tp, pcb_t *p){
+
+}
+
+/* Removes the head element from the PCB queue whose tail pointer is pointed to by (tp).
+Returns NULL if the process queue passed in was already empty, but otherwise returns a
+pointer to the process control block that was removed from the queue. It also updates
+the tail pointer if necessary. */
+pcb_t *removeProcQ(pcb_t **tp){
+
+}
+
+/* Removes an element pointed to by "p". This pcb can be located anywhere in the queue.
+Updates the tail pointer of the queue if necessary. Returns NULL if the given address
+cannot be matched in the provided queue, and otherwise returns "p". */
+pcb_t *outProcQ(pcb_t **tp, pcb_t *p){
+
+}
+
+/* Returns a pointer of the head element of a given pcb queue, but does not remove it
+from the list. */
+pcb_t *headProcQ(pcb_t *tp){
+
+}
+
+/***************************PROCESS TREE MAINTENENCE**********************************/
+
+// I'll get back to this I got some other homework to do...
