@@ -1,7 +1,8 @@
 /* This is currently a dummy file for methods relating to the manipulation of
 the Process Control Block struct. */
 
-#include "defs.h"
+#include "../h/defs.h"
+#include "../h/const.h"
 
 /******************************ALLOC/DEALLOC PBCS*********************************/
 
