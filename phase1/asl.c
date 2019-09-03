@@ -5,20 +5,20 @@ associated with an address in memory and a process queue.*/
 #include "../h/types.h"
 #include "../h/const.h"
 
-int insertBlocked(int *semAdd, pcb_t *p){
+int insertBlocked(int *semAdd, pcb_PTR p){
 
 }
 
 
-pcb_t *removeBlocked(int *semAdd){
+pcb_PTR removeBlocked(int *semAdd){
 
 }
 
-pcb_t *outBlocked(pcb_t *p){
+pcb_PTR outBlocked(pcb_PTR p){
 
 }
 
-pcb_t *headBlocked(int *semAdd){
+pcb_PTR headBlocked(int *semAdd){
 
 }
 
