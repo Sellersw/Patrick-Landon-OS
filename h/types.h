@@ -1,6 +1,6 @@
 /* The struct file for the Kaya OS project, containing public
 structs and methods for use across multiple .c files. This currently
-includes structs for the Process Control Blocks and the Active 
+includes structs for the Process Control Blocks and the Active
 Semephore List. */
 
 
@@ -19,7 +19,7 @@ typedef struct pcb_t{
                                 /* which process blocked */
   /* plus other entries to be added later */
 
-} pcb_t;
+} pcb_t, *pcb_PTR;
 
 
 
