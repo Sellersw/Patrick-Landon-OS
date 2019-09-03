@@ -58,20 +58,20 @@ insertProcQ(pcb_PTR *tp, pcbPTR p){
 Returns NULL if the process queue passed in was already empty, but otherwise returns a
 pointer to the process control block that was removed from the queue. It also updates
 the tail pointer if necessary. */
-pcbPTR removeProcQ(pcb_PTR *tp){
+pcb_PTR removeProcQ(pcb_PTR *tp){
 
 }
 
 /* Removes an element pointed to by "p". This pcb can be located anywhere in the queue.
 Updates the tail pointer of the queue if necessary. Returns NULL if the given address
 cannot be matched in the provided queue, and otherwise returns "p". */
-pcbPTR outProcQ(pcb_PTR *tp, pcb_PTR p){
+pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
 
 }
 
 /* Returns a pointer of the head element of a given pcb queue, but does not remove it
 from the list. */
-pcbPTR headProcQ(pcb_PTR tp){
+pcb_PTR headProcQ(pcb_PTR tp){
 
 }
 
