@@ -14,13 +14,10 @@ void freePcb(pcb_PTR p){
   if(pcbFree_h == NULL){
     pcbFree_h = p;
   }
-  // If pcbFree has elements in it, add process p to the end of the list.
+  // If pcbFree has elements in it, add process p to the front of the list.
   else{
-    pcb_PTR current = pcbFree_h->p_next;
-    while(current != NULL){
-      current = current->p_next;
-    }
-    current = p;
+    p->p_next = pcbFree_h->p_next;
+    pcbFree_h = p;
   }
 }
 
@@ -36,9 +33,14 @@ pct_PTR allocPcb(){
   // Grab first process in list, edit pcbFree_h to point at second process, and
   // reinitialize first process to have NULL fields before returning it.
   pcb_PTR p_ret = pcbFree_h;
-  pcbFree_h = p_ret->p_next;
+  pcbFree_h = pcbFree_h->p_next;
 
   p_ret->p_next = NULL;
+  p_ret->p_prev = NULL;
+  p_ret->p_prnt = NULL;
+  p_ret->p_child = NULL;
+  p_ret->p_sib = NULL;
+
   return p_ret;
 }
 
@@ -74,7 +76,11 @@ int emptyProcQ(pcb_PTR tp){
 /* Inserts the process control block pointed to by "p" into the PCB queue whose tail-
 pointer is pointed to by "tp". */
 insertProcQ(pcb_PTR *tp, pcbPTR p){
-
+  p->p_next = *tp->p_next;
+  *tp->p_next = p;
+  p->p_prev = *tp;
+  p->p_next->p_prev = p;
+  *tp = p;
 }
 
 /* Removes the head element from the PCB queue whose tail pointer is pointed to by (tp).
@@ -82,7 +88,21 @@ Returns NULL if the process queue passed in was already empty, but otherwise ret
 pointer to the process control block that was removed from the queue. It also updates
 the tail pointer if necessary. */
 pcb_PTR removeProcQ(pcb_PTR *tp){
+  if(emptyProcQ(*tp)){
+    return NULL;
+  }
+  else if(*tp->p_next == NULL){
+    pcb_PTR head = *tp;
+    *tp = NULL;
+    return head;
+  }
+  else{
+    pcb_PTR head = *tp->p_next;
+    *tp->p_next = *tp->p_next->p_next;
+    *tp->p_next->p_prev = *tp;
 
+    return head;
+  }
 }
 
 /* Removes an element pointed to by "p". This pcb can be located anywhere in the queue.
