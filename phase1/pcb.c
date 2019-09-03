@@ -1,7 +1,7 @@
 /* This is currently a dummy file for methods relating to the manipulation of
 the Process Control Block struct. */
 
-#include "../h/defs.h"
+#include "../h/types.h"
 #include "../h/const.h"
 static pcb_PTR pcbFree_h;
 
