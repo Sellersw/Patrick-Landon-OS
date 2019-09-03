@@ -3,13 +3,25 @@ the Process Control Block struct. */
 
 #include "../h/types.h"
 #include "../h/const.h"
+
 static pcb_PTR pcbFree_h;
 
 /******************************ALLOC/DEALLOC PBCS*********************************/
 
 /* Inserts the element pointed to by "p" onto the pcbFree list */
 void freePcb(pcb_PTR p){
-
+  // If no current head on free list, insert p as next.
+  if(pcbFree_h == NULL){
+    pcbFree_h = p;
+  }
+  // If pcbFree has elements in it, add process p to the end of the list.
+  else{
+    pcb_PTR current = pcbFree_h->p_next;
+    while(current != NULL){
+      current = current->p_next;
+    }
+    current->p_next = p;
+  }
 }
 
 /* If pcbFree list is empty, return NULL. Otherwise, remove an element
