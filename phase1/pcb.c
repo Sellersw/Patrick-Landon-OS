@@ -20,7 +20,7 @@ void freePcb(pcb_PTR p){
     while(current != NULL){
       current = current->p_next;
     }
-    current->p_next = p;
+    current = p;
   }
 }
 
