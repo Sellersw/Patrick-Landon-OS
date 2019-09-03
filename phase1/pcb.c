@@ -28,7 +28,18 @@ void freePcb(pcb_PTR p){
 from the pcbFree list, initialize values for the pcb's fields (NULL) and
 return a pointer to the removed element. */
 pct_PTR allocPcb(){
+  // If pcbFree list is empty, return NULL.
+  if(pcbFree_h == NULL){
+    return NULL;
+  }
 
+  // Grab first process in list, edit pcbFree_h to point at second process, and
+  // reinitialize first process to have NULL fields before returning it.
+  pcb_PTR p_ret = pcbFree_h;
+  pcbFree_h = p_ret->p_next;
+
+  p_ret->p_next = NULL;
+  return p_ret;
 }
 
 /* Initialize the pcbFree list to contain (x) number of elements, where
