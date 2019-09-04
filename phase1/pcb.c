@@ -76,8 +76,8 @@ int emptyProcQ(pcb_PTR tp){
 /* Inserts the process control block pointed to by "p" into the PCB queue whose tail-
 pointer is pointed to by "tp". */
 insertProcQ(pcb_PTR *tp, pcbPTR p){
-  p->p_next = *tp->p_next;
-  *tp->p_next = p;
+  p->p_next = (*tp)->p_next;
+  (*tp)->p_next = p;
   p->p_prev = *tp;
   p->p_next->p_prev = p;
   *tp = p;
@@ -91,15 +91,15 @@ pcb_PTR removeProcQ(pcb_PTR *tp){
   if(emptyProcQ(*tp)){
     return NULL;
   }
-  else if(*tp->p_next == NULL){
+  else if((*tp)->p_next == NULL){
     pcb_PTR head = *tp;
     *tp = NULL;
     return head;
   }
   else{
-    pcb_PTR head = *tp->p_next;
-    *tp->p_next = *tp->p_next->p_next;
-    *tp->p_next->p_prev = *tp;
+    pcb_PTR head = (*tp)->p_next;
+    (*tp)->p_next = (*tp)->p_next->p_next;
+    (*tp)->p_next->p_prev = *tp;
 
     return head;
   }
@@ -109,13 +109,46 @@ pcb_PTR removeProcQ(pcb_PTR *tp){
 Updates the tail pointer of the queue if necessary. Returns NULL if the given address
 cannot be matched in the provided queue, and otherwise returns "p". */
 pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
+  if(emptyProcQ(*tp)){
+    return NULL;
+  }
+  else{
+    if((*tp)->next != NULL){
+      pcb_PTR current = *tp;
+      while(current != p)
+      {
+        current = current->p_next;
+        if(current == *tp)
+        {
+          return NULL;
+        }
+      }
+      current->p_next->p_prev = current->p_prev;
+      current->p_prev->p_next = current->p_next;
 
+      return current;
+    }
+    if(*tp == p){
+      return removeProcQ(tp);
+    }
+    else{
+      return NULL;
+    }
+  }
 }
 
 /* Returns a pointer of the head element of a given pcb queue, but does not remove it
 from the list. */
 pcb_PTR headProcQ(pcb_PTR tp){
-
+  if(emptyProcQ(*tp)){
+    return NULL;
+  }
+  else if(tp->p_next == NULL){
+    return tp;
+  }
+  else{
+    return tp->p_next;
+  }
 }
 
 /***************************PROCESS TREE MAINTENENCE**********************************/
