@@ -156,7 +156,8 @@ pcb_PTR headProcQ(pcb_PTR tp){
 int emptyChild(pcb_PTR p){
   if(p->p_child == NULL){
     return(TRUE);
-  } else {
+  }
+  else{
     return(FALSE);
   }
 }
@@ -166,13 +167,15 @@ pointed to by prnt by pointing parent's p_child to p and linking pcb p with its 
 insertChild(pcb_PTR prnt, pcb_PTR p){
   if(prnt == NULL){             /* (CASE 1) if parent is empty, we have an error. */
     return(NULL);
-  } else {
+  }
+  else {
     if(prnt->p_child != NULL){  /* (CASE 2) parent has a null terminated list of children. */
       p->p_sib = prnt->p_child; // set p's sibling equal to first element on parent list.
       prnt->p_child = p; // set parent's first child equal to p's address.
-      } else {                  /* (CASE 3) parent does not yet have children. */
-        prnt->p_child = p; // set parent's first child equal to p's address.
       }
+    else{                  /* (CASE 3) parent does not yet have children. */
+      prnt->p_child = p; // set parent's first child equal to p's address.
+    }
   }
 }
 
