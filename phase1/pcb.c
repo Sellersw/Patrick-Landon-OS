@@ -76,11 +76,11 @@ int emptyProcQ(pcb_PTR tp){
 /* Inserts the process control block pointed to by "p" into the PCB queue whose tail-
 pointer is pointed to by "tp". */
 insertProcQ(pcb_PTR *tp, pcbPTR p){
-  p->p_next = (*tp)->p_next;
-  (*tp)->p_next = p;
-  p->p_prev = *tp;
-  p->p_next->p_prev = p;
-  *tp = p;
+  p->p_next = (*tp)->p_next; // sets p's next equal to queue's head address.
+  (*tp)->p_next = p; // sets tail pcb's next equal to p's address
+  p->p_prev = *tp; // sets p's prev equal to tail pcb's address
+  p->p_next->p_prev = p; // sets head's prev equal to p's address
+  *tp = p; // sets tail pointer equal to p's address.
 }
 
 /* Removes the head element from the PCB queue whose tail pointer is pointed to by (tp).
@@ -111,8 +111,7 @@ cannot be matched in the provided queue, and otherwise returns "p". */
 pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
   if(emptyProcQ(*tp)){
     return NULL;
-  }
-  else{
+  } else {
     if((*tp)->next != NULL){
       pcb_PTR current = *tp;
       while(current != p)
@@ -153,4 +152,34 @@ pcb_PTR headProcQ(pcb_PTR tp){
 
 /***************************PROCESS TREE MAINTENENCE**********************************/
 
-// I'll get back to this I got some other homework to do...
+/* Returns TRUE (1) if pcb has no children. Returns FALSE (0) otherwise. */
+int emptyChild(pcb_PTR p){
+  if(p->p_child == NULL){
+    return(TRUE);
+  } else {
+    return(FALSE);
+  }
+}
+
+/* Place the pcb pointed to by p on the null terminated list of children of the pcb
+pointed to by prnt by pointing parent's p_child to p and linking pcb p with its siblings */
+insertChild(pcb_PTR prnt, pcb_PTR p){
+  if(prnt == NULL){             /* (CASE 1) if parent is empty, we have an error. */
+    return(NULL);
+  } else {
+    if(prnt->p_child != NULL){  /* (CASE 2) parent has a null terminated list of children. */
+      p->p_sib = prnt->p_child; // set p's sibling equal to first element on parent list.
+      prnt->p_child = p; // set parent's first child equal to p's address.
+      } else {                  /* (CASE 3) parent does not yet have children. */
+        prnt->p_child = p; // set parent's first child equal to p's address.
+      }
+  }
+}
+
+pcb_PTR removeChild(pcb_PTR p){
+
+}
+
+pcb_PTR outChild(pcb_PTR p){
+
+}
