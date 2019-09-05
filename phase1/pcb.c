@@ -10,11 +10,11 @@ HIDDEN pcb_PTR pcbFree_h;
 
 /* Inserts the element pointed to by "p" onto the pcbFree list */
 void freePcb(pcb_PTR p){
-  // If no current head on free list, insert p as next.
+  /* If no current head on free list, insert p as next. */
   if(pcbFree_h == NULL){
     pcbFree_h = p;
   }
-  // If pcbFree has elements in it, add process p to the front of the list.
+  /* If pcbFree has elements in it, add process p to the front of the list. */
   else{
     p->p_next = pcbFree_h;
     pcbFree_h = p;
@@ -25,13 +25,13 @@ void freePcb(pcb_PTR p){
 from the pcbFree list, initialize values for the pcb's fields (NULL) and
 return a pointer to the removed element. */
 pcb_PTR allocPcb(){
-  // If pcbFree list is empty, return NULL.
+  /* If pcbFree list is empty, return NULL. */
   if(pcbFree_h == NULL){
     return NULL;
   }
 
-  // Grab first process in list, edit pcbFree_h to point at second process, and
-  // reinitialize first process to have NULL fields before returning it.
+  /* Grab first process in list, edit pcbFree_h to point at second process, and
+  reinitialize first process to have NULL fields before returning it. */
   pcb_PTR p_ret = pcbFree_h;
   pcbFree_h = pcbFree_h->p_next;
 
@@ -51,7 +51,7 @@ initPcbs(){
   static pcb_t pcbArr[MAXPROC];
   int i = 0;
   while(i < MAXPROC){
-    freePcb(&(pcbArr[i])); //stores all the new pcbs addresses in the pcbFree_h list.
+    freePcb(&(pcbArr[i])); /* stores all the new pcbs addresses in the pcbFree_h list.*/
     i++;
   }
 
@@ -60,14 +60,14 @@ initPcbs(){
 /* Initializes an empty Process Queue by setting a variable to be a tail pointer to a
 new process queue. Returns a tail pointer. */
 pcb_PTR mkEmptyProcQ(){
-  return(NULL); // returns a place in memory that is a pointer to a empty pcb.
+  return(NULL); /* returns a place in memory that is a pointer to a empty pcb.*/
 }
 
 /* A query method that checks whether a given queue is empty. Returns TRUE if the
 pcb_t pointed to by the tail pointer (*tp) is empty. Returns FALSE otherwise. */
 int emptyProcQ(pcb_PTR tp){
-  if(tp == NULL){ // could also be written (return(tp == NULL)) but this made more
-    return TRUE;  // sense to me.
+  if(tp == NULL){ /* could also be written (return(tp == NULL)) but this made more */
+    return TRUE;  /*  sense to me.                                                 */
   } else {
     return FALSE;
   }
@@ -76,11 +76,11 @@ int emptyProcQ(pcb_PTR tp){
 /* Inserts the process control block pointed to by "p" into the PCB queue whose tail-
 pointer is pointed to by "tp". */
 insertProcQ(pcb_PTR *tp, pcbPTR p){
-  p->p_next = (*tp)->p_next; // sets p's next equal to queue's head address.
-  (*tp)->p_next = p;         // sets tail pcb's next equal to p's address
-  p->p_prev = *tp;           // sets p's prev equal to tail pcb's address
-  p->p_next->p_prev = p;     // sets head's prev equal to p's address
-  *tp = p;                   // sets tail pointer equal to p's address.
+  p->p_next = (*tp)->p_next; /* sets p's next equal to queue's head address. */
+  (*tp)->p_next = p;         /* sets tail pcb's next equal to p's address */
+  p->p_prev = *tp;           /* sets p's prev equal to tail pcb's address */
+  p->p_next->p_prev = p;     /* sets head's prev equal to p's address */
+  *tp = p;                   /* sets tail pointer equal to p's address */
 }
 
 /* Removes the head element from the PCB queue whose tail pointer is pointed to by (tp).
@@ -169,12 +169,12 @@ insertChild(pcb_PTR prnt, pcb_PTR p){
   }
   else {
     if(prnt->p_child != NULL){  /* (CASE 2): parent has a null terminated list of children. */
-      p->p_sib = prnt->p_child;   // set p's sibling equal to first element on parent list.
-      prnt->p_child = p;          // set parent's first child equal to p's address.
+      p->p_sib = prnt->p_child;   /* set p's sibling equal to first element on parent list. */
+      prnt->p_child = p;          /* set parent's first child equal to p's address. */
       p->p_prnt = prnt;
     }
     else{                  /* (CASE 3): parent does not yet have children. */
-      prnt->p_child = p;     // set parent's first child equal to p's address.
+      prnt->p_child = p;     /* set parent's first child equal to p's address. */
       p->p_prnt = prnt;
     }
   }

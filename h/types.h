@@ -10,33 +10,6 @@
 /* The struct file for the Kaya OS project, containing public structs and
    methods for use across multiple .c files. */
 
-/* process control block type */
-typedef struct pcb_t{
-
-  /* process queue fields */
-  struct pcb_t  *p_next,        /* pointer to next entry */
-                *p_prev,        /* pointer to previous entry */
-
-  /* process tree fields */
-                *p_prnt,        /* pointer to parent */
-                *p_child,       /* pointer to 1st child */
-                *p_sib;         /* pointer to sibling */
-  state_t        p_s;           /* processor state */
-  int           *p_semAdd;      /* pointer to sema4 on */
-                                /* which process blocked */
-  /* plus other entries to be added later */
-
-} pcb_t, *pcb_PTR;
-
-/* semaphore descriptor type */
-typedef struct semd_t{
-
-  struct semd_t *s_next;        /* next element on the ASL */
-  int           *s_semAdd;      /* pointer to the semaphore */
-  pcb_t         *s_procQ;       /* tail pointer to a */
-                                /* process queue */
-} semd_t, *semd_PTR;
-
 typedef signed int cpu_t;
 
 
@@ -82,6 +55,33 @@ typedef struct state_t {
 	int	 			s_reg[STATEREGNUM];
 
 } state_t, *state_PTR;
+
+/* process control block type */
+typedef struct pcb_t{
+
+  /* process queue fields */
+  struct pcb_t  *p_next;        /* pointer to next entry */
+  struct pcb_t  *p_prev;        /* pointer to previous entry */
+
+  /* process tree fields */
+  struct pcb_t  *p_prnt;        /* pointer to parent */
+  struct pcb_t  *p_child;       /* pointer to 1st child */
+  struct pcb_t  *p_sib;         /* pointer to sibling */
+  state_t        p_s;           /* processor state */
+  int           *p_semAdd;      /* pointer to sema4 on */
+                                            /* which process blocked */
+  /* plus other entries to be added later */
+
+} pcb_t, *pcb_PTR;
+
+/* semaphore descriptor type */
+typedef struct semd_t{
+
+  struct semd_t *s_next;        /* next element on the ASL */
+  int           *s_semAdd;      /* pointer to the semaphore */
+  pcb_t         *s_procQ;       /* tail pointer to a */
+                                /* process queue */
+} semd_t, *semd_PTR;
 
 #define	s_at	s_reg[0]
 #define	s_v0	s_reg[1]
