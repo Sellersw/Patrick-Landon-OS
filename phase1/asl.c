@@ -1,6 +1,7 @@
-/* currently a dummy file, planned to contain the methods for the Active
-Semephore List. The struct for this is a LinkedList of integers each
-associated with an address in memory and a process queue.*/
+/* This module organizes process queues with structures called semephores
+which are kept in sorted order according to their semephore address. This
+module has methods to initialize the active semephore list as well as perform
+operations (mutators and accessors) on the data structure. */
 
 #include "../h/types.h"
 #include "../h/const.h"
@@ -43,10 +44,10 @@ initASL(){
 by the global semdFree_h. */
 void freeSemd(semd_PTR s){
     if(semdFree_h == NULL){
-        semdFree_h = s;
+        semdFree_h = s;     // if the semdFree pointer is empty, have it point to the node
     } else {
-        s->s_next = semdFree_h;
-        semdFree_h = s;
+        s->s_next = semdFree_h; // if the list is not empty, s's next is head of semdFree
+        semdFree_h = s;         // and semdFree points to s
     }
 }
 
@@ -61,4 +62,15 @@ semd_PTR allocSemd(int i){
     s_ret->semAdd = i;
 
     return s_ret;
+}
+
+/* Given a semephore address, find that active semephore on the list. Regardless of
+whether the address is on the list, it will always return the parent of the semephore
+as if it were active. */
+semd_PTR findASemd(int i){
+    semd_PTR s_current = semdActive_h->s_next;
+    while(s_current->s_next->s_semAdd < i){
+        s_current = s_current->s_next;
+    }
+    return(s_current);
 }
