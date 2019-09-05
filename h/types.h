@@ -31,4 +31,4 @@ typedef struct semd_t{
   int           *s_semAdd;      /* pointer to the semaphore */
   pcb_t         *s_procQ;       /* tail pointer to a */
                                 /* process queue */
-} semd_t;
+} semd_t, *semd_PTR;
