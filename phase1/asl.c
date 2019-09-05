@@ -5,7 +5,7 @@ operations (mutators and accessors) on the data structure. */
 
 #include "../h/types.h"
 #include "../h/const.h"
-#include "pcb.c"
+#include "pcb.e"
 
 HIDDEN semd_PTR semdActive_h, semdFree_h;
 
@@ -60,7 +60,7 @@ void freeSemd(semd_PTR s){
     }
 }
 
-/* Allocates (activates) a semephore by removing it from the free list, intitializing 
+/* Allocates (activates) a semephore by removing it from the free list, intitializing
 it's semAdd as a given int "i", and returning a pointer to it */
 semd_PTR allocSemd(int i){
     semd_PTR s_ret = semdFree_h;
