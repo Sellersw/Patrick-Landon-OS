@@ -10,7 +10,10 @@ operations (mutators and accessors) on the data structure. */
 HIDDEN semd_PTR semdActive_h, semdFree_h;
 
 int insertBlocked(int *semAdd, pcb_PTR p){
-
+    semd_PTR s_current = semdActive_h;
+    while(semAdd > s_current->s_semAdd){
+        
+    }
 }
 
 
@@ -30,12 +33,18 @@ pcb_PTR headBlocked(int *semAdd){
 static semd_t semdTable[MAXPROC]. This method will be only called once
 during data structure initialization. */
 initASL(){
-    static semd_t semdArr[MAXPROC];
+
+    // first, initialize the free list, similar to pcbFree.
+    static semd_t semdArr[MAXPROC + 2];
     int i = 0;
-    while(i < MAXPROC){
+    while(i < MAXPROC + 2){
          freeSemd(&(semdArr[i]));
          i++;
     }
+
+    // next, allocate semephore descriptors as dummy nodes on the active list.
+    semdActive_h = allocSemd(0x0);
+    semdActive_h->s_next = allocSemd(0xffffffff);
 }
 
 /*******************************HELPER FUNCTIONS**********************************/
@@ -68,9 +77,9 @@ semd_PTR allocSemd(int i){
 whether the address is on the list, it will always return the parent of the semephore
 as if it were active. */
 semd_PTR findASemd(int i){
-    semd_PTR s_current = semdActive_h->s_next;
-    while(s_current->s_next->s_semAdd < i){
-        s_current = s_current->s_next;
+    semd_PTR s_current = semdActive_h;
+    while(s_current->s_next->s_semAdd < i){ // keep looping while current's next's semadd is less than i
+        s_current = s_current->s_next;  // point current's pointer to the next element.
     }
     return(s_current);
 }
