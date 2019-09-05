@@ -16,7 +16,7 @@ void freePcb(pcb_PTR p){
   }
   // If pcbFree has elements in it, add process p to the front of the list.
   else{
-    p->p_next = pcbFree_h->p_next; // THINK THIS NEEDS TO JUST BE PCBFREE_H
+    p->p_next = pcbFree_h;
     pcbFree_h = p;
   }
 }
@@ -139,7 +139,7 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
 /* Returns a pointer of the head element of a given pcb queue, but does not remove it
 from the list. */
 pcb_PTR headProcQ(pcb_PTR tp){
-  if(emptyProcQ(*tp)){
+  if(emptyProcQ(tp)){
     return NULL;
   }
   else if(tp->p_next == NULL){
