@@ -111,14 +111,13 @@ cannot be matched in the provided queue, and otherwise returns "p". */
 pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
   if(emptyProcQ(*tp)){
     return NULL;
-  } else {
+  }
+  else{
     if((*tp)->next != NULL){
       pcb_PTR current = *tp;
-      while(current != p)
-      {
+      while(current != p){
         current = current->p_next;
-        if(current == *tp)
-        {
+        if(current == *tp){
           return NULL;
         }
       }
@@ -127,7 +126,7 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
 
       return current;
     }
-    if(*tp == p){
+    else if(*tp == p){
       return removeProcQ(tp);
     }
     else{
@@ -172,17 +171,53 @@ insertChild(pcb_PTR prnt, pcb_PTR p){
     if(prnt->p_child != NULL){  /* (CASE 2): parent has a null terminated list of children. */
       p->p_sib = prnt->p_child;   // set p's sibling equal to first element on parent list.
       prnt->p_child = p;          // set parent's first child equal to p's address.
-      }
+      p->p_prnt = prnt;
+    }
     else{                  /* (CASE 3): parent does not yet have children. */
       prnt->p_child = p;     // set parent's first child equal to p's address.
+      p->p_prnt = prnt;
     }
   }
 }
 
 pcb_PTR removeChild(pcb_PTR p){
-
+  if(p->p_child == NULL){
+    return NULL;
+  }
+  else{
+    pcb_PTR child = p->p_child;
+    if(child->p_sib != NULL){
+      p->child = child->p_sib;
+    }
+    else{
+      p->p_child = NULL;
+    }
+    return child;
+  }
 }
 
 pcb_PTR outChild(pcb_PTR p){
-
+  if(p->p_prnt == NULL){
+    return NULL;
+  }
+  else{
+    pcb_PTR prnt = p->p_prnt;
+    if(prnt->p_child == p){
+      prnt->p_child = p->p_sib;
+      return p;
+    }
+    else{
+      pcb_PTR current = prnt->p_child;
+      while(current->p_sib != p){
+        current = current->p_sib;
+      }
+      if(p->p_sib != NULL){
+        current->p_sib = p->p_sib;
+      }
+      else{
+        current->p_sib = NULL;
+      }
+      return p;
+    }
+  }
 }
