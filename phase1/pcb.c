@@ -33,9 +33,8 @@ void insertProcQ(pcb_PTR *tp, pcb_PTR p){
       p->p_next = p;
       p->p_prev = p;
       *tp = p;
-      
-    } else {
-    
+    }
+    else{
       p->p_next = (*tp)->p_next; /* sets p's next equal to queue's head address. */
       (*tp)->p_next = p;         /* sets tail pcb's next equal to p's address */
       p->p_prev = *tp;           /* sets p's prev equal to tail pcb's address */
@@ -54,7 +53,7 @@ pcb_PTR removeProcQ(pcb_PTR *tp){
     debugB(5);
     return NULL;
   }
-  else if((*tp)->p_next == NULL){
+  else if((*tp)->p_next == *tp){
     debugB(10);
     head = *tp;
     *tp = NULL;

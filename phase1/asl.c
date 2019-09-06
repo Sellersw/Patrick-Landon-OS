@@ -53,7 +53,7 @@ semd_PTR findASemd(int *i){
 int insertBlocked(int *semAdd, pcb_PTR p){
     semd_PTR s_current = semdActive_h;
     semd_PTR s_insert;
-    while(semAdd < s_current->s_semAdd){
+    while(semAdd > s_current->s_semAdd){
       s_current = s_current->s_next;
     }
     if(semAdd == s_current->s_semAdd){
@@ -77,7 +77,7 @@ int insertBlocked(int *semAdd, pcb_PTR p){
 
 pcb_PTR removeBlocked(int *semAdd){
   semd_PTR s_current = semdActive_h;
-  while(semAdd < s_current->s_semAdd){
+  while(semAdd > s_current->s_semAdd){
     s_current = s_current->s_next;
   }
   if(s_current->s_semAdd == semAdd){
@@ -98,7 +98,7 @@ pcb_PTR outBlocked(pcb_PTR p){
 
 pcb_PTR headBlocked(int *semAdd){
   semd_PTR s_current = semdActive_h;
-  while(semAdd < s_current->s_semAdd){
+  while(semAdd > s_current->s_semAdd){
     s_current = s_current->s_next;
   }
   if(semAdd == s_current->s_semAdd){
