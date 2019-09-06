@@ -6,54 +6,9 @@ the Process Control Block struct. */
 
 HIDDEN pcb_PTR pcbFree_h;
 
-/******************************ALLOC/DEALLOC PBCS*********************************/
-
-/* Inserts the element pointed to by "p" onto the pcbFree list */
-void freePcb(pcb_PTR p){
-  /* If no current head on free list, insert p as next. */
-  if(pcbFree_h == NULL){
-    pcbFree_h = p;
-  }
-  /* If pcbFree has elements in it, add process p to the front of the list. */
-  else{
-    p->p_next = pcbFree_h;
-    pcbFree_h = p;
-  }
-}
-
-/* If pcbFree list is empty, return NULL. Otherwise, remove an element
-from the pcbFree list, initialize values for the pcb's fields (NULL) and
-return a pointer to the removed element. */
-pcb_PTR allocPcb(){
-  pcb_PTR p_ret = pcbFree_h;
-  
-  /* If pcbFree list is empty, return NULL. */
-  if(pcbFree_h == NULL){
-    return NULL;
-  }
-
-  /* Grab first process in list, edit pcbFree_h to point at second process, and
-  reinitialize first process to have NULL fields before returning it. */
-  pcbFree_h = pcbFree_h->p_next;
-  p_ret->p_next = NULL;
-  p_ret->p_prev = NULL;
-  p_ret->p_prnt = NULL;
-  p_ret->p_child = NULL;
-  p_ret->p_sib = NULL;
-
-  return p_ret;
-}
-
-/* Initialize the pcbFree list to contain (x) number of elements, where
-x is equal to the MAXPROC constant in const.h. This method should only be called
-once at initialization. */
-void initPcbs(){
-  static pcb_t pcbArr[MAXPROC];
-  int i = 0;
-  while(i < MAXPROC){
-    freePcb(&(pcbArr[i])); /* stores all the new pcbs addresses in the pcbFree_h list.*/
-    i++;
-  }
+void debugB(int a){
+  int i;
+  i = 0;
 }
 
 /****************************PCB QUEUE MAINTENANCE********************************/
@@ -67,21 +22,26 @@ pcb_PTR mkEmptyProcQ(){
 /* A query method that checks whether a given queue is empty. Returns TRUE if the
 pcb_t pointed to by the tail pointer (*tp) is empty. Returns FALSE otherwise. */
 int emptyProcQ(pcb_PTR tp){
-  if(tp == NULL){ /* could also be written (return(tp == NULL)) but this made more */
-    return TRUE;  /*  sense to me.                                                 */
-  } else {
-    return FALSE;
-  }
+  return (tp == NULL);
 }
 
 /* Inserts the process control block pointed to by "p" into the PCB queue whose tail-
 pointer is pointed to by "tp". */
 void insertProcQ(pcb_PTR *tp, pcb_PTR p){
-  p->p_next = (*tp)->p_next; /* sets p's next equal to queue's head address. */
-  (*tp)->p_next = p;         /* sets tail pcb's next equal to p's address */
-  p->p_prev = *tp;           /* sets p's prev equal to tail pcb's address */
-  p->p_next->p_prev = p;     /* sets head's prev equal to p's address */
-  *tp = p;                   /* sets tail pointer equal to p's address */
+  debugB(1);
+  if(emptyProcQ(*tp)){
+      p->p_next = p;
+      p->p_prev = p;
+      *tp = p;
+      
+    } else {
+    
+      p->p_next = (*tp)->p_next; /* sets p's next equal to queue's head address. */
+      (*tp)->p_next = p;         /* sets tail pcb's next equal to p's address */
+      p->p_prev = *tp;           /* sets p's prev equal to tail pcb's address */
+      p->p_next->p_prev = p;     /* sets head's prev equal to p's address */
+      *tp = p;                   /* sets tail pointer equal to p's address */
+    }
 }
 
 /* Removes the head element from the PCB queue whose tail pointer is pointed to by (tp).
@@ -89,19 +49,22 @@ Returns NULL if the process queue passed in was already empty, but otherwise ret
 pointer to the process control block that was removed from the queue. It also updates
 the tail pointer if necessary. */
 pcb_PTR removeProcQ(pcb_PTR *tp){
+  pcb_PTR head;
   if(emptyProcQ(*tp)){
+    debugB(5);
     return NULL;
   }
   else if((*tp)->p_next == NULL){
-    pcb_PTR head = *tp;
+    debugB(10);
+    head = *tp;
     *tp = NULL;
     return head;
   }
   else{
-    pcb_PTR head = (*tp)->p_next;
+    debugB(15);
+    head = (*tp)->p_next;
     (*tp)->p_next = (*tp)->p_next->p_next;
     (*tp)->p_next->p_prev = *tp;
-
     return head;
   }
 }
@@ -149,6 +112,58 @@ pcb_PTR headProcQ(pcb_PTR tp){
     return tp->p_next;
   }
 }
+
+/******************************ALLOC/DEALLOC PBCS*********************************/
+
+/* Inserts the element pointed to by "p" onto the pcbFree list */
+void freePcb(pcb_PTR p){
+  /* If no current head on free list, insert p as next. */
+  if(emptyProcQ(pcbFree_h)){
+    p->p_next = NULL;
+    pcbFree_h = p;
+  }
+  /* If pcbFree has elements in it, add process p to the front of the list. */
+  else{
+    p->p_next = pcbFree_h;
+    pcbFree_h = p;
+  }
+}
+
+/* If pcbFree list is empty, return NULL. Otherwise, remove an element
+from the pcbFree list, initialize values for the pcb's fields (NULL) and
+return a pointer to the removed element. */
+pcb_PTR allocPcb(){
+  pcb_PTR p_ret = pcbFree_h;
+  /* If pcbFree list is empty, return NULL. */
+  if(emptyProcQ(pcbFree_h)){
+    return NULL;
+  }
+
+  /* Grab first process in list, edit pcbFree_h to point at second process, and
+  reinitialize first process to have NULL fields before returning it. */
+  pcbFree_h = pcbFree_h->p_next;
+  p_ret->p_next = NULL;
+  p_ret->p_prev = NULL;
+  p_ret->p_prnt = NULL;
+  p_ret->p_child = NULL;
+  p_ret->p_sib = NULL;
+
+  return p_ret;
+}
+
+/* Initialize the pcbFree list to contain (x) number of elements, where
+x is equal to the MAXPROC constant in const.h. This method should only be called
+once at initialization. */
+void initPcbs(){
+  static pcb_t pcbArr[MAXPROC];
+  int i = 0;
+  pcbFree_h = mkEmptyProcQ(); /* initializes pcbFree as a tail pointer to a null list. */
+  while(i < MAXPROC){
+    freePcb(&(pcbArr[i])); /* stores all the new pcbs addresses in the pcbFree_h list.*/
+    i++;
+  }
+}
+
 
 /***************************PROCESS TREE MAINTENENCE**********************************/
 
