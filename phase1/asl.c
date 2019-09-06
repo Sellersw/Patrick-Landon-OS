@@ -8,8 +8,8 @@ operations (mutators and accessors) on the data structure. */
 #include "../e/pcb.e"
 
 HIDDEN semd_PTR semdActive_h, semdFree_h;
-HIDDEN int maxInt = 0xFFFFFFFF;
-HIDDEN int minInt = 0x0;
+HIDDEN int *maxInt = 0xFFFFFFFF;
+HIDDEN int *minInt = 0x0;
 
 /*******************************HELPER FUNCTIONS**********************************/
 
@@ -50,38 +50,56 @@ semd_PTR findASemd(int *i){
 
 /***********************************MAIN FUNCTIONS*************************************/
 
+/* Insert the ProcBlk pointed to by p at the tail of the process queue
+associated with the semaphore whose physical address is semAdd and set the
+semaphore address of p to semAdd. If the semaphore is currently not active
+(i.e. there is no descriptor for it in the ASL), allocate a new descriptor
+from the semdFree list, insert it in the ASL (at the appropriate position),
+initialize all of the fields (i.e. set s semAdd to semAdd, and s procq to
+mkEmptyProcQ()), and proceed as above. If a new semaphore descriptor needs to be
+allocated and the semdFree list is empty, return TRUE. In all other cases return
+FALSE. */
 int insertBlocked(int *semAdd, pcb_PTR p){
-    semd_PTR s_current = semdActive_h;
-    semd_PTR s_insert;
-    while(semAdd > s_current->s_semAdd){
-      s_current = s_current->s_next;
-    }
-    if(semAdd == s_current->s_semAdd){
-      insertProcQ(&(s_current->s_procQ), p);
-      return FALSE;
+  semd_PTR s_current = semdActive_h;
+  semd_PTR s_insert;
+  while(semAdd > s_current->s_semAdd){
+    s_current = s_current->s_next;
+  }
+  if(semAdd == s_current->s_semAdd){
+    insertProcQ(&(s_current->s_procQ), p);
+    return FALSE;
+  }
+  else{
+    if(semdFree_h == NULL){
+      return TRUE;
     }
     else{
-      if(semdFree_h == NULL){
-        return TRUE;
-      }
-      else{
-        s_insert = allocSemd(semAdd);
-        s_insert->s_next = s_current->s_next;
-        s_current->s_next = s_insert;
-        insertProcQ(&(s_insert->s_procQ), p);
-        return FALSE;
-      }
+      s_insert = allocSemd(semAdd);
+      s_insert->s_next = s_current->s_next;
+      s_current->s_next = s_insert;
+      insertProcQ(&(s_insert->s_procQ), p);
+      return FALSE;
     }
+  }
 }
 
-
+/* Search the ASL for a descriptor of this semaphore. If none is found, return
+NULL; otherwise, remove the first (i.e. head) ProcBlk from the process queue of
+the found semaphore descriptor and return a pointer to it. If the process
+queue for this semaphore becomes empty (emptyProcQ(s procq) is TRUE), remove the
+semaphore descriptor from the ASL and return it to the semdFree list. */
 pcb_PTR removeBlocked(int *semAdd){
   semd_PTR s_current = semdActive_h;
+  pcb_PTR = p_return;
   while(semAdd > s_current->s_semAdd){
     s_current = s_current->s_next;
   }
   if(s_current->s_semAdd == semAdd){
-    return removeProcQ(&(s_current->s_procQ));
+    p_return = removeProcQ(&(s_current->s_procQ));
+    if(emptyProcQ(s_current->s_procQ)){
+      freeSemd(s_current);
+    }
+    return p_return;
   }
   else if(emptyProcQ(s_current->s_procQ)){
     freeSemd(s_current);
@@ -92,11 +110,18 @@ pcb_PTR removeBlocked(int *semAdd){
   }
 }
 
+/* Remove the ProcBlk pointed to by p from the process queue associated with p’s
+semaphore (p→ p semAdd) on the ASL. If ProcBlk pointed to by p does not appear
+in the process queue associated with p’s semaphore, which is an error condition,
+return NULL; otherwise, return p. */
 pcb_PTR outBlocked(pcb_PTR p){
   semd_PTR s_current = findASemd(p->p_semAdd);
   return outProcQ(&(s_current->s_procQ), p);
 }
 
+/* Return a pointer to the ProcBlk that is at the head of the process queue
+associated with the semaphore semAdd. Return NULL if semAdd is not found on the
+ASL or if the process queue associ- ated with semAdd is empty. */
 pcb_PTR headBlocked(int *semAdd){
   semd_PTR s_current = semdActive_h;
   while(semAdd > s_current->s_semAdd){
@@ -116,7 +141,7 @@ pcb_PTR headBlocked(int *semAdd){
 /* Initialize the semdFree list to contain all the elements of the array
 static semd_t semdTable[MAXPROC]. This method will be only called once
 during data structure initialization. */
-initASL(){
+void initASL(){
 
   /* first, initialize the free list, similar to pcbFree. */
     static semd_t semdArr[MAXPROC + 2];
@@ -127,6 +152,6 @@ initASL(){
     }
 
     /* next, allocate semephore descriptors as dummy nodes on the active list.*/
-    semdActive_h = allocSemd(&minInt);
-    semdActive_h->s_next = allocSemd(&maxInt);
+    semdActive_h = allocSemd(minInt);
+    semdActive_h->s_next = allocSemd(maxInt);
 }
