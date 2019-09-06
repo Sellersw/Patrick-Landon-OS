@@ -93,7 +93,7 @@ pcb_PTR removeBlocked(int *semAdd){
 }
 
 pcb_PTR outBlocked(pcb_PTR p){
-  semd_PTR s_current = findASemd(p->s_semAdd);
+  semd_PTR s_current = findASemd(p->p_semAdd);
   return outProcQ(&(s_current->s_procQ), p);
 }
 
