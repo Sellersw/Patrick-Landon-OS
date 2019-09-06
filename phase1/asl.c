@@ -57,7 +57,7 @@ int insertBlocked(int *semAdd, pcb_PTR p){
       s_current = s_current->s_next;
     }
     if(semAdd == s_current->s_semAdd){
-      insertProcQ(s_current->s_procQ, p);
+      insertProcQ(&(s_current->s_procQ), p);
       return FALSE;
     }
     else{
@@ -68,7 +68,7 @@ int insertBlocked(int *semAdd, pcb_PTR p){
         s_insert = allocSemd(semAdd);
         s_insert->s_next = s_current->s_next;
         s_current->s_next = s_insert;
-        insertProcQ(s_insert->s_procQ, p);
+        insertProcQ(&(s_insert->s_procQ), p);
         return FALSE;
       }
     }
@@ -93,7 +93,8 @@ pcb_PTR removeBlocked(int *semAdd){
 }
 
 pcb_PTR outBlocked(pcb_PTR p){
-  return outProcQ(&(p->p_semAdd->s_procQ), p);
+  semd_PTR s_current = findASemd(p->s_semAdd);
+  return outProcQ(&(s_current->s_procQ), p);
 }
 
 pcb_PTR headBlocked(int *semAdd){
