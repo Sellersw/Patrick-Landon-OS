@@ -25,6 +25,8 @@ void freePcb(pcb_PTR p){
 from the pcbFree list, initialize values for the pcb's fields (NULL) and
 return a pointer to the removed element. */
 pcb_PTR allocPcb(){
+  pcb_PTR p_ret = pcbFree_h;
+  
   /* If pcbFree list is empty, return NULL. */
   if(pcbFree_h == NULL){
     return NULL;
@@ -32,9 +34,7 @@ pcb_PTR allocPcb(){
 
   /* Grab first process in list, edit pcbFree_h to point at second process, and
   reinitialize first process to have NULL fields before returning it. */
-  pcb_PTR p_ret = pcbFree_h;
   pcbFree_h = pcbFree_h->p_next;
-
   p_ret->p_next = NULL;
   p_ret->p_prev = NULL;
   p_ret->p_prnt = NULL;
@@ -47,13 +47,14 @@ pcb_PTR allocPcb(){
 /* Initialize the pcbFree list to contain (x) number of elements, where
 x is equal to the MAXPROC constant in const.h. This method should only be called
 once at initialization. */
-initPcbs(){
+void initPcbs(){
   static pcb_t pcbArr[MAXPROC];
   int i = 0;
   while(i < MAXPROC){
     freePcb(&(pcbArr[i])); /* stores all the new pcbs addresses in the pcbFree_h list.*/
     i++;
   }
+}
 
 /****************************PCB QUEUE MAINTENANCE********************************/
 
@@ -75,7 +76,7 @@ int emptyProcQ(pcb_PTR tp){
 
 /* Inserts the process control block pointed to by "p" into the PCB queue whose tail-
 pointer is pointed to by "tp". */
-insertProcQ(pcb_PTR *tp, pcbPTR p){
+void insertProcQ(pcb_PTR *tp, pcb_PTR p){
   p->p_next = (*tp)->p_next; /* sets p's next equal to queue's head address. */
   (*tp)->p_next = p;         /* sets tail pcb's next equal to p's address */
   p->p_prev = *tp;           /* sets p's prev equal to tail pcb's address */
@@ -113,7 +114,7 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
     return NULL;
   }
   else{
-    if((*tp)->next != NULL){
+    if((*tp)->p_next != NULL){
       pcb_PTR current = *tp;
       while(current != p){
         current = current->p_next;
@@ -163,9 +164,9 @@ int emptyChild(pcb_PTR p){
 
 /* Place the pcb pointed to by p on the null terminated list of children of the pcb
 pointed to by prnt by pointing parent's p_child to p and linking pcb p with its siblings */
-insertChild(pcb_PTR prnt, pcb_PTR p){
+int insertChild(pcb_PTR prnt, pcb_PTR p){
   if(prnt == NULL){             /* (CASE 1): if parent is empty, we have an error. */
-    return(NULL);
+    return(0);
   }
   else {
     if(prnt->p_child != NULL){  /* (CASE 2): parent has a null terminated list of children. */
@@ -178,6 +179,7 @@ insertChild(pcb_PTR prnt, pcb_PTR p){
       p->p_prnt = prnt;
     }
   }
+  return(0);
 }
 
 pcb_PTR removeChild(pcb_PTR p){
@@ -187,7 +189,7 @@ pcb_PTR removeChild(pcb_PTR p){
   else{
     pcb_PTR child = p->p_child;
     if(child->p_sib != NULL){
-      p->child = child->p_sib;
+      p->p_child = child->p_sib;
     }
     else{
       p->p_child = NULL;
