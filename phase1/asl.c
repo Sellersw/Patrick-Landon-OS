@@ -52,22 +52,64 @@ semd_PTR findASemd(int *i){
 
 int insertBlocked(int *semAdd, pcb_PTR p){
     semd_PTR s_current = semdActive_h;
-    while(semAdd > s_current->s_semAdd){
-        
+    semd_PTR s_insert;
+    while(semAdd < s_current->s_semAdd){
+      s_current = s_current->s_next;
+    }
+    if(semAdd == s_current->s_semAdd){
+      insertProcQ(s_current->s_procQ, p);
+      return FALSE;
+    }
+    else{
+      if(semdFree_h == NULL){
+        return TRUE;
+      }
+      else{
+        s_insert = allocSemd(semAdd);
+        s_insert->s_next = s_current->s_next;
+        s_current->s_next = s_insert;
+        insertProcQ(s_insert->s_procQ, p);
+        return FALSE;
+      }
     }
 }
 
 
 pcb_PTR removeBlocked(int *semAdd){
-
+  semd_PTR s_current = semdActive_h;
+  while(semAdd < s_current->s_semAdd){
+    s_current = s_current->s_next;
+  }
+  if(s_current->s_semAdd == semAdd){
+    return removeProcQ(&(s_current->s_procQ));
+  }
+  else if(emptyProcQ(s_current->s_procQ)){
+    freeSemd(s_current);
+    return NULL;
+  }
+  else{
+    return NULL;
+  }
 }
 
 pcb_PTR outBlocked(pcb_PTR p){
-
+  return outProcQ(&(p->p_semAdd->s_procQ), p);
 }
 
 pcb_PTR headBlocked(int *semAdd){
-
+  semd_PTR s_current = semdActive_h;
+  while(semAdd < s_current->s_semAdd){
+    s_current = s_current->s_next;
+  }
+  if(semAdd == s_current->s_semAdd){
+    if(emptyProcQ(s_current->s_procQ)){
+      return NULL;
+    }
+    return s_current->s_procQ->p_next;
+  }
+  else{
+    return NULL;
+  }
 }
 
 /* Initialize the semdFree list to contain all the elements of the array
