@@ -68,7 +68,7 @@ associated with the semaphore whose physical address is semAdd and set the
 semaphore address of p to semAdd. If the semaphore is currently not active
 (i.e. there is no descriptor for it in the ASL), allocate a new descriptor
 from the semdFree list, insert it in the ASL (at the appropriate position),
-initialize all of the fields (i.e. set s semAdd to semAdd, and s procq to
+initialize all of the fields (i.e. set s_semAdd to semAdd, and s procq to
 mkEmptyProcQ()), and proceed as above. If a new semaphore descriptor needs to be
 allocated and the semdFree list is empty, return TRUE. In all other cases return
 FALSE. */
@@ -109,16 +109,18 @@ pcb_PTR removeBlocked(int *semAdd){
   while(semAdd > s_current->s_semAdd){
     s_current = s_current->s_next;
   }
-  if(s_current->s_semAdd == semAdd){
-    p_return = removeProcQ(&(s_current->s_procQ));
+  else if(s_current->s_semAdd == semAdd){
     if(emptyProcQ(s_current->s_procQ)){
       freeSemd(s_current);
+      return NULL;
     }
-    return p_return;
-  }
-  else if(emptyProcQ(s_current->s_procQ)){
-    freeSemd(s_current);
-    return NULL;
+    else{
+      p_return = removeProcQ(&(s_current->s_procQ));
+      if(emptyProcQ(s_current->s_procQ)){
+        freeSemd(s_current);
+      }
+      return p_return;
+    }
   }
   else{
     return NULL;
