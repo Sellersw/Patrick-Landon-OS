@@ -57,6 +57,9 @@ pcb_PTR removeProcQ(pcb_PTR *tp){
     debugB(10);
     head = *tp;
     *tp = NULL;
+    head->p_next = NULL;
+    head->p_prev = NULL;
+    head->p_semAdd = NULL;
     return head;
   }
   else{
@@ -64,6 +67,9 @@ pcb_PTR removeProcQ(pcb_PTR *tp){
     head = (*tp)->p_next;
     (*tp)->p_next = (*tp)->p_next->p_next;
     (*tp)->p_next->p_prev = *tp;
+    head->p_next = NULL;
+    head->p_prev = NULL;
+    head->p_semAdd = NULL;
     return head;
   }
 }
@@ -86,7 +92,9 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
       }
       current->p_next->p_prev = current->p_prev;
       current->p_prev->p_next = current->p_next;
-
+      current->p_next = NULL;
+      current->p_prev = NULL;
+      current->p_semAdd = NULL;
       return current;
     }
     else if(*tp == p){
