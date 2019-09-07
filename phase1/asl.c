@@ -18,23 +18,36 @@ by the global semdFree_h. */
 void freeSemd(semd_PTR s){
     if(semdFree_h == NULL){
       semdFree_h = s;     /* if the semdFree pointer is empty, have it point to the node */
-    } else {
-        s->s_next = semdFree_h; /* if the list is not empty, s's next is head of semdFree */
-        semdFree_h = s;         /* and semdFree points to s */
+      s->s_next = NULL;
+    }
+    else{
+      s->s_next = semdFree_h; /* if the list is not empty, s's next is head of semdFree */
+      semdFree_h = s;         /* and semdFree points to s */
     }
 }
 
 /* Allocates (activates) a semephore by removing it from the free list, intitializing
 it's semAdd as a given int "i", and returning a pointer to it */
 semd_PTR allocSemd(int *i){
-    semd_PTR s_ret = semdFree_h;
-    semdFree_h = semdFree_h->s_next;
-
-    s_ret->s_next = NULL;
-    s_ret->s_procQ = NULL;
-    s_ret->s_semAdd = i;
-
+  semd_PTR s_ret = semdFree_h;
+  if(semdFree_h == NULL){
+    return NULL;
+  }
+  else{
+    if(semdFree_h->s_next == NULL){
+      s_ret->s_next = NULL;
+      s_ret->s_procQ = mkEmptyProcQ();
+      s_ret->s_semAdd = i;
+      semdFree_h = NULL;
+    }
+    else{
+      semdFree_h = semdFree_h->s_next;
+      s_ret->s_next = NULL;
+      s_ret->s_procQ = mkEmptyProcQ();
+      s_ret->s_semAdd = i;
+    }
     return s_ret;
+  }
 }
 
 /* Given a semephore address, find that active semephore on the list. Regardless of
@@ -62,6 +75,7 @@ FALSE. */
 int insertBlocked(int *semAdd, pcb_PTR p){
   semd_PTR s_current = semdActive_h;
   semd_PTR s_insert;
+  p->p_semAdd = semAdd;
   while(semAdd > s_current->s_semAdd){
     s_current = s_current->s_next;
   }
@@ -77,6 +91,7 @@ int insertBlocked(int *semAdd, pcb_PTR p){
       s_insert = allocSemd(semAdd);
       s_insert->s_next = s_current->s_next;
       s_current->s_next = s_insert;
+      s_insert->s_procQ = mkEmptyProcQ();
       insertProcQ(&(s_insert->s_procQ), p);
       return FALSE;
     }
@@ -90,7 +105,7 @@ queue for this semaphore becomes empty (emptyProcQ(s procq) is TRUE), remove the
 semaphore descriptor from the ASL and return it to the semdFree list. */
 pcb_PTR removeBlocked(int *semAdd){
   semd_PTR s_current = semdActive_h;
-  pcb_PTR = p_return;
+  pcb_PTR p_return;
   while(semAdd > s_current->s_semAdd){
     s_current = s_current->s_next;
   }
