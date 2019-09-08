@@ -6,10 +6,7 @@ the Process Control Block struct. */
 
 HIDDEN pcb_PTR pcbFree_h;
 
-void debugB(int a){
-  int i;
-  i = 0;
-}
+
 
 /****************************PCB QUEUE MAINTENANCE********************************/
 
@@ -19,11 +16,13 @@ pcb_PTR mkEmptyProcQ(){
   return(NULL); /* returns a place in memory that is a pointer to a empty pcb.*/
 }
 
+
 /* A query method that checks whether a given queue is empty. Returns TRUE if the
 pcb_t pointed to by the tail pointer (*tp) is empty. Returns FALSE otherwise. */
 int emptyProcQ(pcb_PTR tp){
   return (tp == NULL);
 }
+
 
 /* Inserts the process control block pointed to by "p" into the PCB queue whose tail-
 pointer is pointed to by "tp". */
@@ -42,6 +41,7 @@ void insertProcQ(pcb_PTR *tp, pcb_PTR p){
       *tp = p;                   /* sets tail pointer equal to p's address */
     }
 }
+
 
 /* Removes the head element from the PCB queue whose tail pointer is pointed to by (tp).
 Returns NULL if the process queue passed in was already empty, but otherwise returns a
@@ -73,6 +73,7 @@ pcb_PTR removeProcQ(pcb_PTR *tp){
     return head;
   }
 }
+
 
 /* Removes an element pointed to by "p". This pcb can be located anywhere in the queue.
 Updates the tail pointer of the queue if necessary. Returns NULL if the given address
@@ -106,6 +107,7 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
   }
 }
 
+
 /* Returns a pointer of the head element of a given pcb queue, but does not remove it
 from the list. */
 pcb_PTR headProcQ(pcb_PTR tp){
@@ -120,7 +122,10 @@ pcb_PTR headProcQ(pcb_PTR tp){
   }
 }
 
+
+
 /******************************ALLOC/DEALLOC PBCS*********************************/
+
 
 /* Inserts the element pointed to by "p" onto the pcbFree list */
 void freePcb(pcb_PTR p){
@@ -135,6 +140,7 @@ void freePcb(pcb_PTR p){
     pcbFree_h = p;
   }
 }
+
 
 /* If pcbFree list is empty, return NULL. Otherwise, remove an element
 from the pcbFree list, initialize values for the pcb's fields (NULL) and
@@ -158,6 +164,7 @@ pcb_PTR allocPcb(){
   return p_ret;
 }
 
+
 /* Initialize the pcbFree list to contain (x) number of elements, where
 x is equal to the MAXPROC constant in const.h. This method should only be called
 once at initialization. */
@@ -172,7 +179,9 @@ void initPcbs(){
 }
 
 
+
 /***************************PROCESS TREE MAINTENENCE**********************************/
+
 
 /* Returns TRUE (1) if pcb has no children. Returns FALSE (0) otherwise. */
 int emptyChild(pcb_PTR p){
@@ -183,6 +192,7 @@ int emptyChild(pcb_PTR p){
     return(FALSE);
   }
 }
+
 
 /* Place the pcb pointed to by p on the null terminated list of children of the pcb
 pointed to by prnt by pointing parent's p_child to p and linking pcb p with its siblings */
@@ -204,6 +214,7 @@ int insertChild(pcb_PTR prnt, pcb_PTR p){
   return(0);
 }
 
+
 pcb_PTR removeChild(pcb_PTR p){
   if(p->p_child == NULL){
     return NULL;
@@ -219,6 +230,7 @@ pcb_PTR removeChild(pcb_PTR p){
     return child;
   }
 }
+
 
 pcb_PTR outChild(pcb_PTR p){
   if(p->p_prnt == NULL){
