@@ -1,7 +1,11 @@
 /* This module organizes process queues with structures called semephores
 which are kept in sorted order according to their semephore address. This
 module has methods to initialize the active semephore list as well as perform
-operations (mutators and accessors) on the data structure. */
+operations (mutators and accessors) on the data structure.
+
+AUTHORS: Patrick Sellers and Landon Clark
+
+*/
 
 #include "../h/types.h"
 #include "../h/const.h"
@@ -29,6 +33,7 @@ void freeSemd(semd_PTR s){
     }
 }
 
+
 /* Allocates (activates) a semephore by removing it from the free list, intitializing
 it's semAdd as a given int "i", and returning a pointer to it */
 semd_PTR allocSemd(int *i){
@@ -47,6 +52,7 @@ semd_PTR allocSemd(int *i){
       return s_ret;
   }
 }
+
 
 /* Given a semephore address, find that active semephore on the list. Regardless of
 whether the address is on the list, it will always return the parent of the semephore
@@ -71,7 +77,7 @@ associated with the semaphore whose physical address is semAdd and set the
 semaphore address of p to semAdd. If the semaphore is currently not active
 (i.e. there is no descriptor for it in the ASL), allocate a new descriptor
 from the semdFree list, insert it in the ASL (at the appropriate position),
-initialize all of the fields (i.e. set s_semAdd to semAdd, and s procq to
+initialize all of the fields (i.e. set s_semAdd to semAdd, and s_procq to
 mkEmptyProcQ()), and proceed as above. If a new semaphore descriptor needs to be
 allocated and the semdFree list is empty, return TRUE. In all other cases return
 FALSE. */
@@ -114,7 +120,7 @@ int insertBlocked(int *semAdd, pcb_PTR p){
 /* Search the ASL for a descriptor of this semaphore. If none is found, return
 NULL; otherwise, remove the first (i.e. head) ProcBlk from the process queue of
 the found semaphore descriptor and return a pointer to it. If the process
-queue for this semaphore becomes empty (emptyProcQ(s procq) is TRUE), remove the
+queue for this semaphore becomes empty (emptyProcQ(s_procq) is TRUE), remove the
 semaphore descriptor from the ASL and return it to the semdFree list. */
 pcb_PTR removeBlocked(int *semAdd){
   /* Find the semaphore pointed to by semAdd and the semaphore previous to that */
@@ -149,7 +155,7 @@ pcb_PTR removeBlocked(int *semAdd){
 
 
 /* Remove the ProcBlk pointed to by p from the process queue associated with p’s
-semaphore (p→ p semAdd) on the ASL. If ProcBlk pointed to by p does not appear
+semaphore (p→ p_semAdd) on the ASL. If ProcBlk pointed to by p does not appear
 in the process queue associated with p’s semaphore, which is an error condition,
 return NULL; otherwise, return p. */
 pcb_PTR outBlocked(pcb_PTR p){
@@ -175,7 +181,7 @@ pcb_PTR outBlocked(pcb_PTR p){
 
 /* Return a pointer to the ProcBlk that is at the head of the process queue
 associated with the semaphore semAdd. Return NULL if semAdd is not found on the
-ASL or if the process queue associ- ated with semAdd is empty. */
+ASL or if the process queue associated with semAdd is empty. */
 pcb_PTR headBlocked(int *semAdd){
   /* Find the semaphore pointed to by semAdd */
   semd_PTR s_current = findASemd(semAdd);

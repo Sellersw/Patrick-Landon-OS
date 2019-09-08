@@ -1,5 +1,9 @@
 /* This is currently a dummy file for methods relating to the manipulation of
-the Process Control Block struct. */
+the Process Control Block struct.
+
+AUTHORS: Patrick Sellers and Landon Clark
+
+*/
 
 #include "../h/types.h"
 #include "../h/const.h"
@@ -27,7 +31,6 @@ int emptyProcQ(pcb_PTR tp){
 /* Inserts the process control block pointed to by "p" into the PCB queue whose tail-
 pointer is pointed to by "tp". */
 void insertProcQ(pcb_PTR *tp, pcb_PTR p){
-  debugB(1);
   if(emptyProcQ(*tp)){
       p->p_next = p;
       p->p_prev = p;
@@ -49,12 +52,15 @@ pointer to the process control block that was removed from the queue. It also up
 the tail pointer if necessary. */
 pcb_PTR removeProcQ(pcb_PTR *tp){
   pcb_PTR head;
+  /* If the procQ at tp is empty, return NULL */
   if(emptyProcQ(*tp)){
-    debugB(5);
     return NULL;
   }
+
+  /* If tp points back to itself, it is the only process in the procQ, so we
+  set the tp (and therefore procQ) to NULL, set the process' pointers to NULL,
+  then returns it */
   else if((*tp)->p_next == *tp){
-    debugB(10);
     head = *tp;
     *tp = NULL;
     head->p_next = NULL;
@@ -62,8 +68,10 @@ pcb_PTR removeProcQ(pcb_PTR *tp){
     head->p_semAdd = NULL;
     return head;
   }
+
+  /* Grab the head from the procQ, adjust tp's pointers to remove the head from
+  the procQ, set the head's pointers to NULL and return the head */
   else{
-    debugB(15);
     head = (*tp)->p_next;
     (*tp)->p_next = (*tp)->p_next->p_next;
     (*tp)->p_next->p_prev = *tp;
@@ -79,18 +87,26 @@ pcb_PTR removeProcQ(pcb_PTR *tp){
 Updates the tail pointer of the queue if necessary. Returns NULL if the given address
 cannot be matched in the provided queue, and otherwise returns "p". */
 pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
+  /* If the procQ at tp is empty, return NULL */
   if(emptyProcQ(*tp)){
     return NULL;
   }
   else{
+    /* If there are more than one processes in the procQ, search through the
+    procQ for p */
     if((*tp)->p_next != NULL){
       pcb_PTR current = *tp;
       while(current != p){
         current = current->p_next;
+        /* if we loop all the way back to tp, p in not in the procQ so return
+        NULL */
         if(current == *tp){
           return NULL;
         }
       }
+
+      /* Once p has been found, remove it from the procQ, set its fields to
+      NULL and return it */
       current->p_next->p_prev = current->p_prev;
       current->p_prev->p_next = current->p_next;
       current->p_next = NULL;
@@ -98,9 +114,14 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
       current->p_semAdd = NULL;
       return current;
     }
+
+    /* if the tail pointer is the only process in the procQ and it is also p,
+    remove it from the procQ and return it */
     else if(*tp == p){
       return removeProcQ(tp);
     }
+
+    /* If procQ is NULL, return NULL */
     else{
       return NULL;
     }
@@ -186,10 +207,10 @@ void initPcbs(){
 /* Returns TRUE (1) if pcb has no children. Returns FALSE (0) otherwise. */
 int emptyChild(pcb_PTR p){
   if(p->p_child == NULL){
-    return(TRUE);
+    return TRUE;
   }
   else{
-    return(FALSE);
+    return FALSE;
   }
 }
 
@@ -197,33 +218,43 @@ int emptyChild(pcb_PTR p){
 /* Place the pcb pointed to by p on the null terminated list of children of the pcb
 pointed to by prnt by pointing parent's p_child to p and linking pcb p with its siblings */
 int insertChild(pcb_PTR prnt, pcb_PTR p){
-  if(prnt == NULL){             /* (CASE 1): if parent is empty, we have an error. */
-    return(0);
+  /* (CASE 1): if parent is empty, we have an error. */
+  if(prnt == NULL){
+    return 0;
   }
-  else {
-    if(prnt->p_child != NULL){  /* (CASE 2): parent has a null terminated list of children. */
+  else{
+    /* (CASE 2): parent has a null terminated list of children. */
+    if(prnt->p_child != NULL){
       p->p_sib = prnt->p_child;   /* set p's sibling equal to first element on parent list. */
       prnt->p_child = p;          /* set parent's first child equal to p's address. */
       p->p_prnt = prnt;
     }
-    else{                  /* (CASE 3): parent does not yet have children. */
-      prnt->p_child = p;     /* set parent's first child equal to p's address. */
+    /* (CASE 3): parent does not yet have children. */
+    else{
+      prnt->p_child = p;          /* set parent's first child equal to p's address. */
       p->p_prnt = prnt;
     }
   }
-  return(0);
+  return 0;
 }
 
 
+/* Make the first child of the ProcBlk pointed to by p no longer a child of p.
+Return NULL if initially there were no children of p. Otherwise, return a
+pointer to this removed first child ProcBlk. */
 pcb_PTR removeChild(pcb_PTR p){
+  pcb_PTR child;
+  /* If p has no children, return NULL. */
   if(p->p_child == NULL){
     return NULL;
   }
   else{
-    pcb_PTR child = p->p_child;
+    child = p->p_child;
+    /* If p's child has a sibling, set p's child to the previous child's sibling */
     if(child->p_sib != NULL){
       p->p_child = child->p_sib;
     }
+    /* If there are no siblings, set p's child to NULL */
     else{
       p->p_child = NULL;
     }
@@ -232,18 +263,26 @@ pcb_PTR removeChild(pcb_PTR p){
 }
 
 
+/* Make the ProcBlk pointed to by p no longer the child of its parent. If the
+ProcBlk pointed to by p has no parent, return NULL; otherwise, return p. Note
+that the element pointed to by p need not be the first child of its parent. */
 pcb_PTR outChild(pcb_PTR p){
+  pcb_PTR prnt, current;
+  /* If p has no parent, return NULL. */
   if(p->p_prnt == NULL){
     return NULL;
   }
   else{
-    pcb_PTR prnt = p->p_prnt;
+    prnt = p->p_prnt;
+    /* if p is its parent's first child, remove and return it */
     if(prnt->p_child == p){
       prnt->p_child = p->p_sib;
       return p;
     }
     else{
-      pcb_PTR current = prnt->p_child;
+      /* Search through all of prnt's children, find p and remove it from the
+      list of siblings before returning it */
+      current = prnt->p_child;
       while(current->p_sib != p){
         current = current->p_sib;
       }
