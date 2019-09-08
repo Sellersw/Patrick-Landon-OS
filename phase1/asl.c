@@ -97,7 +97,7 @@ the found semaphore descriptor and return a pointer to it. If the process
 queue for this semaphore becomes empty (emptyProcQ(s procq) is TRUE), remove the
 semaphore descriptor from the ASL and return it to the semdFree list. */
 pcb_PTR removeBlocked(int *semAdd){
-  semd_PTR s_prev = findASemd(semdAdd);
+  semd_PTR s_prev = findASemd(semAdd);
   semd_PTR s_current = s_prev->s_next;
   pcb_PTR p_return;
   if(s_current->s_semAdd == semAdd){
