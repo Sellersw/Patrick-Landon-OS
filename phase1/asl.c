@@ -11,10 +11,7 @@ HIDDEN semd_PTR semdActive_h, semdFree_h;
 HIDDEN int *maxInt = 0xFFFFFFFF;
 HIDDEN int *minInt = 0x0;
 
-void debugR(int *a){
-  int i;
-  i = 0;
-}  
+
 /*******************************HELPER FUNCTIONS**********************************/
 
 /* Inserts a semephore pointed to by s onto the free list of semephores pointed to
@@ -59,6 +56,7 @@ semd_PTR findASemd(int *i){
 
 /***********************************MAIN FUNCTIONS*************************************/
 
+
 /* Insert the ProcBlk pointed to by p at the tail of the process queue
 associated with the semaphore whose physical address is semAdd and set the
 semaphore address of p to semAdd. If the semaphore is currently not active
@@ -69,12 +67,9 @@ mkEmptyProcQ()), and proceed as above. If a new semaphore descriptor needs to be
 allocated and the semdFree list is empty, return TRUE. In all other cases return
 FALSE. */
 int insertBlocked(int *semAdd, pcb_PTR p){
-  semd_PTR s_current = semdActive_h;
-  semd_PTR s_insert, s_prev;
-  while(semAdd > s_current->s_semAdd){
-    s_prev = s_current;
-    s_current = s_current->s_next;
-  }
+  semd_PTR s_prev = findASemd(semAdd);
+  semd_PTR s_current = s_prev->s_next;
+  semd_PTR s_insert;
   if(semAdd == s_current->s_semAdd){
     p->p_semAdd = semAdd;
     insertProcQ(&(s_current->s_procQ), p);
@@ -102,13 +97,9 @@ the found semaphore descriptor and return a pointer to it. If the process
 queue for this semaphore becomes empty (emptyProcQ(s procq) is TRUE), remove the
 semaphore descriptor from the ASL and return it to the semdFree list. */
 pcb_PTR removeBlocked(int *semAdd){
-  semd_PTR s_current = semdActive_h;
-  semd_PTR s_prev;
+  semd_PTR s_prev = findASemd(semdAdd);
+  semd_PTR s_current = s_prev->s_next;
   pcb_PTR p_return;
-  while(semAdd > s_current->s_semAdd){
-    s_prev = s_current;
-    s_current = s_current->s_next;
-  }
   if(s_current->s_semAdd == semAdd){
     if(emptyProcQ(s_current->s_procQ)){
       s_prev->s_next = s_current->s_next;
@@ -150,10 +141,8 @@ pcb_PTR outBlocked(pcb_PTR p){
 associated with the semaphore semAdd. Return NULL if semAdd is not found on the
 ASL or if the process queue associ- ated with semAdd is empty. */
 pcb_PTR headBlocked(int *semAdd){
-  semd_PTR s_current = semdActive_h;
-  while(semAdd > s_current->s_semAdd){
-    s_current = s_current->s_next;
-  }
+  semd_PTR s_current = findASemd(semAdd);
+  s_current = s_current->s_next;
   if(semAdd == s_current->s_semAdd){
     if(emptyProcQ(s_current->s_procQ)){
       return NULL;
@@ -172,7 +161,7 @@ void initASL(){
   /* first, initialize the free list, similar to pcbFree. */
     static semd_t semdArr[MAXPROC + 2];
     int i = 0;
-    semdFree_h = NULL;    
+    semdFree_h = NULL;
     while(i < MAXPROC + 2){
          freeSemd(&(semdArr[i]));
          i++;
