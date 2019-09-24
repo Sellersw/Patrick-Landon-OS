@@ -1,6 +1,8 @@
 /*
+Main entry point of the Kaya operating system. Properly initializes processes
+before passing control to the scheduler.
 
-
+^Not sure what else to put here.
 
 */
 
