@@ -1,10 +1,10 @@
 #ifndef CONSTS
 #define CONSTS
 
-/**************************************************************************** 
+/****************************************************************************
  *
  * This header file contains utility constants & macro definitions.
- * 
+ *
  ****************************************************************************/
 
 /* Hardware & software constants */
@@ -16,10 +16,20 @@
 #define ROMPAGESTART	0x20000000	 /* ROM Reserved Page */
 
 
+#define SYSCALLNEW 0x200003D4
+#define SYSCALLOLD 0x20000348
+#define PTRAPNEW 0x200002BC
+#define PTRAPOLD 0x20000230
+#define TLBMGMTNEW 0x200001A4
+#define TLBMGMTOLD 0x20000118
+#define INTERNEW 0x2000008C
+#define INTEROLD 0x20000000
+
+
 /* timer, timescale, TOD-LO and other bus regs */
 #define RAMBASEADDR	0x10000000
 #define TODLOADDR	0x1000001C
-#define INTERVALTMR	0x10000020	
+#define INTERVALTMR	0x10000020
 #define TIMESCALEADDR	0x10000024
 
 
@@ -84,7 +94,7 @@
 
 /* Useful operations */
 #define STCK(T) ((T) = ((* ((cpu_t *) TODLOADDR)) / (* ((cpu_t *) TIMESCALEADDR))))
-#define LDIT(T)	((* ((cpu_t *) INTERVALTMR)) = (T) * (* ((cpu_t *) TIMESCALEADDR))) 
+#define LDIT(T)	((* ((cpu_t *) INTERVALTMR)) = (T) * (* ((cpu_t *) TIMESCALEADDR)))
 
 
 #endif

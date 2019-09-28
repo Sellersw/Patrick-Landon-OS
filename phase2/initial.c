@@ -11,6 +11,11 @@ before passing control to the scheduler.
 #include "../e/pcb.e"
 #include "../e/asl.e"
 
+static int procCnt;
+static int sftBlkCnt;
+static pcb_PTR readyQue;
+static pcb_PTR currProc;
+
 void main(){
 
   /* HERE WE NEED TO POPULATE ROM RESERVED FRAMES. NOT CERTAIN HOW TO ACCOMPLISH THAT YET. */
@@ -23,16 +28,16 @@ void main(){
   initASL();
 
   /* Initialize nucleus-maintained vars */
-  static int procCnt = 0;
-  static int sftBlkCnt = 0;
-  static pcb_PTR readyQue = MkEmptyProcQ;
-  static pcb_PTR currProc = NULL;
+  procCnt = 0;
+  sftBlkCnt = 0;
+  readyQue = MkEmptyProcQ;
+  pcb_PTR currProc = NULL;
           /* NOTE: THESE MIGHT NEED TO BE INITIALIZED IN THE HEADER TO BE MADE GLOBAL, AND
           SET IN THE MAIN METHOD. IF NOT, THEY MIGHT FALL OUT OF SCOPE ONCE WE CALL SCHEDULER.
           CURRENTLY UNCLEAR, SO IM LEAVING IT THIS WAY.
 
   /* INIT NUCLEUS-MAINTAINED SEMEPHORES */
-  
+
 
 
 
