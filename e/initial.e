@@ -13,7 +13,7 @@
 extern int procCnt;
 extern int sftBlkCnt;
 extern pcb_PTR readyQue;
-extern pcb_PTR currProc;
+extern pcb_PTR runningProc;
 
 extern semd_PTR semArray;
 

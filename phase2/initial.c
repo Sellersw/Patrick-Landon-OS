@@ -14,7 +14,7 @@ before passing control to the scheduler.
 static int procCnt;
 static int sftBlkCnt;
 static pcb_PTR readyQue;
-static pcb_PTR currProc;
+static pcb_PTR runningProc;
 
 static semd_PTR semArray[DEVICECNT];
 
@@ -53,7 +53,7 @@ void main(){
   procCnt = 0;
   sftBlkCnt = 0;
   readyQue = MkEmptyProcQ;
-  pcb_PTR currProc = NULL;
+  pcb_PTR runningProc = NULL;
 
 
   /* INIT NUCLEUS-MAINTAINED SEMEPHORES */
