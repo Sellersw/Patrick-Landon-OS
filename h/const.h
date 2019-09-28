@@ -15,15 +15,25 @@
 
 #define ROMPAGESTART	0x20000000	 /* ROM Reserved Page */
 
-
 #define SYSCALLNEW 0x200003D4
 #define SYSCALLOLD 0x20000348
-#define PTRAPNEW 0x200002BC
-#define PTRAPOLD 0x20000230
+#define PROGTRAPNEW 0x200002BC
+#define PROGTRAPOLD 0x20000230
 #define TLBMGMTNEW 0x200001A4
 #define TLBMGMTOLD 0x20000118
 #define INTERNEW 0x2000008C
 #define INTEROLD 0x20000000
+
+
+#define ALLOFF 0x00000000
+#define VMON 0x00010000
+#define VMOFF 0x
+#define KERNELON 0x
+#define KERNELOFF 0x
+#define INTERUNMASKED 0x
+#define INTERMASKED 0x
+#define PROCTIMEON 0x
+#define PROCTIMEOFF 0x
 
 
 /* timer, timescale, TOD-LO and other bus regs */
@@ -44,6 +54,7 @@
 
 #define NULL ((void *)0xFFFFFFFF)
 
+#define DEVICECNT 49
 
 /* vectors number and type */
 #define VECTSNUM	4
