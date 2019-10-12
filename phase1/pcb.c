@@ -63,10 +63,6 @@ pcb_PTR removeProcQ(pcb_PTR *tp){
   else if((*tp)->p_next == *tp){
     head = *tp;
     *tp = NULL;
-    head->p_next = NULL;
-    head->p_prev = NULL;
-    head->p_semAdd = NULL;
-    return head;
   }
 
   /* Grab the head from the procQ, adjust tp's pointers to remove the head from
@@ -75,11 +71,12 @@ pcb_PTR removeProcQ(pcb_PTR *tp){
     head = (*tp)->p_next;
     (*tp)->p_next = (*tp)->p_next->p_next;
     (*tp)->p_next->p_prev = *tp;
-    head->p_next = NULL;
-    head->p_prev = NULL;
-    head->p_semAdd = NULL;
-    return head;
   }
+
+  head->p_next = NULL;
+  head->p_prev = NULL;
+  head->p_semAdd = NULL;
+  return head;
 }
 
 
@@ -87,44 +84,45 @@ pcb_PTR removeProcQ(pcb_PTR *tp){
 Updates the tail pointer of the queue if necessary. Returns NULL if the given address
 cannot be matched in the provided queue, and otherwise returns "p". */
 pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
+  pcb_PTR current;
+
   /* If the procQ at tp is empty, return NULL */
   if(emptyProcQ(*tp)){
     return NULL;
   }
-  else{
-    /* If there are more than one processes in the procQ, search through the
-    procQ for p */
-    if((*tp)->p_next != NULL){
-      pcb_PTR current = *tp;
-      while(current != p){
-        current = current->p_next;
-        /* if we loop all the way back to tp, p in not in the procQ so return
-        NULL */
-        if(current == *tp){
-          return NULL;
-        }
-      }
 
-      /* Once p has been found, remove it from the procQ, set its fields to
-      NULL and return it */
-      current->p_next->p_prev = current->p_prev;
-      current->p_prev->p_next = current->p_next;
-      current->p_next = NULL;
-      current->p_prev = NULL;
-      current->p_semAdd = NULL;
-      return current;
-    }
+  /* if the tail pointer is the only process in the procQ and it is also p,
+  remove it from the procQ and return it */
+  else if(*tp == p){
+    return removeProcQ(tp);
+  }
 
-    /* if the tail pointer is the only process in the procQ and it is also p,
-    remove it from the procQ and return it */
-    else if(*tp == p){
-      return removeProcQ(tp);
-    }
-
-    /* If procQ is NULL, return NULL */
-    else{
+  /* If there are more than one processes in the procQ, search through the
+  procQ for p */
+  current = *tp;
+  while(current != p){
+    current = current->p_next;
+    /* if we loop all the way back to tp, p in not in the procQ so return
+    NULL */
+    if(current == *tp){
       return NULL;
     }
+
+  /* Once p has been found, remove it from the procQ, set its fields to
+  NULL and return it */
+  current->p_next->p_prev = current->p_prev;
+  current->p_prev->p_next = current->p_next;
+  current->p_next = NULL;
+  current->p_prev = NULL;
+  current->p_semAdd = NULL;
+  return current;
+  }
+
+
+
+  /* If procQ is NULL, return NULL */
+  else{
+    return NULL;
   }
 }
 
@@ -135,7 +133,7 @@ pcb_PTR headProcQ(pcb_PTR tp){
   if(emptyProcQ(tp)){
     return NULL;
   }
-  else if(tp->p_next == NULL){
+  else if(tp->p_next == tp){
     return tp;
   }
   else{

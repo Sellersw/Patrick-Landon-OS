@@ -54,6 +54,8 @@
 #define HIDDEN		static
 #define EOS		'\0'
 #define MAXPROC         20
+#define MAXINT  ((int*)0xFFFFFFFF)
+#define MININT  ((int*)0x0)
 
 #define NULL ((void *)0xFFFFFFFF)
 

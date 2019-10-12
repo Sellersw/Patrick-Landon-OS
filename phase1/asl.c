@@ -12,9 +12,6 @@ AUTHORS: Patrick Sellers and Landon Clark
 #include "../e/pcb.e"
 
 HIDDEN semd_PTR semdActive_h, semdFree_h;
-HIDDEN int *maxInt = 0xFFFFFFFF;
-HIDDEN int *minInt = 0x0;
-
 
 
 /*******************************HELPER FUNCTIONS**********************************/
@@ -23,14 +20,10 @@ HIDDEN int *minInt = 0x0;
 /* Inserts a semephore pointed to by s onto the free list of semephores pointed to
 by the global semdFree_h. */
 void freeSemd(semd_PTR s){
-    if(semdFree_h == NULL){
-      semdFree_h = s;     /* if the semdFree pointer is empty, have it point to the node */
-      s->s_next = NULL;
-    }
-    else{
-      s->s_next = semdFree_h; /* if the list is not empty, s's next is head of semdFree */
-      semdFree_h = s;         /* and semdFree points to s */
-    }
+  /* if the list is not empty, s's next is head of semdFree and semdFree points
+  to s */
+  s->s_next = semdFree_h;
+  semdFree_h = s;
 }
 
 
@@ -159,6 +152,7 @@ semaphore (p→ p_semAdd) on the ASL. If ProcBlk pointed to by p does not appear
 in the process queue associated with p’s semaphore, which is an error condition,
 return NULL; otherwise, return p. */
 pcb_PTR outBlocked(pcb_PTR p){
+  pcb_PTR p_return;
   int *s_add = p->p_semAdd;
 
   /* Find the semaphore being pointed to by the process p */
@@ -170,7 +164,11 @@ pcb_PTR outBlocked(pcb_PTR p){
   removal - which will be the process p if the removal was successful and
   NULL otherwise */
   if(s_current->s_semAdd == s_add){
-    return outProcQ(&(s_current->s_procQ), p);
+    p_return = outProcQ(&(s_current->s_procQ), p);
+    if(emptyProcQ(s_current->s_procQ)){
+      freeSemd(s_current);
+    }
+    return p_return;
   }
   /* Return NULL if the semaphore pointed to by p is not on the ASL */
   else{
@@ -216,6 +214,6 @@ void initASL(){
     }
 
     /* next, allocate semephore descriptors as dummy nodes on the active list.*/
-    semdActive_h = allocSemd(minInt);
-    semdActive_h->s_next = allocSemd(maxInt);
+    semdActive_h = allocSemd(MININT);
+    semdActive_h->s_next = allocSemd(MAXINT);
 }
