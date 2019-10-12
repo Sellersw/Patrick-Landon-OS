@@ -24,16 +24,19 @@
 #define INTERNEW 0x2000008C
 #define INTEROLD 0x20000000
 
-
+/* flags for setting the Status reg */
 #define ALLOFF 0x00000000
-#define VMON 0x00010000
-#define VMOFF 0x
-#define KERNELON 0x
-#define KERNELOFF 0x
-#define INTERUNMASKED 0x
-#define INTERMASKED 0x
-#define PROCTIMEON 0x
-#define PROCTIMEOFF 0x
+#define ALLON 0xFFFFFFFF
+#define VMON 0x02000000
+#define VMOFF 0x00000000
+#define KERNELON 0x00000008
+#define KERNELOFF 0x00000000
+#define INTERUNMASKED 0x0000FF00
+#define INTERMASKED 0x00000000
+#define INTERON 0x00000004
+#define INTEROFF 0x00000000
+#define PLOCTIMEON 0x08000000
+#define PLOCTIMEOFF 0x00000000
 
 
 /* timer, timescale, TOD-LO and other bus regs */
