@@ -14,7 +14,10 @@ extern int procCnt;
 extern int sftBlkCnt;
 extern pcb_PTR readyQue;
 extern pcb_PTR runningProc;
+extern cpu_t startTOD;
 
 extern semd_PTR semArray;
+
+extern void test();
 
 #endif

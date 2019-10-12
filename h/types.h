@@ -1,10 +1,10 @@
 #ifndef TYPES
 #define TYPES
 
-/**************************************************************************** 
+/****************************************************************************
  *
  * This header file contains utility types definitions.
- * 
+ *
  ****************************************************************************/
 
 /* The struct file for the Kaya OS project, containing public structs and

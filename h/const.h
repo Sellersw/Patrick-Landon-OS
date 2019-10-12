@@ -38,6 +38,8 @@
 #define PLOCTIMEON 0x08000000
 #define PLOCTIMEOFF 0x00000000
 
+/* quantum time between interrupts from cpu local timer*/
+#define QUANTUM 5000
 
 /* timer, timescale, TOD-LO and other bus regs */
 #define RAMBASEADDR	0x10000000

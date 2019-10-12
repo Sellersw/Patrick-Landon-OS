@@ -1,7 +1,8 @@
 /*
 INSERT WORDS HERE
-*/
 
+
+*/
 
 #include "../e/initial.e"
 
@@ -12,7 +13,7 @@ void scheduler(){
   if(currP != NULL){
     procCnt = procCnt - 1;
     runningProc = currP;
-    // INSERT QUANTUM THINGY HERE
+    setTIMER(QUANTUM);
     LDST(&(runningProc->p_s));
   }
   else{
@@ -23,7 +24,7 @@ void scheduler(){
       PANIC ();
     }
     else if(sftBlkCnt > 0){
-      // CHILL DAWG
+      WAIT ();
     }
 
   }
