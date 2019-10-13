@@ -1,8 +1,9 @@
 /*
+
 Main entry point of the Kaya operating system. Properly initializes processes
 before passing control to the scheduler.
 
-^Not sure what else to put here.
+More words to follow.
 
 */
 
@@ -20,12 +21,12 @@ static cpu_t startTOD;
 static semd_PTR semArray[DEVICECNT];
 
 void main(){
+  pcb_PTR p;
+
   /* Begin clock for total time machine has been on */
   STCK(startTOD);
 
-  pcb_PTR p;
-
-  /* HERE WE NEED TO POPULATE ROM RESERVED FRAMES. NOT CERTAIN HOW TO ACCOMPLISH THAT YET. */
+  /* HERE WE NEED TO POPULATE ROM RESERVED FRAMES */
   devregarea_t *regArea = (devregarea_t *) RAMBASEADDR;
   memaddr RAMTOP = regArea->rambase + regArea->ramsize;
 
@@ -50,11 +51,12 @@ void main(){
   interNew->s_status = INTERMASKED | VMOFF | PLOCTIMEON | KERNELON;
 
 
-  /* Initialize the data structures (Process Control Blocks and Active Semephore List) */
+  /* Initialize the data structures (Process Control Blocks and Active
+  Semephore List) */
   initPcbs();
   initASL();
 
-  /* Initialize nucleus-maintained vars */
+  /* INIT NUCLEUS-MAINTAINED VARIABLES */
   procCnt = 0;
   sftBlkCnt = 0;
   readyQue = MkEmptyProcQ;
