@@ -1,9 +1,11 @@
 /*
-INSERT WORDS HERE
 
+INSERT WORDS HERE
 
 */
 
+#include "../h/types.h"
+#include "../h/const.h"
 #include "../e/initial.e"
 
 
