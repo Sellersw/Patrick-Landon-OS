@@ -48,6 +48,17 @@
 #define TIMESCALEADDR	0x10000024
 
 
+/* Mnemonics for syscall functions */
+#define CREATEPROCESS 1
+#define TERMINATEPROCESS 2
+#define VERHOGEN 3
+#define PASSEREN 4
+#define SPECTRAPVEC 5
+#define GETCPUTIME 6
+#define WAITCLOCK 7
+#define WAITIO 8
+
+
 /* utility constants */
 #define	TRUE		1
 #define	FALSE		0
@@ -58,10 +69,9 @@
 #define MAXPROC         20
 #define MAXINT  ((int*)0xFFFFFFFF)
 #define MININT  ((int*)0x0)
-
 #define NULL ((void *)0xFFFFFFFF)
-
 #define DEVICECNT 49
+
 
 /* vectors number and type */
 #define VECTSNUM	4

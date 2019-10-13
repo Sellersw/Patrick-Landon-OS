@@ -19,23 +19,30 @@ void sysCallHandler(){
   }
 
 
-
   switch(call){
-    case 1:
+    case CREATEPROCESS:
 
-    case 2:
 
-    case 3:
+    case TERMINATEPROCESS:
 
-    case 4:
 
-    case 5:
+    case VERHOGEN:
 
-    case 6:
 
-    case 7:
+    case PASSEREN:
 
-    case 8:
+
+    case SPECTRAPVEC:
+
+
+    case GETCPUTIME:
+
+
+    case WAITCLOCK:
+
+
+    case WAITIO:
+
 
   }
 }

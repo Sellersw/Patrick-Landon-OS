@@ -28,8 +28,5 @@ void scheduler(){
     else if(sftBlkCnt > 0){
       WAIT ();
     }
-
   }
-
-
 }
