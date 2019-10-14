@@ -15,9 +15,10 @@ void scheduler(){
   pcb_PTR currP = removeProcQ(&readyQue);
 
   if(currP != NULL){
-    procCnt = procCnt - 1;
+    procCnt--;
     runningProc = currP;
     setTIMER(QUANTUM);
+    STCK(startTOD);
     LDST(&(runningProc->p_s));
   }
   else{

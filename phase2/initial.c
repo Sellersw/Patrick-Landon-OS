@@ -30,7 +30,7 @@ void main(){
   devregarea_t *regArea = (devregarea_t *) RAMBASEADDR;
   memaddr RAMTOP = regArea->rambase + regArea->ramsize;
 
-  state_t *syscallNew = (state_t *) SYSCALLNEW;
+  state_t *sysCallNew = (state_t *) SYSCALLNEW;
   sysCallNew->s_pc = sysCallNew->s_t9 = (memaddr) sysCallHandler;
   sysCallNew->s_sp = RAMTOP;
   sysCallNew->s_status = INTERMASKED | VMOFF | PLOCTIMEON | KERNELON;
