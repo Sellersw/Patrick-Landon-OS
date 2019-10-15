@@ -13,6 +13,10 @@ AUTHORS: Patrick Sellers and Landon Clark
 
 HIDDEN semd_PTR semdActive_h, semdFree_h;
 
+void debugG(int a){
+  a + 5;
+}
+
 
 /*******************************HELPER FUNCTIONS**********************************/
 
@@ -97,15 +101,13 @@ int insertBlocked(int *semAdd, pcb_PTR p){
     least on free semaphore, set the semAdd of the process p, remove the next
     semaphore from the free list and set the address to semAdd, and insert
     p into the semaphore's procQ and finally returning FALSE */
-    else{
-      p->p_semAdd = semAdd;
-      s_insert = allocSemd(semAdd);
-      s_insert->s_next = s_current;
-      s_prev->s_next = s_insert;
-      s_insert->s_procQ = mkEmptyProcQ();
-      insertProcQ(&(s_insert->s_procQ), p);
-      return FALSE;
-    }
+    p->p_semAdd = semAdd;
+    s_insert = allocSemd(semAdd);
+    s_insert->s_next = s_current;
+    s_prev->s_next = s_insert;
+    s_insert->s_procQ = mkEmptyProcQ();
+    insertProcQ(&(s_insert->s_procQ), p);
+    return FALSE;
   }
 }
 
@@ -182,11 +184,14 @@ pcb_PTR outBlocked(pcb_PTR p){
 associated with the semaphore semAdd. Return NULL if semAdd is not found on the
 ASL or if the process queue associated with semAdd is empty. */
 pcb_PTR headBlocked(int *semAdd){
+  debugG(10);
   /* Find the semaphore pointed to by semAdd */
   semd_PTR s_current = findASemd(semAdd);
   s_current = s_current->s_next;
+  debugG(15);
 
   if(semAdd == s_current->s_semAdd){
+    debugG(20);
     /* If the semaphore at semAdd is on the ASL, return NULL if the semaphore's
     procQ is empty. If not, return a pointer to the head of the procQ */
     if(emptyProcQ(s_current->s_procQ)){
@@ -196,6 +201,7 @@ pcb_PTR headBlocked(int *semAdd){
   }
   /* If the semaphore at semAdd is not on the ASL, return NULL */
   else{
+    debugG(25);
     return NULL;
   }
 }
