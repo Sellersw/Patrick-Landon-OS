@@ -107,6 +107,7 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
     if(current == *tp){
       return NULL;
     }
+  }
 
   /* Once p has been found, remove it from the procQ, set its fields to
   NULL and return it */
