@@ -156,8 +156,8 @@ pcb_PTR outBlocked(pcb_PTR p){
   int *s_add = p->p_semAdd;
 
   /* Find the semaphore being pointed to by the process p */
-  semd_PTR s_current = findASemd(s_add);
-  s_current = s_current->s_next;
+  semd_PTR s_prev = findASemd(s_add);
+  semd_PTR s_current = s_prev->s_next;
 
   /* If we have found the semaphore we were looking for, attempt to remove the
   process p from the semaphore's procQ. Return the result of the attempted
@@ -166,6 +166,7 @@ pcb_PTR outBlocked(pcb_PTR p){
   if(s_current->s_semAdd == s_add){
     p_return = outProcQ(&(s_current->s_procQ), p);
     if(emptyProcQ(s_current->s_procQ)){
+      s_prev->s_next = s_current->s_next;
       freeSemd(s_current);
     }
     return p_return;
