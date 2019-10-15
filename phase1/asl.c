@@ -13,6 +13,10 @@ AUTHORS: Patrick Sellers and Landon Clark
 
 HIDDEN semd_PTR semdActive_h, semdFree_h;
 
+void debugG(int a){
+  a+5;
+}
+
 
 /*******************************HELPER FUNCTIONS**********************************/
 
@@ -163,12 +167,10 @@ pcb_PTR outBlocked(pcb_PTR p){
   NULL otherwise */
   if(s_current->s_semAdd == s_add){
     p_return = outProcQ(&(s_current->s_procQ), p);
-    /*
     if(emptyProcQ(s_current->s_procQ)){
       s_prev->s_next = s_current->s_next;
       freeSemd(s_current);
     }
-    */
     return p_return;
   }
   /* Return NULL if the semaphore pointed to by p is not on the ASL */
@@ -184,6 +186,7 @@ ASL or if the process queue associated with semAdd is empty. */
 pcb_PTR headBlocked(int *semAdd){
   /* Find the semaphore pointed to by semAdd */
   semd_PTR s_current = findASemd(semAdd);
+  debugG(*semAdd);
   s_current = s_current->s_next;
 
   if(semAdd == s_current->s_semAdd){
