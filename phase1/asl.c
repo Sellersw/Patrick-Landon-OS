@@ -61,6 +61,7 @@ semd_PTR findASemd(int *i){
       /* point current's pointer to the next element. */
       s_current = s_current->s_next;
     }
+    debugG(s_current);
     return(s_current);
 }
 
