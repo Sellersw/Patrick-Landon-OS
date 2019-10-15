@@ -16,10 +16,6 @@ HIDDEN semd_PTR semdActive_h, semdFree_h;
 
 /*******************************HELPER FUNCTIONS**********************************/
 
-int debugA(int a){
-  a + 5;
-  return a;
-}
 
 /* Inserts a semephore pointed to by s onto the free list of semephores pointed to
 by the global semdFree_h. */
