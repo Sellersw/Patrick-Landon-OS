@@ -116,14 +116,7 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
   current->p_prev = NULL;
   current->p_semAdd = NULL;
   return current;
-  }
 
-
-
-  /* If procQ is NULL, return NULL */
-  else{
-    return NULL;
-  }
 }
 
 
