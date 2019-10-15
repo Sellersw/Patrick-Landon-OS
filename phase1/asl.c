@@ -186,7 +186,7 @@ ASL or if the process queue associated with semAdd is empty. */
 pcb_PTR headBlocked(int *semAdd){
   /* Find the semaphore pointed to by semAdd */
   semd_PTR s_current = findASemd(semAdd);
-  debugG(&(s_current->s_next));
+  debugG(s_current->s_next);
   s_current = s_current->s_next;
 
   if(semAdd == s_current->s_semAdd){
