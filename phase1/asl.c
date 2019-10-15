@@ -13,7 +13,7 @@ AUTHORS: Patrick Sellers and Landon Clark
 
 HIDDEN semd_PTR semdActive_h, semdFree_h;
 
-void debugG(int a){
+void debugG(int *a){
   a+5;
 }
 
@@ -186,8 +186,9 @@ ASL or if the process queue associated with semAdd is empty. */
 pcb_PTR headBlocked(int *semAdd){
   /* Find the semaphore pointed to by semAdd */
   semd_PTR s_current = findASemd(semAdd);
-  debugG(*semAdd);
+  debugG(semAdd);
   s_current = s_current->s_next;
+  debugG(s_current->semAdd);
 
   if(semAdd == s_current->s_semAdd){
     /* If the semaphore at semAdd is on the ASL, return NULL if the semaphore's
