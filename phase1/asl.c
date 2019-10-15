@@ -186,14 +186,11 @@ pcb_PTR outBlocked(pcb_PTR p){
 associated with the semaphore semAdd. Return NULL if semAdd is not found on the
 ASL or if the process queue associated with semAdd is empty. */
 pcb_PTR headBlocked(int *semAdd){
-  debugA(15);
   /* Find the semaphore pointed to by semAdd */
   semd_PTR s_current = findASemd(semAdd);
   s_current = s_current->s_next;
 
-  debugA(20);
   if(semAdd == s_current->s_semAdd){
-    debugA(35);
     /* If the semaphore at semAdd is on the ASL, return NULL if the semaphore's
     procQ is empty. If not, return a pointer to the head of the procQ */
     if(emptyProcQ(s_current->s_procQ)){
@@ -203,7 +200,6 @@ pcb_PTR headBlocked(int *semAdd){
   }
   /* If the semaphore at semAdd is not on the ASL, return NULL */
   else{
-    debugA(25);
     return NULL;
   }
 }
