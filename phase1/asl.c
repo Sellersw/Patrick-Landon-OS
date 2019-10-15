@@ -188,7 +188,7 @@ pcb_PTR headBlocked(int *semAdd){
   semd_PTR s_current = findASemd(semAdd);
   debugG(semAdd);
   s_current = s_current->s_next;
-  debugG(s_current->semAdd);
+  debugG(s_current->s_semAdd);
 
   if(semAdd == s_current->s_semAdd){
     /* If the semaphore at semAdd is on the ASL, return NULL if the semaphore's
