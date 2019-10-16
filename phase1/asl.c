@@ -134,12 +134,10 @@ pcb_PTR removeBlocked(int *semAdd){
       s_prev->s_next = s_current->s_next;
       freeSemd(s_current);
     }
-    return p_return;  
+    return p_return;
   }
   /* If the semaphore at semAdd is not on the ASL, return NULL */
-  else{
-    return NULL;
-  }
+  return NULL;
 }
 
 
@@ -168,9 +166,7 @@ pcb_PTR outBlocked(pcb_PTR p){
     return p_return;
   }
   /* Return NULL if the semaphore pointed to by p is not on the ASL */
-  else{
-    return NULL;
-  }
+  return NULL;
 }
 
 
@@ -188,9 +184,7 @@ pcb_PTR headBlocked(int *semAdd){
     return headProcQ(s_current->s_procQ);
   }
   /* If the semaphore at semAdd is not on the ASL, return NULL */
-  else{
-    return NULL;
-  }
+  return NULL;
 }
 
 
