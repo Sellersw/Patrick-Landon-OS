@@ -129,14 +129,12 @@ pcb_PTR removeBlocked(int *semAdd){
     }
     /* If the semaphore at semAdd is on the ASL and the semaphore's procQ is
     not empty, remove the head of the semaphore's procQ and return this process */
-    else{
-      p_return = removeProcQ(&(s_current->s_procQ));
-      if(emptyProcQ(s_current->s_procQ)){
-	      s_prev->s_next = s_current->s_next;
-        freeSemd(s_current);
-      }
-      return p_return;
+    p_return = removeProcQ(&(s_current->s_procQ));
+    if(emptyProcQ(s_current->s_procQ)){
+      s_prev->s_next = s_current->s_next;
+      freeSemd(s_current);
     }
+    return p_return;  
   }
   /* If the semaphore at semAdd is not on the ASL, return NULL */
   else{
@@ -187,10 +185,7 @@ pcb_PTR headBlocked(int *semAdd){
   if(semAdd == s_current->s_semAdd){
     /* If the semaphore at semAdd is on the ASL, return NULL if the semaphore's
     procQ is empty. If not, return a pointer to the head of the procQ */
-    if(emptyProcQ(s_current->s_procQ)){
-      return NULL;
-    }
-    return s_current->s_procQ->p_next;
+    return headProcQ(s_current->s_procQ);
   }
   /* If the semaphore at semAdd is not on the ASL, return NULL */
   else{
