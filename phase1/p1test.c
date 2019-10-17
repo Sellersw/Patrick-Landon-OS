@@ -135,11 +135,9 @@ void main() {
 		if ((procp[i] = allocPcb()) == NULL)
 			adderrbuf("allocPcb: unexpected NULL   ");
 	}
-	debugA(10);
 	if (allocPcb() != NULL) {
 		adderrbuf("allocPcb: allocated more than MAXPROC entries   ");
 	}
-	debugA(20);
 	addokbuf("allocPcb ok   \n");
 
 	/* return the last 10 entries back to free list */
