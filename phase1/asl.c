@@ -179,7 +179,7 @@ associated with the semaphore semAdd. Return NULL if semAdd is not found on the
 ASL or if the process queue associated with semAdd is empty. */
 pcb_PTR headBlocked(int *semAdd){
   /* Find the semaphore pointed to by semAdd */
-  debugG(semdAdd);
+  debugG(semAdd);
   semd_PTR s_current = findASemd(semAdd);
   debugG(s_current->s_semAdd);
   s_current = s_current->s_next;
