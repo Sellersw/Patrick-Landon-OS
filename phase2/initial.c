@@ -24,6 +24,11 @@ static cpu_t startTOD;
 
 static semd_PTR semArray[DEVICECNT];
 
+void test(){
+  1 + 1;
+}
+
+
 void main(){
   pcb_PTR p;
 
@@ -72,7 +77,7 @@ void main(){
   /* INIT NUCLEUS-MAINTAINED VARIABLES */
   procCnt = 0;
   sftBlkCnt = 0;
-  readyQue = MkEmptyProcQ;
+  readyQue = MkEmptyProcQ();
   runningProc = NULL;
 
 
@@ -95,8 +100,4 @@ void main(){
 
   /* CALL SCHEDULER */
   scheduler();
-}
-
-void test(){
-  1 + 1;
 }

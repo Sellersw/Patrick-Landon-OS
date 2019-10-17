@@ -61,8 +61,7 @@ void sysCallHandler(){
       break;
 
     case GETCPUTIME:
-      runningProc->p_time = QUANTUM -
-
+      getcputime(oldSys);
       break;
 
     case WAITCLOCK:
@@ -146,7 +145,7 @@ void V(state_t *state){
     temp = removeBlocked(sem);
     insertProcQ(&readyQue, temp);
   }
-  LDST(&oldSys);
+  LDST(&state);
 }
 
 
@@ -159,5 +158,14 @@ void P(state_t *state){
     currentProc = NULL;
     scheduler();
   }
-  LDST(&oldSys);
+  LDST(&state);
+}
+
+
+void getcputime(state_t *state){
+  int currTime;
+  STCK(currTime);
+  runningProc->p_time += QUANTUM - (currTime - startTOD);
+  state->s_v0 = runningProc->p_time;
+  LDST(&state);
 }
