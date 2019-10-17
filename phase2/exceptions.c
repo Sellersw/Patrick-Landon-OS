@@ -89,6 +89,7 @@ void tlbTrapHandler(){
 /* ------------ HELPER FUNCTIONS ---------------------------- */
 
 void copyState(state_t *orig, state_t *curr){
+  int i;
   /* Copy state values over to new state */
   curr->s_asid = orig->s_asid;
   curr->s_cause = orig->s_cause;
@@ -96,7 +97,6 @@ void copyState(state_t *orig, state_t *curr){
   curr->s_pc = orig->s_pc;
 
   /* Copy previous register vaules to new state registers */
-  int i;
   for(i = 0; i < STATEREGNUM; i++){
     curr->s_reg[i] = orig->s_reg[i];
   }

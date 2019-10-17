@@ -15,6 +15,8 @@ HIDDEN pcb_PTR pcbFree_h;
 /*-------- FUNCTION TO RESET STATE TO 0 VALUES ---------*/
 
 void resetState(state_t *state){
+  int i;
+
   /* Set state values to 0 */
   state->s_asid = 0;
   state->s_cause = 0;
@@ -22,7 +24,6 @@ void resetState(state_t *state){
   state->s_pc = 0;
 
   /* Set register values to 0 */
-  int i;
   for(i = 0; i < STATEREGNUM; i++){
     state->s_reg[i] = 0;
   }
