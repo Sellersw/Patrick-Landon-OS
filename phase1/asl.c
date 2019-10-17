@@ -16,7 +16,7 @@ HIDDEN semd_PTR semdActive_h, semdFree_h;
 
 /*******************************HELPER FUNCTIONS**********************************/
 
-void debugG(int a){
+void debugG(semd_PTR a){
   5+5;
 }
 
@@ -55,16 +55,12 @@ semd_PTR allocSemd(int *i){
 whether the address is on the list, it will always return the parent of the semephore
 as if it were active. */
 semd_PTR findASemd(int *i){
-  debugG(10);
   semd_PTR s_current = semdActive_h;
   /* keep looping while current's next's semadd is less than i */
-  debugG(15);
   while(s_current->s_next->s_semAdd < i){
-    debugG(20);
     /* point current's pointer to the next element. */
     s_current = s_current->s_next;
   }
-  debugG(25);
   return(s_current);
 }
 
@@ -132,6 +128,7 @@ pcb_PTR removeBlocked(int *semAdd){
     empty, remove the semaphore from the ASL and return NULL */
     if(emptyProcQ(s_current->s_procQ)){
       s_prev->s_next = s_current->s_next;
+      debugG(s_current);
       freeSemd(s_current);
       return NULL;
     }
@@ -140,6 +137,7 @@ pcb_PTR removeBlocked(int *semAdd){
     p_return = removeProcQ(&(s_current->s_procQ));
     if(emptyProcQ(s_current->s_procQ)){
       s_prev->s_next = s_current->s_next;
+      debugG(s_current);
       freeSemd(s_current);
     }
     return p_return;
@@ -169,6 +167,7 @@ pcb_PTR outBlocked(pcb_PTR p){
     p_return = outProcQ(&(s_current->s_procQ), p);
     if(emptyProcQ(s_current->s_procQ)){
       s_prev->s_next = s_current->s_next;
+      debugG(s_current);
       freeSemd(s_current);
     }
     return p_return;
