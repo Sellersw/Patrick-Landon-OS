@@ -165,7 +165,6 @@ void P(state_t *state){
 void getcputime(state_t *state){
   int currTime;
   STCK(currTime);
-  runningProc->p_time += QUANTUM - (currTime - startTOD);
-  state->s_v0 = runningProc->p_time;
+  state->s_v0 = runningProc->p_time + currTime - startTOD;
   LDST(&state);
 }
