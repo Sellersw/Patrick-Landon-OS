@@ -75,7 +75,6 @@ pcb_PTR removeProcQ(pcb_PTR *tp){
 
   head->p_next = NULL;
   head->p_prev = NULL;
-  //head->p_semAdd = NULL;
   return head;
 }
 
@@ -115,7 +114,6 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
   current->p_prev->p_next = current->p_next;
   current->p_next = NULL;
   current->p_prev = NULL;
-  //current->p_semAdd = NULL;
   return current;
 
 }
@@ -144,14 +142,12 @@ pcb_PTR headProcQ(pcb_PTR tp){
 void freePcb(pcb_PTR p){
   /* If no current head on free list, insert p as next. */
   if(emptyProcQ(pcbFree_h)){
-    p->p_semAdd = NULL;
     p->p_prev = NULL;
     p->p_next = NULL;
     pcbFree_h = p;
   }
   /* If pcbFree has elements in it, add process p to the front of the list. */
   else{
-    p->p_semAdd = NULL;
     p->p_prev = NULL;
     p->p_next = pcbFree_h;
     pcbFree_h = p;
