@@ -16,7 +16,7 @@ HIDDEN semd_PTR semdActive_h, semdFree_h;
 
 /*******************************HELPER FUNCTIONS**********************************/
 
-void debugG(int* a){
+void debugG(int a){
   5+5;
 }
 
@@ -42,11 +42,11 @@ semd_PTR allocSemd(int *i){
   /* Remove a semaphore from the free list and initialize an empty semaphore
   with only a semaphore address and return a pointer to this semaphore */
   else{
-      semdFree_h = semdFree_h->s_next;
-      s_ret->s_next = NULL;
-      s_ret->s_procQ = mkEmptyProcQ();
-      s_ret->s_semAdd = i;
-      return s_ret;
+    semdFree_h = semdFree_h->s_next;
+    s_ret->s_next = NULL;
+    s_ret->s_procQ = mkEmptyProcQ();
+    s_ret->s_semAdd = i;
+    return s_ret;
   }
 }
 
@@ -55,13 +55,17 @@ semd_PTR allocSemd(int *i){
 whether the address is on the list, it will always return the parent of the semephore
 as if it were active. */
 semd_PTR findASemd(int *i){
-    semd_PTR s_current = semdActive_h;
-    /* keep looping while current's next's semadd is less than i */
-    while(s_current->s_next->s_semAdd < i){
-      /* point current's pointer to the next element. */
-      s_current = s_current->s_next;
-    }
-    return(s_current);
+  debugG(10);
+  semd_PTR s_current = semdActive_h;
+  /* keep looping while current's next's semadd is less than i */
+  debugG(15);
+  while(s_current->s_next->s_semAdd < i){
+    debugG(20);
+    /* point current's pointer to the next element. */
+    s_current = s_current->s_next;
+  }
+  debugG(25);
+  return(s_current);
 }
 
 
@@ -179,20 +183,15 @@ associated with the semaphore semAdd. Return NULL if semAdd is not found on the
 ASL or if the process queue associated with semAdd is empty. */
 pcb_PTR headBlocked(int *semAdd){
   /* Find the semaphore pointed to by semAdd */
-  debugG(semAdd);
   semd_PTR s_current = findASemd(semAdd);
-  debugG(s_current->s_semAdd);
   s_current = s_current->s_next;
-  debugG(s_current->s_semAdd);
 
   if(semAdd == s_current->s_semAdd){
-    debugG(semAdd);
     /* If the semaphore at semAdd is on the ASL, return NULL if the semaphore's
     procQ is empty. If not, return a pointer to the head of the procQ */
     return headProcQ(s_current->s_procQ);
   }
   /* If the semaphore at semAdd is not on the ASL, return NULL */
-  debugG(semAdd);
   return NULL;
 }
 
