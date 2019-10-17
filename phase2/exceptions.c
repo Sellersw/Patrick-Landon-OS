@@ -86,6 +86,24 @@ void tlbTrapHandler(){
 
 
 
+/* ------------ HELPER FUNCTIONS ---------------------------- */
+
+void copyState(state_t *orig, state_t *curr){
+  /* Copy state values over to new state */
+  curr->s_asid = orig->s_asid;
+  curr->s_cause = orig->s_cause;
+  curr->s_status = orig->s_status;
+  curr->s_pc = orig->s_pc;
+
+  /* Copy previous register vaules to new state registers */
+  int i;
+  for(i = 0; i < STATEREGNUM; i++){
+    curr->s_reg[i] = orig->s_reg[i];
+  }
+}
+
+
+
 /* ------------ SYSCALL FUNCTIONS ---------------------------- */
 
 
@@ -142,22 +160,4 @@ void P(state_t *state){
     scheduler();
   }
   LDST(&oldSys);
-}
-
-
-
-
-/* ------------ HELPER FUNCTIONS ---------------------------- */
-
-void copyState(state_t *orig, state_t *curr){
-  /* Copy state values over to new state */
-  curr->s_asid = orig->s_asid;
-  curr->s_cause = orig->s_cause;
-  curr->s_status = orig->s_status;
-  curr->s_pc = orig->s_pc;
-
-  /* Copy previous register vaules to new state registers */
-  for(i = 0; i < STATEREGNUM; i++){
-    curr->s_reg[i] = orig->s_reg[i];
-  }
 }

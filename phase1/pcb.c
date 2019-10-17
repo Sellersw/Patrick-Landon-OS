@@ -12,6 +12,25 @@ HIDDEN pcb_PTR pcbFree_h;
 
 
 
+/*-------- FUNCTION TO RESET STATE TO 0 VALUES ---------*/
+
+void resetState(state_t *state){
+  /* Set state values to 0 */
+  state->s_asid = 0;
+  state->s_cause = 0;
+  state->s_status = 0;
+  state->s_pc = 0;
+
+  /* Set register values to 0 */
+  int i;
+  for(i = 0; i < STATEREGNUM; i++){
+    state->s_reg[i] = 0;
+  }
+}
+
+/* -----------------------------------------------------*/
+
+
 /****************************PCB QUEUE MAINTENANCE********************************/
 
 /* Initializes an empty Process Queue by setting a variable to be a tail pointer to a
@@ -301,23 +320,5 @@ pcb_PTR outChild(pcb_PTR p){
       }
       return p;
     }
-  }
-}
-
-
-
-
-/* FUNCTION TO RESET STATE TO 0 VALUES   */
-
-void resetState(state_t *state){
-  /* Copy state values over to new state */
-  state->s_asid = 0;
-  state->s_cause = 0;
-  state->s_status = 0;
-  state->s_pc = 0;
-
-  /* Copy previous register vaules to new state registers */
-  for(i = 0; i < STATEREGNUM; i++){
-    state->s_reg[i] = 0;
   }
 }
