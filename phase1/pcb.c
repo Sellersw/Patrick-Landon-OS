@@ -147,7 +147,6 @@ void freePcb(pcb_PTR p){
     p->p_prnt = NULL;
     p->p_child = NULL;
     p->p_sib = NULL;
-    p->p_s = NULL;
     p->p_semAdd = NULL;
     p->p_time = 0;
     p->p_oldSys = NULL;
@@ -167,7 +166,6 @@ void freePcb(pcb_PTR p){
     p->p_prnt = NULL;
     p->p_child = NULL;
     p->p_sib = NULL;
-    p->p_s = NULL;
     p->p_semAdd = NULL;
     p->p_time = 0;
     p->p_oldSys = NULL;
@@ -176,7 +174,7 @@ void freePcb(pcb_PTR p){
     p->p_newSys = NULL;
     p->p_newPgm = NULL;
     p->p_newTlb = NULL;
-    
+
     p->p_prev = NULL;
     p->p_next = pcbFree_h;
     pcbFree_h = p;
