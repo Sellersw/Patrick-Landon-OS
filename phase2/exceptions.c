@@ -41,34 +41,19 @@ void sysCallHandler(){
 
     /* Syscall 1: Creates a new child process for the current runningProc */
     case CREATEPROCESS:
-      pcb_PTR p = allocPcb();
-
-      /* If an error occurs when attempting to create a new PCB, return error
-      code of -1 in the v0 register of oldSys */
-      if(p == NULL){
-        oldSys->s_v0 = -1;
-      }
-      else{
-        p->p_s = (state_t *) oldSys->s_a1;
-        procCnt++;
-        insertChild(runningProc, p);
-        insertProcQ(&readyQue, p);
-        copyState(oldSys->s_a1, &(p->p_s));
-        oldSys->s_v0 = 0;
-        LDST(&oldSys)
-      }
+      createprocess(oldSys);
       break;
 
     case TERMINATEPROCESS:
-      terminateprocess();
+      terminateprocess(runningProc);
       break;
 
     case VERHOGEN:
-      semd_PTR semd_signal = (semd_PTR) oldSys->s_a1;
+      V(oldSys);
       break;
 
     case PASSEREN:
-      semd_PTR semd_wait = (semd_PTR) oldSys->s_a1;
+      P(oldSys);
       break;
 
     case SPECTRAPVEC:
@@ -101,26 +86,78 @@ void tlbTrapHandler(){
 
 
 
-/* ------------ HELPER FUNCTIONS ---------------------------- */
+/* ------------ SYSCALL FUNCTIONS ---------------------------- */
 
 
 
-void terminateprocess(){
-  // kill runningProc and children and children's children and so on.
+void createprocess(state_t *state){
+  pcb_PTR p = allocPcb();
+
+  /* If an error occurs when attempting to create a new PCB, return error
+  code of -1 in the v0 register of oldSys */
+  if(p == NULL){
+    oldSys->s_v0 = -1;
+  }
+  else{
+    procCnt++;
+    copyState(state->s_a1, &(p->p_s));
+    insertChild(runningProc, p);
+    insertProcQ(&readyQue, p);
+    state->s_v0 = 0;
+    LDST(&state)
+  }
 }
 
 
 
-void copyState(state_PTR prev, state_PTR curr){
+void terminateprocess(pcb_PTR p){
+  // kill runningProc and children and children's children and so on.
+
+
+  freePcb(p);
+}
+
+
+/* SIGNAL */
+void V(state_t *state){
+  pcb_PTR temp;
+
+  int *sem = (int*) state->s_a1;
+  (*sem)++;
+  if((*sem) <= 0){
+    temp = removeBlocked(sem);
+    insertProcQ(&readyQue, temp);
+  }
+  LDST(&oldSys);
+}
+
+
+/* WAIT */
+void P(state_t *state){
+  int *sem = (int*) state->s_a1;
+  (*sem)--;
+  if((*sem) < 0){
+    insertBlocked(sem, currentProc);
+    currentProc = NULL;
+    scheduler();
+  }
+  LDST(&oldSys);
+}
+
+
+
+
+/* ------------ HELPER FUNCTIONS ---------------------------- */
+
+void copyState(state_t *orig, state_t *curr){
   /* Copy state values over to new state */
-  curr->s_asid = prev->s_asid;
-  curr->s_cause = prev->s_cause;
-  curr->s_status = prev->s_status;
-  curr->s_pc = prev->s_pc;
+  curr->s_asid = orig->s_asid;
+  curr->s_cause = orig->s_cause;
+  curr->s_status = orig->s_status;
+  curr->s_pc = orig->s_pc;
 
   /* Copy previous register vaules to new state registers */
-  int i;
   for(i = 0; i < STATEREGNUM; i++){
-    curr->s_reg[i] = prev->s_reg[i];
+    curr->s_reg[i] = orig->s_reg[i];
   }
 }

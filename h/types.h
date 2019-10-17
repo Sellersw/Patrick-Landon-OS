@@ -72,12 +72,12 @@ typedef struct pcb_t{
                                             /* which process blocked */
 	cpu_t 				 p_time;				/* total running time of procBlk */
 
-	state_t 			*oldSys;
-	state_t				*oldPgm;
-	state_t				*oldTlb;
-	state_t 			*newSys;
-	state_t 			*newPgm;
-	state_t 			*newTlb;
+	state_t 			*p_oldSys;
+	state_t				*p_oldPgm;
+	state_t				*p_oldTlb;
+	state_t 			*p_newSys;
+	state_t 			*p_newPgm;
+	state_t 			*p_newTlb;
 
 } pcb_t, *pcb_PTR;
 

@@ -142,12 +142,41 @@ pcb_PTR headProcQ(pcb_PTR tp){
 void freePcb(pcb_PTR p){
   /* If no current head on free list, insert p as next. */
   if(emptyProcQ(pcbFree_h)){
+
+    /* Set all fields in process to default values */
+    p->p_prnt = NULL;
+    p->p_child = NULL;
+    p->p_sib = NULL;
+    p->p_s = NULL;
+    p->p_semAdd = NULL;
+    p->p_time = 0;
+    p->p_oldSys = NULL;
+    p->p_oldPgm = NULL;
+    p->p_oldTlb = NULL;
+    p->p_newSys = NULL;
+    p->p_newPgm = NULL;
+    p->p_newTlb = NULL;
+
     p->p_prev = NULL;
     p->p_next = NULL;
     pcbFree_h = p;
   }
   /* If pcbFree has elements in it, add process p to the front of the list. */
   else{
+    /* Set all fields in process to default values */
+    p->p_prnt = NULL;
+    p->p_child = NULL;
+    p->p_sib = NULL;
+    p->p_s = NULL;
+    p->p_semAdd = NULL;
+    p->p_time = 0;
+    p->p_oldSys = NULL;
+    p->p_oldPgm = NULL;
+    p->p_oldTlb = NULL;
+    p->p_newSys = NULL;
+    p->p_newPgm = NULL;
+    p->p_newTlb = NULL;
+    
     p->p_prev = NULL;
     p->p_next = pcbFree_h;
     pcbFree_h = p;
