@@ -144,11 +144,15 @@ pcb_PTR headProcQ(pcb_PTR tp){
 void freePcb(pcb_PTR p){
   /* If no current head on free list, insert p as next. */
   if(emptyProcQ(pcbFree_h)){
+    p->p_semAdd = NULL;
+    p->p_prev = NULL;
     p->p_next = NULL;
     pcbFree_h = p;
   }
   /* If pcbFree has elements in it, add process p to the front of the list. */
   else{
+    p->p_semAdd = NULL;
+    p->p_prev = NULL;
     p->p_next = pcbFree_h;
     pcbFree_h = p;
   }
@@ -168,6 +172,7 @@ pcb_PTR allocPcb(){
   /* Grab first process in list, edit pcbFree_h to point at second process, and
   reinitialize first process to have NULL fields before returning it. */
   pcbFree_h = pcbFree_h->p_next;
+  p_ret->p_semAdd = NULL;
   p_ret->p_next = NULL;
   p_ret->p_prev = NULL;
   p_ret->p_prnt = NULL;
