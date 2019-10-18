@@ -49,14 +49,19 @@ void sysCallHandler(){
       createprocess(oldSys);
       break;
 
+    /* Syscall 2: Kills the executing process and recursively kills all children
+    of that process */
     case TERMINATEPROCESS:
       terminateprocess(runningProc);
       break;
 
+    /* Syscall 3: Signal that the process is done working with a shared piece of data */
     case VERHOGEN:
       V(oldSys);
       break;
 
+    /* Syscall 4: Tell any process that wants to play with a shared piece of data that
+    they must wait until a process signals it is clear (Verhogen) */
     case PASSEREN:
       P(oldSys);
       break;
@@ -65,10 +70,13 @@ void sysCallHandler(){
 
       break;
 
+    /* Syscall 6: Returns the processor time used by the requesting process. */
     case GETCPUTIME:
       getcputime(oldSys);
       break;
 
+    /* Syscall 7: Performs a P (Wait) operation on the pseudo-clock timer semephore. This
+    semephore will be V'ed (Signal) every 100 milliseconds automatically by the nucleus. */
     case WAITCLOCK:
 
       break;
