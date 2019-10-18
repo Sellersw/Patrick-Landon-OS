@@ -1,15 +1,15 @@
-/*
+/********************************INITIAL.C*****************************************
 
-Main entry point of the Kaya operating system. Properly initializes processes
-before passing control to the scheduler. This sets up the nucleus of basic
-Operating System functionality which includes global variables and data
-structures that handle the flow of our processes (readyQue, procCnt, semArray, etc.)
-
+Main entry point of the Kaya operating system. Properly initializes necessary data
+structures, global control data, and physical memory locations before passing control
+to the scheduler. This sets up the nucleus of basic Operating System functionality 
+which includes global variables and data structures that handle the flow of our 
+processes (readyQue, procCnt, semArray, etc.)
 
 More words to follow.
-Written by Patrick Sellers and Landon Clark
+Written by: Patrick Sellers and Landon Clark
 
-*/
+********************************************************************************/
 
 #include "../h/types.h"
 #include "../h/const.h"
@@ -21,13 +21,13 @@ static int sftBlkCnt;
 static pcb_PTR readyQue;
 static pcb_PTR runningProc;
 static cpu_t startTOD;
-
 static semd_PTR semArray[DEVICECNT];
 
 void test(){
   1 + 1;
 }
 
+/**********************************************************************/
 
 void main(){
   pcb_PTR p;
@@ -83,7 +83,7 @@ void main(){
 
   /* INIT NUCLEUS-MAINTAINED SEMEPHORES */
   for(i = 0; i < DEVICECNT; i++){
-    semArray[i] = NULL;
+    semArray[i] = NULL; // These probably need to be set to zero, because only the dummy can equal NULL
   }
 
 

@@ -10,6 +10,11 @@ Module to handle exceptions. More words to follow.
 #include "../e/pcb.e"
 #include "../e/asl.e"
 
+/*****Localized (Private) Methods****/
+HIDDEN void copyState(state_t *orig, state_t *curr);
+HIDDEN void createprocess(state_t *state);
+
+
 void sysCallHandler(){
   unsigned int call, status, mode;
 
@@ -83,10 +88,7 @@ void tlbTrapHandler(){
 
 }
 
-
-
-/* ------------ HELPER FUNCTIONS ---------------------------- */
-
+/****************************HELPER FUNCTIONS******************************/
 void copyState(state_t *orig, state_t *curr){
   int i;
   /* Copy state values over to new state */
@@ -101,12 +103,7 @@ void copyState(state_t *orig, state_t *curr){
   }
 }
 
-
-
-/* ------------ SYSCALL FUNCTIONS ---------------------------- */
-
-
-
+/****************************SYSCALL FUNCTIONS*****************************/
 void createprocess(state_t *state){
   pcb_PTR p = allocPcb();
 
@@ -125,15 +122,12 @@ void createprocess(state_t *state){
   }
 }
 
-
-
 void terminateprocess(pcb_PTR p){
   // kill runningProc and children and children's children and so on.
 
 
   freePcb(p);
 }
-
 
 /* SIGNAL */
 void V(state_t *state){
@@ -148,7 +142,6 @@ void V(state_t *state){
   LDST(&state);
 }
 
-
 /* WAIT */
 void P(state_t *state){
   int *sem = (int*) state->s_a1;
@@ -161,10 +154,11 @@ void P(state_t *state){
   LDST(&state);
 }
 
-
 void getcputime(state_t *state){
   int currTime;
   STCK(currTime);
   state->s_v0 = runningProc->p_time + currTime - startTOD;
   LDST(&state);
 }
+
+/*******************************************************************************/

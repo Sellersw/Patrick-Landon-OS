@@ -1,8 +1,10 @@
-/*
+/***************************SCHEDULER.C**********************************
 
 Module to handle the scheduler. More words to follow.
 
-*/
+Written by: Patrick Sellers and Landon Clark
+
+************************************************************************/
 
 #include "../h/types.h"
 #include "../h/const.h"
@@ -10,9 +12,11 @@ Module to handle the scheduler. More words to follow.
 #include "../e/pcb.e"
 #include "../e/asl.e"
 
+/****Local Variables*****/
+pcb_PTR currP;
 
 void scheduler(){
-  pcb_PTR currP = removeProcQ(&readyQue);
+  currP = removeProcQ(&readyQue);
 
   if(currP != NULL){
     procCnt--;
@@ -25,10 +29,10 @@ void scheduler(){
     if(procCnt == 0){
       HALT ();
     }
-    else if(sftBlkCnt == 0){
+    if(sftBlkCnt == 0){
       PANIC ();
     }
-    else if(sftBlkCnt > 0){
+    if(sftBlkCnt > 0){
       WAIT ();
     }
   }

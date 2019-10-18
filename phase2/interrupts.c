@@ -1,8 +1,10 @@
-/*
+/*******************************INTERRUPTS.C********************************
 
 Module to handle interrupts. More words to follow.
 
-*/
+Written by: Patrick Sellers and Landon Clark
+
+****************************************************************************/
 
 #include "../h/types.h"
 #include "../h/const.h"
