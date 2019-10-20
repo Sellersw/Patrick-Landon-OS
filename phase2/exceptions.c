@@ -13,16 +13,20 @@ Module to handle exceptions. More words to follow.
 /*****Localized (Private) Methods****/
 HIDDEN void copyState(state_t *orig, state_t *curr);
 HIDDEN void createprocess(state_t *state);
+HIDDEN void terminateprocess(pcb_PTR p);
+HIDDEN void spectrapvec(state_t *state);
+HIDDEN void getcputime(state_t *state);
 
 
 void sysCallHandler(){
   unsigned int call, status, mode;
 
-  state_t *oldSys = (state_t *) SYSCALLOLD;
+  state_t * oldSys, oldPgm;
+  oldSys = (state_t *) SYSCALLOLD;
 
   /* We need to make sure we do not return to the instruction that brought
   about this syscall */
-  oldSys->s_pc = oldSys->s_pc + 4;
+  oldSys->s_pc = oldSys->s_pc + WORDLEN;
 
   /* Grab relevant information from oldSys registers */
   status = oldSys->s_status;
@@ -37,7 +41,9 @@ void sysCallHandler(){
   /* Check the KUp bit to determine if we were working in Kernel mode */
   if((status & KERNELOFF) == KERNELOFF){
     // Handle user mode priveleged instruction
-
+    oldPgm = (state_t *) PROGTRAPOLD;
+    copyState(oldSys, oldPgm);
+    oldPgm->s_cause = 10;
     progTrapHandler();
   }
 
@@ -53,6 +59,7 @@ void sysCallHandler(){
     of that process */
     case TERMINATEPROCESS:
       terminateprocess(runningProc);
+      scheduler();
       break;
 
     /* Syscall 3: Signal that the process is done working with a shared piece of data */
@@ -67,7 +74,7 @@ void sysCallHandler(){
       break;
 
     case SPECTRAPVEC:
-
+      spectrapvec(oldSys);
       break;
 
     /* Syscall 6: Returns the processor time used by the requesting process. */
@@ -78,7 +85,9 @@ void sysCallHandler(){
     /* Syscall 7: Performs a P (Wait) operation on the pseudo-clock timer semephore. This
     semephore will be V'ed (Signal) every 100 milliseconds automatically by the nucleus. */
     case WAITCLOCK:
-
+      /* Perform a p operation on interval timer (nucleus maintained device
+      semaphore) */
+      P(timer);
       break;
 
     case WAITIO:
@@ -131,9 +140,36 @@ void createprocess(state_t *state){
 }
 
 void terminateprocess(pcb_PTR p){
-  // kill runningProc and children and children's children and so on.
+  int * firstDevice, lastDevice;
+  int *semAdd = p->p_semAdd;
 
+  /* Check for children of p. If they exist, kill them first */
+  while(!emptyChild(p)){
+    terminateprocess(removeChild(p));
+  }
 
+  /* Handle removing the given process: */
+
+  if(p == currentProc){
+    outChild(p);
+  }
+
+  else if((outProcQ(&readyQue, p)) == NULL){
+    outBlocked(p);
+
+    firstDevice = &semDevArray[0];
+    lastDevice = &semDevArray[DEVICECNT-1];
+
+    /* Check to see if p's semaphore was a device semaphore */
+    if((semAdd >= firstDevice) && (semAdd <= lastDevice)){
+      sftBlkCnt--;
+    }
+    else{
+      *(semAdd)++;
+    }
+  }
+
+  procCnt--;
   freePcb(p);
 }
 
@@ -141,9 +177,10 @@ void terminateprocess(pcb_PTR p){
 void V(state_t *state){
   pcb_PTR temp;
 
-  int *sem = (int*) state->s_a1;
+  int *sem = (int *) state->s_a1;
   (*sem)++;
   if((*sem) <= 0){
+    sftBlkCnt--;
     temp = removeBlocked(sem);
     insertProcQ(&readyQue, temp);
   }
@@ -152,14 +189,28 @@ void V(state_t *state){
 
 /* WAIT */
 void P(state_t *state){
-  int *sem = (int*) state->s_a1;
+  int *sem = (int *) state->s_a1;
   (*sem)--;
   if((*sem) < 0){
+    sftBlkCnt++;
     insertBlocked(sem, currentProc);
     currentProc = NULL;
     scheduler();
   }
   LDST(&state);
+}
+
+
+void spectrapvec(state_t *state){
+  int type = state->s_al;
+
+  switch(type):
+    case TLBTRAP:
+
+    case PROGTRAP:
+
+    case SYSTRAP:
+
 }
 
 void getcputime(state_t *state){
