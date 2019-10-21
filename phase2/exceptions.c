@@ -14,13 +14,18 @@ Module to handle exceptions. More words to follow.
 HIDDEN void copyState(state_t *orig, state_t *curr);
 HIDDEN void createprocess(state_t *state);
 HIDDEN void terminateprocess(pcb_PTR p);
+HIDDEN void P(state_t * state);
+HIDDEN void V(state_t * state);
 HIDDEN void spectrapvec(state_t *state);
 HIDDEN void getcputime(state_t *state);
 HIDDEN void waitforclock(state_t *state);
 
 
-void P(state_t * state);
-void V(state_t * state);
+void progTrapHandler();
+void tlbTrapHandler();
+
+
+
 
 void sysCallHandler(){
   unsigned int call, status, mode;
@@ -140,7 +145,7 @@ void createprocess(state_t *state){
     procCnt++;
 
     state->s_v0 = 0;
-    
+
     LDST(state)
   }
 }
@@ -272,7 +277,7 @@ void waitforclock(state_t *state){
     /* Calculate time taken up in current quantum minus any time spent handling
     IO interrupts */
     STCK(currTime);
-    currentProc->p_time = QUANTUM - (currTime - startTOD) - ioProcTime;
+    currentProc->p_time = (currTime - startTOD) - ioProcTime;
 
     copyState(state, &(currentProc->p_s));
     insertBlocked(clockAdd, currentProc);
