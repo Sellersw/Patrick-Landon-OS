@@ -202,12 +202,20 @@ pcb_PTR allocPcb(){
   /* Grab first process in list, edit pcbFree_h to point at second process, and
   reinitialize first process to have NULL fields before returning it. */
   pcbFree_h = pcbFree_h->p_next;
-  p_ret->p_semAdd = NULL;
   p_ret->p_next = NULL;
   p_ret->p_prev = NULL;
   p_ret->p_prnt = NULL;
   p_ret->p_child = NULL;
   p_ret->p_sib = NULL;
+  resetState(&(p_ret->p_s));
+  p_ret->p_semAdd = NULL;
+  p_ret->p_time = 0;
+  p_ret->p_oldSys = NULL;
+  p_ret->p_oldPgm = NULL;
+  p_ret->p_oldTlb = NULL;
+  p_ret->p_newSys = NULL;
+  p_ret->p_newPgm = NULL;
+  p_ret->p_newTlb = NULL;
 
   return p_ret;
 }

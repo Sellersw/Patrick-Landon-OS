@@ -12,6 +12,7 @@ Module to handle exceptions. More words to follow.
 
 /*****Localized (Private) Methods****/
 HIDDEN void copyState(state_t *orig, state_t *curr);
+HIDDEN void passUpOrDie();
 HIDDEN void createprocess(state_t *state);
 HIDDEN void terminateprocess(pcb_PTR p);
 HIDDEN void P(state_t * state);
@@ -127,6 +128,10 @@ void copyState(state_t *orig, state_t *curr){
   for(i = 0; i < STATEREGNUM; i++){
     curr->s_reg[i] = orig->s_reg[i];
   }
+}
+
+void passUpOrDie(){
+  
 }
 
 /****************************SYSCALL FUNCTIONS*****************************/
