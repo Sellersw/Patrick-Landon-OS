@@ -16,7 +16,11 @@ HIDDEN void createprocess(state_t *state);
 HIDDEN void terminateprocess(pcb_PTR p);
 HIDDEN void spectrapvec(state_t *state);
 HIDDEN void getcputime(state_t *state);
+HIDDEN void waitforclock(state_t *state);
 
+
+void P(state_t * state);
+void V(state_t * state);
 
 void sysCallHandler(){
   unsigned int call, status, mode;
@@ -87,7 +91,7 @@ void sysCallHandler(){
     case WAITCLOCK:
       /* Perform a p operation on interval timer (nucleus maintained device
       semaphore) */
-      P(timer);
+      waitforclock(oldSys);
       break;
 
     case WAITIO:
@@ -130,12 +134,14 @@ void createprocess(state_t *state){
     oldSys->s_v0 = -1;
   }
   else{
-    procCnt++;
     copyState(state->s_a1, &(p->p_s));
     insertChild(runningProc, p);
     insertProcQ(&readyQue, p);
+    procCnt++;
+
     state->s_v0 = 0;
-    LDST(&state)
+    
+    LDST(state)
   }
 }
 
@@ -157,8 +163,8 @@ void terminateprocess(pcb_PTR p){
   else if((outProcQ(&readyQue, p)) == NULL){
     outBlocked(p);
 
-    firstDevice = &semDevArray[0];
-    lastDevice = &semDevArray[DEVICECNT-1];
+    firstDevice = &(semDevArray[0]);
+    lastDevice = &(semDevArray[DEVICECNT-1]);
 
     /* Check to see if p's semaphore was a device semaphore */
     if((semAdd >= firstDevice) && (semAdd <= lastDevice)){
@@ -180,44 +186,101 @@ void V(state_t *state){
   int *sem = (int *) state->s_a1;
   (*sem)++;
   if((*sem) <= 0){
-    sftBlkCnt--;
     temp = removeBlocked(sem);
-    insertProcQ(&readyQue, temp);
+    if(temp != NULL){
+      insertProcQ(&readyQue, temp);
+      sftBlkCnt--;
+    }
   }
-  LDST(&state);
+  LDST(state);
 }
 
 /* WAIT */
 void P(state_t *state){
+  cpu_t currTime;
   int *sem = (int *) state->s_a1;
   (*sem)--;
   if((*sem) < 0){
-    sftBlkCnt++;
+    /* Calculate time taken up in current quantum minus any time spent handling
+    IO interrupts */
+    STCK(currTime);
+    currentProc->p_time = QUANTUM - (currTime - startTOD) - ioProcTime;
+
+    copyState(state, &(currentProc->p_s));
     insertBlocked(sem, currentProc);
+    sftBlkCnt++;
     currentProc = NULL;
     scheduler();
   }
-  LDST(&state);
+  LDST(state);
 }
 
 
 void spectrapvec(state_t *state){
-  int type = state->s_al;
+  int type = (int) state->s_al;
 
-  switch(type):
+  switch(type){
     case TLBTRAP:
+      if(currentProc->p_newTlb != NULL){
+        terminateprocess(currentProc);
+        scheduler();
+      }
+      else{
+        currentProc->p_oldTlb = (state_t *) state->s_a2;
+        currentProc->p_newTlb = (state_t *) state->s_a3;
+      }
+      break;
 
     case PROGTRAP:
+      if(currentProc->p_newPgm != NULL){
+        terminateprocess(currentProc);
+        scheduler();
+      }
+      else{
+        currentProc->p_oldPgm = (state_t *) state->s_a2;
+        currentProc->p_newPgm = (state_t *) state->s_a3;
+      }
+      break;
 
     case SYSTRAP:
-
+      if(currentProc->p_newSys != NULL){
+        terminateprocess(currentProc);
+        scheduler();
+      }
+      else{
+        currentProc->p_oldSys = (state_t *) state->s_a2;
+        currentProc->p_newSys = (state_t *) state->s_a3;
+      }
+      break;
+  }
+  LDST(state);
 }
 
 void getcputime(state_t *state){
-  int currTime;
+  cpu_t currTime;
   STCK(currTime);
   state->s_v0 = runningProc->p_time + currTime - startTOD;
-  LDST(&state);
+  LDST(state);
+}
+
+
+void waitforclock(state_t *state){
+  cpu_t currTime;
+  int *clockAdd = (int *) &(semDevArray[DEVICECNT-1]);
+  (*clockAdd)--;
+  if((*clockAdd) < 0){
+    /* Calculate time taken up in current quantum minus any time spent handling
+    IO interrupts */
+    STCK(currTime);
+    currentProc->p_time = QUANTUM - (currTime - startTOD) - ioProcTime;
+
+    copyState(state, &(currentProc->p_s));
+    insertBlocked(clockAdd, currentProc);
+    sftBlkCnt++;
+
+    scheduler();
+  }
+  LDST(state);
 }
 
 /*******************************************************************************/

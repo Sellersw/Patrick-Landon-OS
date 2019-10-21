@@ -21,10 +21,6 @@ static pcb_PTR readyQue, runningProc;
 static cpu_t startTOD, ioProcTime;
 static semd_PTR semDevArray[DEVICECNT];
 
-void test(){
-  1 + 1;
-}
-
 /**********************************************************************/
 
 void main(){
@@ -86,7 +82,7 @@ void main(){
 
   /* INIT NUCLEUS-MAINTAINED SEMEPHORES */
   for(i = 0; i < DEVICECNT; i++){
-    semDevArray[i] = NULL;
+    semDevArray[i] = 0;
   }
 
 
@@ -100,6 +96,8 @@ void main(){
   insertProcQ(&readyQue, p);
   procCnt++;
 
+  /* Instantiate pseudo-clock timer */
+  LDIT(INTERVALTMR);
 
   /* CALL SCHEDULER */
   scheduler();

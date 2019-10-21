@@ -21,8 +21,11 @@ void scheduler(){
   if(currP != NULL){
     procCnt--;
     runningProc = currP;
+
+    ioProcTime = 0;
     setTIMER(QUANTUM);
     STCK(startTOD);
+    
     LDST(&(runningProc->p_s));
   }
   else{
