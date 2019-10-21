@@ -9,10 +9,11 @@ Module to handle exceptions. More words to follow.
 #include "../e/initial.e"
 #include "../e/pcb.e"
 #include "../e/asl.e"
+#include "/usr/local/include/umps2/umps/libumps.e"
 
 /*****Localized (Private) Methods****/
 HIDDEN void copyState(state_t *orig, state_t *curr);
-HIDDEN void passUpOrDie();
+HIDDEN void passUpOrDie(int type);
 HIDDEN void createprocess(state_t *state);
 HIDDEN void terminateprocess(pcb_PTR p);
 HIDDEN void P(state_t * state);
@@ -130,8 +131,38 @@ void copyState(state_t *orig, state_t *curr){
   }
 }
 
-void passUpOrDie(){
-  
+void passUpOrDie(int type){
+  switch(type){
+    case TLBTRAP:
+      if(currentProc->p_newTlb == NULL){
+        terminateprocess(currentProc);
+        scheduler();
+      }
+      else{
+
+      }
+      break;
+
+    case PROGTRAP:
+      if(currentProc->p_newPgm == NULL){
+        terminateprocess(currentProc);
+        scheduler();
+      }
+      else{
+
+      }
+      break;
+
+    case SYSTRAP:
+      if(currentProc->p_newSys == NULL){
+        terminateprocess(currentProc);
+        scheduler();
+      }
+      else{
+
+      }
+      break;
+  }
 }
 
 /****************************SYSCALL FUNCTIONS*****************************/

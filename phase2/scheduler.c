@@ -11,6 +11,7 @@ Written by: Patrick Sellers and Landon Clark
 #include "../e/initial.e"
 #include "../e/pcb.e"
 #include "../e/asl.e"
+#include "/usr/local/include/umps2/umps/libumps.e"
 
 /****Local Variables*****/
 pcb_PTR currP;
@@ -25,7 +26,7 @@ void scheduler(){
     ioProcTime = 0;
     setTIMER(QUANTUM);
     STCK(startTOD);
-    
+
     LDST(&(runningProc->p_s));
   }
   else{

@@ -11,6 +11,7 @@ Written by: Patrick Sellers and Landon Clark
 #include "../e/initial.e"
 #include "../e/pcb.e"
 #include "../e/asl.e"
+#include "/usr/local/include/umps2/umps/libumps.e"
 
 void ioTrapHandler(){
 
@@ -26,12 +27,12 @@ void ioTrapHandler(){
 /* Examine the Cause Register in OldINT (pg. 15) */
 
 /* Given the line number (3-7), determine which instance
-of that device is generating the interrupt 
+of that device is generating the interrupt
     - from this, should be able to determine the device's device
     register
     - and the index of the seme4 for that device. */
 
-/* Treat the interrupt as a "V" op on the device's seme4 
+/* Treat the interrupt as a "V" op on the device's seme4
     - increment the seme4
     - test if the seme4's value is == 0
         - removeBlocked (returns process)
