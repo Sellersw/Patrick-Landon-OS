@@ -21,7 +21,7 @@ void scheduler(){
 
   nextProc = removeProcQ(&readyQue);
 
-  if(currP != NULL){
+  if(nextProc != NULL){
     procCnt--;
     currentProc = nextProc;
 
