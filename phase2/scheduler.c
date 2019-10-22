@@ -16,13 +16,6 @@ Written by: Patrick Sellers and Landon Clark
 #include "../e/initial.e"
 #include "/usr/local/include/umps2/umps/libumps.e"
 
-/* Global Phase 2 variable definitions */
-extern static int procCnt, sftBlkCnt;
-extern static pcb_PTR readyQue, currentProc;
-extern static cpu_t startTOD, ioProcTime;
-extern static semd_PTR semDevArray[DEVICECNT];
-
-
 
 /* A method that handles the transfering of the CPU to the next process that is
     on the ready queue. This uses a round-robin scheduling algorithm to prevent

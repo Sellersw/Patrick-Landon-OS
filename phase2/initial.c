@@ -23,10 +23,10 @@ Written by: Patrick Sellers and Landon Clark
 extern void test();
 
 /********Global Module-Level Variables*********/
-static int procCnt, sftBlkCnt;  /* keep track process amount & which are waiting for I/O*/
-static pcb_PTR readyQue, currentProc; /* Pointer to the queue of executable procs */
-static cpu_t startTOD, ioProcTime; /* Instances our clocks for measuring proc time */
-static semd_PTR semDevArray[DEVICECNT]; /* A sema4 array instanced for the 49 Kaya devices */
+int procCnt, sftBlkCnt;  /* keep track process amount & which are waiting for I/O*/
+pcb_PTR readyQue, currentProc; /* Pointer to the queue of executable procs */
+cpu_t startTOD, ioProcTime; /* Instances our clocks for measuring proc time */
+semd_PTR semDevArray[DEVICECNT]; /* A sema4 array instanced for the 49 Kaya devices */
 
 /*******************************************************************************************/
 
