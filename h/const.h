@@ -38,6 +38,9 @@
 #define PLOCTIMEON 0x08000000
 #define PLOCTIMEOFF 0x00000000
 
+/* exception code values for cause register */
+#define RESERVEDINSTR 0x00000048
+
 /* quantum time between interrupts from cpu local timer*/
 #define QUANTUM 5000
 
