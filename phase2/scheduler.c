@@ -1,6 +1,9 @@
 /***************************SCHEDULER.C**********************************
 
-Module to handle the scheduler. More words to follow.
+This module handles the scheduling of a new process after the previous
+process is finished using the CPU. If no processes are ready, it makes sure
+the interrupt handler can trigger, and halts if there are no more processes
+to load. 
 
 Written by: Patrick Sellers and Landon Clark
 
@@ -8,42 +11,50 @@ Written by: Patrick Sellers and Landon Clark
 
 #include "../h/types.h"
 #include "../h/const.h"
+#include "../e/initial.e"
 #include "../e/pcb.e"
 #include "../e/asl.e"
-#include "../e/initial.e"
-#include "../e/exceptions.e"
-#include "../e/interrupts.e"
 #include "/usr/local/include/umps2/umps/libumps.e"
 
 
+/* A method that handles the transfering of the CPU to the next process that is
+    on the ready queue. This uses a round-robin scheduling algorithm to prevent
+    starvation, and allows the process a set time-slice based on our quantum length. 
+    It also includes wait handling for when processes are waiting for I/O, and halts
+    the machine when all processes have terminated. */
 void scheduler(){
-  /****Local Variables*****/
+  /*****Local Variables*****/
   pcb_PTR nextProc;
   unsigned int status;
+  /*************************/
 
-  nextProc = removeProcQ(&readyQue);
+  nextProc = removeProcQ(&readyQue); /* Take a proc off the head of the ready queue */ 
 
-  if(nextProc != NULL){
-    procCnt--;
-    currentProc = nextProc;
+  if(nextProc != NULL){ /* As long as the head of the ready queue is not NULL... */
+    procCnt--; /* Now have one less process, decrement cnt. */
+    currentProc = nextProc; /* Global currentProc is now the ready process we dequeued */
+    ioProcTime = 0;  /* Reset the time spent in the Interrupt handler.
+                        Used for adding back quantum time to the running process. */
+    setTIMER(QUANTUM); /* sets a timer with our quantum time set in const.h */
+    STCK(startTOD); /* starts the clock */
 
-    ioProcTime = 0;
-    setTIMER(QUANTUM);
-    STCK(startTOD);
-
-    LDST(&(currentProc->p_s));
+    LDST(&(currentProc->p_s)); /* loads our new process into our CPU registers */
   }
   else{
-    if(procCnt == 0){
-      HALT ();
+    if(procCnt == 0){ /* if the ready queue was empty and there are no more processes... */
+      HALT (); /* stop the machine */
     }
+    /* if the ready queue was empty, there are still processes somewhere, and none of
+        them are soft blocked waiting for I/O... */
     if(sftBlkCnt == 0){
-      PANIC ();
+      PANIC (); /* Something is broken :( */
     }
+    /* if the ready queue was empty, there are still processes somewhere, and processes
+        that are soft blocked waiting for I/O is less than zero... */
     if(sftBlkCnt > 0){
       status = getSTATUS() | INTERON;
-      setSTATUS(status);
-      WAIT ();
+      setSTATUS(status); /* Turn interrupts on */
+      WAIT (); /* Wait for I/O */
     }
   }
 }
