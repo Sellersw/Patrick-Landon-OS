@@ -12,7 +12,7 @@ Written by: Patrick Sellers and Landon Clark
 #include "../e/asl.e"
 #include "../e/scheduler.e"
 #include "../e/exceptions.e"
-#include "../e/interrupts.e"
+#include "../e/initial.e"
 #include "/usr/local/include/umps2/umps/libumps.e"
 
 void ioTrapHandler(){
