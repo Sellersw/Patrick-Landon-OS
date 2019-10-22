@@ -15,6 +15,7 @@ Written by: Patrick Sellers and Landon Clark
 
 /****Local Variables*****/
 pcb_PTR currP;
+unsigned int status;
 
 void scheduler(){
   currP = removeProcQ(&readyQue);
@@ -37,6 +38,8 @@ void scheduler(){
       PANIC ();
     }
     if(sftBlkCnt > 0){
+      status = getSTATUS() | INTERON;
+      setSTATUS(status);
       WAIT ();
     }
   }

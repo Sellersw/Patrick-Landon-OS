@@ -21,6 +21,7 @@ HIDDEN void V(state_t * state);
 HIDDEN void spectrapvec(state_t *state);
 HIDDEN void getcputime(state_t *state);
 HIDDEN void waitforclock(state_t *state);
+HIDDEN void waitio();
 
 
 void progTrapHandler();
@@ -102,18 +103,18 @@ void sysCallHandler(){
       break;
 
     case WAITIO:
-
+      waitio();
       break;
 
   }
 }
 
 void progTrapHandler(){
-
+  passUpOrDie(PROGTRAP);
 }
 
 void tlbTrapHandler(){
-
+  passUpOrDie(TLBTRAP);
 }
 
 /****************************HELPER FUNCTIONS******************************/
@@ -132,6 +133,8 @@ void copyState(state_t *orig, state_t *curr){
 }
 
 void passUpOrDie(int type){
+  state_t *state;
+
   switch(type){
     case TLBTRAP:
       if(currentProc->p_newTlb == NULL){
@@ -139,7 +142,9 @@ void passUpOrDie(int type){
         scheduler();
       }
       else{
-
+        state = (state_t *) TLBMGMTOLD;
+        copyState(state, currentProc->p_oldTlb);
+        LDST(currentProc->p_newTlb);
       }
       break;
 
@@ -149,7 +154,9 @@ void passUpOrDie(int type){
         scheduler();
       }
       else{
-
+        state = (state_t *) PROGTRAPOLD;
+        copyState(state, currentProc->p_oldPgm);
+        LDST(currentProc->p_newPgm);
       }
       break;
 
@@ -159,7 +166,9 @@ void passUpOrDie(int type){
         scheduler();
       }
       else{
-
+        state = (state_t *) SYSCALLOLD;
+        copyState(state, currentProc->p_oldSys);
+        LDST(currentProc->p_newSys);
       }
       break;
   }
@@ -324,4 +333,11 @@ void waitforclock(state_t *state){
   LDST(state);
 }
 
+
+
+/* SYSCALL 8 helper function */
+void waitio(){
+
+
+}
 /*******************************************************************************/
