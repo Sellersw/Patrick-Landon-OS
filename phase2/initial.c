@@ -26,41 +26,41 @@ static semd_PTR semDevArray[DEVICECNT]; /* A sema4 array instanced for the 49 Ka
 /*******************************************************************************************/
 
 void main(){
+  state_t * sysCallNew, progTrapNew, tlbTrapNew, interNew;
+  devregarea_t *regArea;
+  memaddr RAMTOP;
   int i;
   pcb_PTR p; /* our placeholder proc that will be placed on the ready queue. */
-
-  /* Begin clock for total time machine has been on */
-  STCK(startTOD);
 
   /******************************POPULATING ROM RESERVED FRAMES******************************/
   /* Here we find the top frame of RAM by adding the size of main RAM
   with the RAM reserved space. */
-  devregarea_t *regArea = (devregarea_t *) RAMBASEADDR;
-  memaddr RAMTOP = regArea->rambase + regArea->ramsize;
+  regArea = (devregarea_t *) RAMBASEADDR;
+  RAMTOP = regArea->rambase + regArea->ramsize;
 
   /* This sets the location of our syscall exception to the memory address
   of our sysCallHandler method. This is a state that our system can load when
   an exception of this type is triggered */
-  state_t *syscallNew = (state_t *) SYSCALLNEW;
+  sysCallNew = (state_t *) SYSCALLNEW;
   sysCallNew->s_pc = sysCallNew->s_t9 = (memaddr) sysCallHandler;
   sysCallNew->s_sp = RAMTOP;
   sysCallNew->s_status = INTERMASKED | VMOFF | PLOCTIMEON | KERNELON;
 
 /* This is the same as above, except it is for our program traps. */
-  state_t *progTrapNew = (state_t *) PROGTRAPNEW;
+  progTrapNew = (state_t *) PROGTRAPNEW;
   progTrapNew->s_pc = progTrapNew->s_t9 = (memaddr) progTrapHandler;
   progTrapNew->s_sp = RAMTOP;
   progTrapNew->s_status = INTERMASKED | VMOFF | PLOCTIMEON | KERNELON;
 
 /* This is also the same but this is for when TLB exceptions are raised */
-  state_t *tlbTrapNew = (state_t *) TLBMGMTNEW;
+  tlbTrapNew = (state_t *) TLBMGMTNEW;
   tlbTrapNew->s_pc = tlbTrapNew->s_t9 = (memaddr) tlbTrapHandler;
   tlbTrapNew->s_sp = RAMTOP;
   tlbTrapNew->s_status = INTERMASKED | VMOFF | PLOCTIMEON | KERNELON;
 
 /* Finally, this section is to define the state the machine should wake up
    in for a interupt. */
-  state_t *interNew = (state_t *) INTERNEW;
+  interNew = (state_t *) INTERNEW;
   interNew->s_pc = interNew->s_t9 = (memaddr) ioTrapHandler;
   interNew->s_sp = RAMTOP;
   interNew->s_status = INTERMASKED | VMOFF | PLOCTIMEON | KERNELON;
@@ -91,7 +91,7 @@ void main(){
 
   /**********************INSTANTIATE A PROC AND PLACE IT ON THE READY QUEUE******************/
   p = allocPcb(); /* remove a proc from the FreePCB queue */
-  (p->p_s).s_pc = p->p_s->s_t9 = (memaddr) test; /* load that PCB with a address from our test file */
+  (p->p_s).s_pc = (p->p_s).s_t9 = (memaddr) test; /* load that PCB with a address from our test file */
   (p->p_s).s_sp = RAMTOP; /* stack pointer is equal to the top of RAM */
 
   /* Establishes a state for the test proc*/
