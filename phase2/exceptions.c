@@ -32,7 +32,7 @@ void tlbTrapHandler();
 void sysCallHandler(){
   unsigned int call, status, mode;
 
-  state_t * oldSys, oldPgm;
+  state_t *oldSys, *oldPgm;
   oldSys = (state_t *) SYSCALLOLD;
 
   /* We need to make sure we do not return to the instruction that brought
