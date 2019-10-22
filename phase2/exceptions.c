@@ -7,6 +7,7 @@ Module to handle exceptions. More words to follow.
 #include "../h/types.h"
 #include "../h/const.h"
 #include "../e/initial.e"
+#include "../e/scheduler.e"
 #include "../e/pcb.e"
 #include "../e/asl.e"
 #include "/usr/local/include/umps2/umps/libumps.e"
@@ -30,7 +31,7 @@ void tlbTrapHandler();
 
 
 void sysCallHandler(){
-  unsigned int call, status, mode;
+  unsigned int call, status;
 
   state_t *oldSys, *oldPgm;
   oldSys = (state_t *) SYSCALLOLD;
@@ -51,7 +52,7 @@ void sysCallHandler(){
 
   /* Check the KUp bit to determine if we were working in Kernel mode */
   if((status & KERNELOFF) == KERNELOFF){
-    // Handle user mode priveleged instruction
+    /* Handle user mode priveleged instruction */
     oldPgm = (state_t *) PROGTRAPOLD;
     copyState(oldSys, oldPgm);
     oldPgm->s_cause = RESERVEDINSTR;
@@ -181,10 +182,10 @@ HIDDEN void createprocess(state_t *state){
   /* If an error occurs when attempting to create a new PCB, return error
   code of -1 in the v0 register of oldSys */
   if(p == NULL){
-    oldSys->s_v0 = -1;
+    state->s_v0 = -1;
   }
   else{
-    copyState(state->s_a1, &(p->p_s));
+    copyState(state->s_a1, (state_t *) &(p->p_s));
     insertChild(currentProc, p);
     insertProcQ(&readyQue, p);
     procCnt++;
