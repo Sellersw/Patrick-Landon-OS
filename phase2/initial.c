@@ -15,14 +15,12 @@ Written by: Patrick Sellers and Landon Clark
 #include "../h/const.h"
 #include "../e/pcb.e"
 #include "../e/asl.e"
+#include "../e/scheduler.e"
+#include "../e/exceptions.e"
+#include "../e/interrupts.e"
 #include "/usr/local/include/umps2/umps/libumps.e"
 
-extern void sysCallHandler();
-extern void progTrapHandler();
-extern void tlbTrapHandler();
-extern void ioTrapHandler();
-
-extern void scheduler();
+extern void test();
 
 /********Global Module-Level Variables*********/
 static int procCnt, sftBlkCnt;  /* keep track process amount & which are waiting for I/O*/
@@ -79,7 +77,6 @@ void main(){
   initPcbs();
   initASL();
 
-<<<<<<< HEAD
 /*****************************INIT NUCLEUS-MAINTAINED VARIABLES****************************/
   procCnt = 0; /* zero processes are handled by the OS at initialization */
   sftBlkCnt = 0; /* zero processes are blocked for I/O at initialization */
