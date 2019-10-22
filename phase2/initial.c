@@ -17,7 +17,7 @@ Written by: Patrick Sellers and Landon Clark
 #include "../e/asl.e"
 #include "/usr/local/include/umps2/umps/libumps.e"
 
-<<<<<<< HEAD
+/********Global Module-Level Variables*********/
 static int procCnt, sftBlkCnt;  /* keep track process amount & which are waiting for I/O*/
 static pcb_PTR readyQue, currentProc; /* Pointer to the queue of executable procs */
 static cpu_t startTOD, ioProcTime; /* Instances our clocks for measuring proc time */
