@@ -30,7 +30,7 @@ semd_PTR semDevArray[DEVICECNT]; /* A sema4 array instanced for the 49 Kaya devi
 
 /*******************************************************************************************/
 
-void main(){
+int main(){
   state_t *sysCallNew, *progTrapNew, *tlbTrapNew, *interNew;
   devregarea_t *regArea;
   memaddr RAMTOP;
