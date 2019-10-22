@@ -117,7 +117,7 @@ void tlbTrapHandler(){
 }
 
 /****************************HELPER FUNCTIONS******************************/
-void copyState(state_t *orig, state_t *curr){
+HIDDEN void copyState(state_t *orig, state_t *curr){
   int i;
   /* Copy state values over to new state */
   curr->s_asid = orig->s_asid;
@@ -131,7 +131,7 @@ void copyState(state_t *orig, state_t *curr){
   }
 }
 
-void passUpOrDie(int type){
+HIDDEN void passUpOrDie(int type){
   state_t *state;
 
   switch(type){
@@ -175,7 +175,7 @@ void passUpOrDie(int type){
 
 /****************************SYSCALL FUNCTIONS*****************************/
 /* SYSCALL 1 helper function */
-void createprocess(state_t *state){
+HIDDEN void createprocess(state_t *state){
   pcb_PTR p = allocPcb();
 
   /* If an error occurs when attempting to create a new PCB, return error
@@ -197,7 +197,7 @@ void createprocess(state_t *state){
 
 
 /* SYSCALL 2 helper function */
-void terminateprocess(pcb_PTR p){
+HIDEEN void terminateprocess(pcb_PTR p){
   int * firstDevice, lastDevice;
   int *semAdd = p->p_semAdd;
 
@@ -234,7 +234,7 @@ void terminateprocess(pcb_PTR p){
 
 /* SYSCALL 3 helper function */
 /* SIGNAL */
-void V(state_t *state){
+HIDDEN void V(state_t *state){
   pcb_PTR temp;
 
   int *sem = (int *) state->s_a1;
@@ -252,7 +252,7 @@ void V(state_t *state){
 
 /* SYSCALL 4 helper function */
 /* WAIT */
-void P(state_t *state){
+HIDDEN void P(state_t *state){
   cpu_t currTime;
   int *sem = (int *) state->s_a1;
   (*sem)--;
@@ -274,7 +274,7 @@ void P(state_t *state){
 
 
 /* SYSCALL 5 helper function */
-void spectrapvec(state_t *state){
+HIDDEN void spectrapvec(state_t *state){
   int type = (int) state->s_al;
 
   switch(type){
@@ -316,7 +316,7 @@ void spectrapvec(state_t *state){
 
 
 /* SYSCALL 6 helper function */
-void getcputime(state_t *state){
+HIDDEN void getcputime(state_t *state){
   cpu_t currTime;
   STCK(currTime);
   state->s_v0 = currentProc->p_time + currTime - startTOD;
@@ -324,7 +324,7 @@ void getcputime(state_t *state){
 }
 
 /* SYSCALL 7 helper function */
-void waitforclock(state_t *state){
+HIDDEN void waitforclock(state_t *state){
   cpu_t currTime;
   int *clockAdd = (int *) &(semDevArray[DEVICECNT-1]);
   (*clockAdd)--;
@@ -347,7 +347,7 @@ void waitforclock(state_t *state){
 
 
 /* SYSCALL 8 helper function */
-void waitio(state_t *state){
+HIDDEN void waitio(state_t *state){
   cpu_t currTime;
   int lineNo, devNo, read, index;
   int *semAdd;
