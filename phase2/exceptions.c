@@ -197,7 +197,7 @@ HIDDEN void createprocess(state_t *state){
 
 
 /* SYSCALL 2 helper function */
-HIDEEN void terminateprocess(pcb_PTR p){
+HIDDEN void terminateprocess(pcb_PTR p){
   int *firstDevice = (int *) &(semDevArray[0]);
   int *lastDevice = (int *) &(semDevArray[DEVICECNT-1]);
   int *semAdd = p->p_semAdd;
