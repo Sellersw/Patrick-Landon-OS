@@ -185,21 +185,21 @@ HIDDEN void createprocess(state_t *state){
     state->s_v0 = -1;
   }
   else{
-    copyState(state->s_a1, (state_t *) &(p->p_s));
+    copyState((state_t *) state->s_a1, (state_t *) &(p->p_s));
     insertChild(currentProc, p);
     insertProcQ(&readyQue, p);
     procCnt++;
 
     state->s_v0 = 0;
-
-    LDST(state)
   }
+  LDST(state);
 }
 
 
 /* SYSCALL 2 helper function */
 HIDEEN void terminateprocess(pcb_PTR p){
-  int * firstDevice, lastDevice;
+  int *firstDevice = (int *) &(semDevArray[0]);
+  int *lastDevice = (int *) &(semDevArray[DEVICECNT-1]);
   int *semAdd = p->p_semAdd;
 
   /* Check for children of p. If they exist, kill them first */
@@ -215,9 +215,6 @@ HIDEEN void terminateprocess(pcb_PTR p){
 
   else if((outProcQ(&readyQue, p)) == NULL){
     outBlocked(p);
-
-    firstDevice = &(semDevArray[0]);
-    lastDevice = &(semDevArray[DEVICECNT-1]);
 
     /* Check to see if p's semaphore was a device semaphore */
     if((semAdd >= firstDevice) && (semAdd <= lastDevice)){
@@ -263,7 +260,7 @@ HIDDEN void P(state_t *state){
     STCK(currTime);
     currentProc->p_time = (currTime - startTOD) - ioProcTime;
 
-    copyState(state, &(currentProc->p_s));
+    copyState(state, (state_t *) &(currentProc->p_s));
     insertBlocked(sem, currentProc);
     sftBlkCnt++;
     currentProc = NULL;
@@ -276,7 +273,7 @@ HIDDEN void P(state_t *state){
 
 /* SYSCALL 5 helper function */
 HIDDEN void spectrapvec(state_t *state){
-  int type = (int) state->s_al;
+  int type = (int) state->s_a1;
 
   switch(type){
     case TLBTRAP:
@@ -320,7 +317,7 @@ HIDDEN void spectrapvec(state_t *state){
 HIDDEN void getcputime(state_t *state){
   cpu_t currTime;
   STCK(currTime);
-  state->s_v0 = currentProc->p_time + currTime - startTOD;
+  state->s_v0 = currentProc->p_time + currTime - startTOD - ioProcTime;
   LDST(state);
 }
 
@@ -335,7 +332,7 @@ HIDDEN void waitforclock(state_t *state){
     STCK(currTime);
     currentProc->p_time = (currTime - startTOD) - ioProcTime;
 
-    copyState(state, &(currentProc->p_s));
+    copyState(state, (state_t *) &(currentProc->p_s));
     insertBlocked(clockAdd, currentProc);
     sftBlkCnt++;
     currentProc = NULL;
@@ -371,7 +368,7 @@ HIDDEN void waitio(state_t *state){
   }
 
 
-  semAdd = &(semDevArray[index]);
+  semAdd = (int *) &(semDevArray[index]);
   (*semAdd)--;
   if((*semAdd) < 0){
     /* Calculate time taken up in current quantum minus any time spent handling
