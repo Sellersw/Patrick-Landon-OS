@@ -14,6 +14,7 @@ Module to handle exceptions. More words to follow.
 /*****Localized (Private) Methods****/
 HIDDEN void copyState(state_t *orig, state_t *curr);
 HIDDEN void passUpOrDie(int type);
+
 HIDDEN void createprocess(state_t *state);
 HIDDEN void terminateprocess(pcb_PTR p);
 HIDDEN void P(state_t * state);
@@ -45,7 +46,7 @@ void sysCallHandler(){
 
   /* Handle syscalls that are not defined yet */
   if(call >= 9){
-    // Pass up or die
+    passUpOrDie(SYSTRAP);
   }
 
   /* Check the KUp bit to determine if we were working in Kernel mode */
