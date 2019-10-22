@@ -18,7 +18,7 @@ Written by: Patrick Sellers and Landon Clark
 #include "/usr/local/include/umps2/umps/libumps.e"
 
 static int procCnt, sftBlkCnt;
-static pcb_PTR readyQue, runningProc;
+static pcb_PTR readyQue, currentProc;
 static cpu_t startTOD, ioProcTime;
 static semd_PTR semDevArray[DEVICECNT];
 
@@ -73,7 +73,7 @@ void main(){
   procCnt = 0;
   sftBlkCnt = 0;
   readyQue = MkEmptyProcQ();
-  runningProc = NULL;
+  currentProc = NULL;
 
   /* Variable to allow us to keep track of how long a process spends in an IO
   interrupt or syscall exception during its quantum to allow us to handle more

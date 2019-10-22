@@ -14,21 +14,21 @@ Written by: Patrick Sellers and Landon Clark
 #include "/usr/local/include/umps2/umps/libumps.e"
 
 /****Local Variables*****/
-pcb_PTR currP;
+pcb_PTR nextProc;
 unsigned int status;
 
 void scheduler(){
-  currP = removeProcQ(&readyQue);
+  nextProc = removeProcQ(&readyQue);
 
   if(currP != NULL){
     procCnt--;
-    runningProc = currP;
+    currentProc = nextProc;
 
     ioProcTime = 0;
     setTIMER(QUANTUM);
     STCK(startTOD);
 
-    LDST(&(runningProc->p_s));
+    LDST(&(currentProc->p_s));
   }
   else{
     if(procCnt == 0){
