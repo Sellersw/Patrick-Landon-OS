@@ -11,6 +11,15 @@ Module to handle exceptions. More words to follow.
 #include "../e/initial.e"
 #include "/usr/local/include/umps2/umps/libumps.e"
 
+
+/* Global Phase 2 variable definitions */
+extern static int procCnt, sftBlkCnt;
+extern static pcb_PTR readyQue, currentProc;
+extern static cpu_t startTOD, ioProcTime;
+extern static semd_PTR semDevArray[DEVICECNT];
+
+
+
 /*****Localized (Private) Methods****/
 HIDDEN void copyState(state_t *orig, state_t *curr);
 HIDDEN void passUpOrDie(int type);

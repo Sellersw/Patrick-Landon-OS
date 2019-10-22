@@ -13,6 +13,14 @@ Written by: Patrick Sellers and Landon Clark
 #include "../e/initial.e"
 #include "/usr/local/include/umps2/umps/libumps.e"
 
+/* Global Phase 2 variable definitions */
+extern static int procCnt, sftBlkCnt;
+extern static pcb_PTR readyQue, currentProc;
+extern static cpu_t startTOD, ioProcTime;
+extern static semd_PTR semDevArray[DEVICECNT];
+
+
+
 void ioTrapHandler(){
 
 /* Determine what line the interrupt is on:
