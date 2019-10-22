@@ -50,7 +50,7 @@ void main(){
   an exception of this type is triggered */
   sysCallNew = (state_t *) SYSCALLNEW;
   sysCallNew->s_pc = sysCallNew->s_t9 = (memaddr) sysCallHandler;
-  (*sysCallNew)s_sp = RAMTOP;
+  (*sysCallNew).s_sp = RAMTOP;
   sysCallNew->s_status = INTERMASKED | VMOFF | PLOCTIMEON | KERNELON;
 
 /* This is the same as above, except it is for our program traps. */
