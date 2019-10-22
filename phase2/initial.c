@@ -1,4 +1,4 @@
-/********************************INITIAL.C*****************************************
+/***************************************INITIAL.C*****************************************
 
 Main entry point of the Kaya operating system. Properly initializes necessary data
 structures, global control data, and physical memory locations before passing control
@@ -9,7 +9,7 @@ processes (readyQue, procCnt, semArray, etc.)
 More words to follow.
 Written by: Patrick Sellers and Landon Clark
 
-********************************************************************************/
+*******************************************************************************************/
 
 #include "../h/types.h"
 #include "../h/const.h"
@@ -17,20 +17,21 @@ Written by: Patrick Sellers and Landon Clark
 #include "../e/asl.e"
 #include "/usr/local/include/umps2/umps/libumps.e"
 
-static int procCnt, sftBlkCnt;
-static pcb_PTR readyQue, currentProc;
-static cpu_t startTOD, ioProcTime;
-static semd_PTR semDevArray[DEVICECNT];
+<<<<<<< HEAD
+static int procCnt, sftBlkCnt;  /* keep track process amount & which are waiting for I/O*/
+static pcb_PTR readyQue, currentProc; /* Pointer to the queue of executable procs */
+static cpu_t startTOD, ioProcTime; /* Instances our clocks for measuring proc time */
+static semd_PTR semDevArray[DEVICECNT]; /* A sema4 array instanced for the 49 Kaya devices */
 
-/**********************************************************************/
+/*******************************************************************************************/
 
 void main(){
-  pcb_PTR p;
+  pcb_PTR p; /* our placeholder proc that will be placed on the ready queue. */
 
   /* Begin clock for total time machine has been on */
   STCK(startTOD);
 
-  /*******************POPULATING ROM RESERVED FRAMES******************/
+  /******************************POPULATING ROM RESERVED FRAMES******************************/
   /* Here we find the top frame of RAM by adding the size of main RAM
   with the RAM reserved space. */
   devregarea_t *regArea = (devregarea_t *) RAMBASEADDR;
@@ -63,37 +64,39 @@ void main(){
   interNew->s_sp = RAMTOP;
   interNew->s_status = INTERMASKED | VMOFF | PLOCTIMEON | KERNELON;
 
+/******************************************************************************************/
 
   /* Initialize the data structures (Process Control Blocks and Active
   Semephore List) */
   initPcbs();
   initASL();
 
-  /* INIT NUCLEUS-MAINTAINED VARIABLES */
-  procCnt = 0;
-  sftBlkCnt = 0;
-  readyQue = MkEmptyProcQ();
-  currentProc = NULL;
+<<<<<<< HEAD
+/*****************************INIT NUCLEUS-MAINTAINED VARIABLES****************************/
+  procCnt = 0; /* zero processes are handled by the OS at initialization */
+  sftBlkCnt = 0; /* zero processes are blocked for I/O at initialization */
+  readyQue = MkEmptyProcQ(); /* Instantiates the readyQue as a pointer to a queue of PCBs */
+  currentProc = NULL; /* no current process is running at initialization */
 
   /* Variable to allow us to keep track of how long a process spends in an IO
   interrupt or syscall exception during its quantum to allow us to handle more
   accurate timing accounting */
   ioProcTime = 0;
 
-
-  /* INIT NUCLEUS-MAINTAINED SEMEPHORES */
+  /**************************INIT NUCLEUS-MAINTAINED DEVICE SEMEPHORES*************************/
   for(i = 0; i < DEVICECNT; i++){
-    semDevArray[i] = 0;
+    semDevArray[i] = 0; /* Set device sema4 vals to 0, used for mutual exclusion */
   }
 
+  /**********************INSTANTIATE A PROC AND PLACE IT ON THE READY QUEUE******************/
+  p = allocPcb(); /* remove a proc from the FreePCB queue */
+  p->p_s->s_pc = p->p_s->s_t9 = (memaddr) test; /* load that PCB with a address from our test file */
+  p->p_s->s_sp = RAMTOP; /* stack pointer is equal to the top of RAM */
 
-  /* INSTANTIATE A PROC AND PLACE IT ON THE READY QUEUE. */
-  p = allocPcb();
-  p->p_s->s_pc = p->p_s->s_t9 = (memaddr) test;
-  p->p_s->s_sp = RAMTOP;
+  /* Establishes a state for the test proc*/
   p->p_s->s_status = INTERON | VMOFF | PLOCTIMEON | KERNELON;
 
-
+  /* Put the process onto the ready queue */
   insertProcQ(&readyQue, p);
   procCnt++;
 
