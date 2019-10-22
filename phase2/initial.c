@@ -17,6 +17,13 @@ Written by: Patrick Sellers and Landon Clark
 #include "../e/asl.e"
 #include "/usr/local/include/umps2/umps/libumps.e"
 
+extern void sysCallHandler();
+extern void progTrapHandler();
+extern void tlbTrapHandler();
+extern void ioTrapHandler();
+
+extern void scheduler();
+
 /********Global Module-Level Variables*********/
 static int procCnt, sftBlkCnt;  /* keep track process amount & which are waiting for I/O*/
 static pcb_PTR readyQue, currentProc; /* Pointer to the queue of executable procs */
@@ -103,6 +110,9 @@ void main(){
 
   /* Instantiate pseudo-clock timer */
   LDIT(INTERVALTMR);
+
+  /* Begin clock for total time machine has been on */
+  STCK(startTOD);
 
   /* CALL SCHEDULER */
   scheduler();
