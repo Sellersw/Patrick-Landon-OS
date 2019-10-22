@@ -80,7 +80,7 @@ void main(){
 /*****************************INIT NUCLEUS-MAINTAINED VARIABLES****************************/
   procCnt = 0; /* zero processes are handled by the OS at initialization */
   sftBlkCnt = 0; /* zero processes are blocked for I/O at initialization */
-  readyQue = MkEmptyProcQ(); /* Instantiates the readyQue as a pointer to a queue of PCBs */
+  readyQue = mkEmptyProcQ(); /* Instantiates the readyQue as a pointer to a queue of PCBs */
   currentProc = NULL; /* no current process is running at initialization */
 
   /* Variable to allow us to keep track of how long a process spends in an IO

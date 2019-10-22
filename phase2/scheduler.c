@@ -11,8 +11,6 @@ Written by: Patrick Sellers and Landon Clark
 #include "../e/pcb.e"
 #include "../e/asl.e"
 #include "../e/initial.e"
-#include "../e/exceptions.e"
-#include "../e/interrupts.e"
 #include "/usr/local/include/umps2/umps/libumps.e"
 
 
