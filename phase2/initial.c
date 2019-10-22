@@ -17,8 +17,9 @@ Written by: Patrick Sellers and Landon Clark
 #include "../e/asl.e"
 #include "/usr/local/include/umps2/umps/libumps.e"
 
+<<<<<<< HEAD
 static int procCnt, sftBlkCnt;  /* keep track process amount & which are waiting for I/O*/
-static pcb_PTR readyQue, runningProc; /* Pointer to the queue of executable procs */
+static pcb_PTR readyQue, currentProc; /* Pointer to the queue of executable procs */
 static cpu_t startTOD, ioProcTime; /* Instances our clocks for measuring proc time */
 static semd_PTR semDevArray[DEVICECNT]; /* A sema4 array instanced for the 49 Kaya devices */
 
@@ -70,11 +71,12 @@ void main(){
   initPcbs();
   initASL();
 
+<<<<<<< HEAD
 /*****************************INIT NUCLEUS-MAINTAINED VARIABLES****************************/
   procCnt = 0; /* zero processes are handled by the OS at initialization */
   sftBlkCnt = 0; /* zero processes are blocked for I/O at initialization */
   readyQue = MkEmptyProcQ(); /* Instantiates the readyQue as a pointer to a queue of PCBs */
-  runningProc = NULL; /* no current process is running at initialization */
+  currentProc = NULL; /* no current process is running at initialization */
 
   /* Variable to allow us to keep track of how long a process spends in an IO
   interrupt or syscall exception during its quantum to allow us to handle more

@@ -14,6 +14,7 @@ Module to handle exceptions. More words to follow.
 /*****Localized (Private) Methods****/
 HIDDEN void copyState(state_t *orig, state_t *curr);
 HIDDEN void passUpOrDie(int type);
+
 HIDDEN void createprocess(state_t *state);
 HIDDEN void terminateprocess(pcb_PTR p);
 HIDDEN void P(state_t * state);
@@ -21,13 +22,11 @@ HIDDEN void V(state_t * state);
 HIDDEN void spectrapvec(state_t *state);
 HIDDEN void getcputime(state_t *state);
 HIDDEN void waitforclock(state_t *state);
-HIDDEN void waitio();
+HIDDEN void waitio(state_t *state);
 
 
 void progTrapHandler();
 void tlbTrapHandler();
-
-
 
 
 void sysCallHandler(){
@@ -47,7 +46,7 @@ void sysCallHandler(){
 
   /* Handle syscalls that are not defined yet */
   if(call >= 9){
-    // Pass up or die
+    passUpOrDie(SYSTRAP);
   }
 
   /* Check the KUp bit to determine if we were working in Kernel mode */
@@ -62,7 +61,7 @@ void sysCallHandler(){
 
   switch(call){
 
-    /* Syscall 1: Creates a new child process for the current runningProc */
+    /* Syscall 1: Creates a new child process for the currentProc */
     case CREATEPROCESS:
       createprocess(oldSys);
       break;
@@ -70,7 +69,7 @@ void sysCallHandler(){
     /* Syscall 2: Kills the executing process and recursively kills all children
     of that process */
     case TERMINATEPROCESS:
-      terminateprocess(runningProc);
+      terminateprocess(currentProc);
       scheduler();
       break;
 
@@ -103,7 +102,7 @@ void sysCallHandler(){
       break;
 
     case WAITIO:
-      waitio();
+      waitio(oldSys);
       break;
 
   }
@@ -175,6 +174,7 @@ void passUpOrDie(int type){
 }
 
 /****************************SYSCALL FUNCTIONS*****************************/
+/* SYSCALL 1 helper function */
 void createprocess(state_t *state){
   pcb_PTR p = allocPcb();
 
@@ -185,7 +185,7 @@ void createprocess(state_t *state){
   }
   else{
     copyState(state->s_a1, &(p->p_s));
-    insertChild(runningProc, p);
+    insertChild(currentProc, p);
     insertProcQ(&readyQue, p);
     procCnt++;
 
@@ -195,6 +195,8 @@ void createprocess(state_t *state){
   }
 }
 
+
+/* SYSCALL 2 helper function */
 void terminateprocess(pcb_PTR p){
   int * firstDevice, lastDevice;
   int *semAdd = p->p_semAdd;
@@ -229,6 +231,8 @@ void terminateprocess(pcb_PTR p){
   freePcb(p);
 }
 
+
+/* SYSCALL 3 helper function */
 /* SIGNAL */
 void V(state_t *state){
   pcb_PTR temp;
@@ -245,6 +249,8 @@ void V(state_t *state){
   LDST(state);
 }
 
+
+/* SYSCALL 4 helper function */
 /* WAIT */
 void P(state_t *state){
   cpu_t currTime;
@@ -254,18 +260,20 @@ void P(state_t *state){
     /* Calculate time taken up in current quantum minus any time spent handling
     IO interrupts */
     STCK(currTime);
-    currentProc->p_time = QUANTUM - (currTime - startTOD) - ioProcTime;
+    currentProc->p_time = (currTime - startTOD) - ioProcTime;
 
     copyState(state, &(currentProc->p_s));
     insertBlocked(sem, currentProc);
     sftBlkCnt++;
     currentProc = NULL;
+
     scheduler();
   }
   LDST(state);
 }
 
 
+/* SYSCALL 5 helper function */
 void spectrapvec(state_t *state){
   int type = (int) state->s_al;
 
@@ -306,14 +314,16 @@ void spectrapvec(state_t *state){
   LDST(state);
 }
 
+
+/* SYSCALL 6 helper function */
 void getcputime(state_t *state){
   cpu_t currTime;
   STCK(currTime);
-  state->s_v0 = runningProc->p_time + currTime - startTOD;
+  state->s_v0 = currentProc->p_time + currTime - startTOD;
   LDST(state);
 }
 
-
+/* SYSCALL 7 helper function */
 void waitforclock(state_t *state){
   cpu_t currTime;
   int *clockAdd = (int *) &(semDevArray[DEVICECNT-1]);
@@ -327,6 +337,7 @@ void waitforclock(state_t *state){
     copyState(state, &(currentProc->p_s));
     insertBlocked(clockAdd, currentProc);
     sftBlkCnt++;
+    currentProc = NULL;
 
     scheduler();
   }
@@ -336,8 +347,46 @@ void waitforclock(state_t *state){
 
 
 /* SYSCALL 8 helper function */
-void waitio(){
+void waitio(state_t *state){
+  cpu_t currTime;
+  int lineNo, devNo, read, index;
+  int *semAdd;
+
+  lineNo = state->s_a1;
+  devNo = state->s_a2;
+  read = state->s_a3;
+
+  /* If we are attempting to wait on a non-device semaphore, panic */
+  if(lineNo < 3){
+    PANIC ();
+  }
+
+  /* Determine the index of the device semaphore in device semaphore array */
+  if(lineNo != 7){
+    index = (8*(lineNo-3)) + devNo;
+  }
+  else{
+    index = (8*(lineNo-3)) + (2*devNo) + read;
+  }
 
 
+  semAdd = &(semDevArray[index]);
+  (*semAdd)--;
+  if((*semAdd) < 0){
+    /* Calculate time taken up in current quantum minus any time spent handling
+    IO interrupts */
+    STCK(currTime);
+    currentProc->p_time = (currTime - startTOD) - ioProcTime;
+
+    copyState(state, &(currentProc->p_s));
+    insertBlocked(semAdd, currentProc);
+    sftBlkCnt++;
+    currentProc = NULL;
+
+    scheduler();
+  }
+
+  /* If our semaphore is greater than 0, this is an error */
+  PANIC ();
 }
 /*******************************************************************************/
