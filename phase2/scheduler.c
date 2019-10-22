@@ -13,11 +13,12 @@ Written by: Patrick Sellers and Landon Clark
 #include "../e/asl.e"
 #include "/usr/local/include/umps2/umps/libumps.e"
 
-/****Local Variables*****/
-pcb_PTR nextProc;
-unsigned int status;
 
 void scheduler(){
+  /****Local Variables*****/
+  pcb_PTR nextProc;
+  unsigned int status;
+
   nextProc = removeProcQ(&readyQue);
 
   if(currP != NULL){
