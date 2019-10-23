@@ -28,9 +28,9 @@
 #define ALLOFF 0x00000000
 #define ALLON 0xFFFFFFFF
 #define VMON 0x02000000
-#define VMOFF 0x00000000
-#define KERNELON 0x00000000
-#define KERNELOFF 0x00000008
+#define VMOFF 0xF8FFFFFF
+#define KERNELON 0xFFFFFFF7
+#define KERNELOFF 0x8
 #define INTERUNMASKED 0x0000FF00
 #define INTERMASKED 0x00000000
 #define INTERON 0x00000004
@@ -62,8 +62,8 @@
 #define DEV7 0x00000080
 
 /* Values for plocal timer and invtimer before causing interrupts */
-#define QUANTUM 5000
-#define INTERVAL 100000
+#define QUANTUM 5000UL
+#define INTERVAL 100000UL
 
 /* timer, timescale, TOD-LO and other bus regs */
 #define RAMBASEADDR	0x10000000
