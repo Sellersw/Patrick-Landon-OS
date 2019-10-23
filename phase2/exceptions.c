@@ -50,7 +50,7 @@ void sysCallHandler(){
 
   /* We need to make sure we do not return to the instruction that brought
   about this syscall */
-  oldSys->s_pc = oldSys->s_t9 = oldSys->s_pc + WORDLEN;
+  oldSys->s_pc = oldSys->s_pc + WORDLEN;
 
   /* Grab relevant information from oldSys registers */
   status = oldSys->s_status;

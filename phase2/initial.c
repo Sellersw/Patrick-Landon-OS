@@ -97,7 +97,7 @@ int main(){
   /**********************INSTANTIATE A PROC AND PLACE IT ON THE READY QUEUE******************/
   p = allocPcb(); /* remove a proc from the FreePCB queue */
   (p->p_s).s_pc = (p->p_s).s_t9 = (memaddr) test; /* load that PCB with a address from our test file */
-  (p->p_s).s_sp = RAMTOP - WORDLEN; /* stack pointer is equal to the top of RAM */
+  (p->p_s).s_sp = RAMTOP - PAGESIZE; /* stack pointer is equal to the top of RAM */
 
   /* Establishes a state for the test proc*/
   (p->p_s).s_status = INTERON | INTERUNMASKED | VMNOTON | PLOCTIMEON | KERNELON;
