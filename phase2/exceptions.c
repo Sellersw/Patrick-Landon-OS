@@ -46,6 +46,8 @@ void sysCallHandler(){
   state_t *oldSys, *oldPgm;
   oldSys = (state_t *) SYSCALLOLD;
 
+  debugS(oldSys->s_pc);
+
   /* We need to make sure we do not return to the instruction that brought
   about this syscall */
   oldSys->s_pc = oldSys->s_pc + WORDLEN;
@@ -260,7 +262,7 @@ HIDDEN void V(state_t *state){
       sftBlkCnt--;
     }
   }
-  debugS(state->s_a0);
+  debugS(state->s_pc);
   LDST(state);
 }
 
