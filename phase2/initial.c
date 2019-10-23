@@ -22,9 +22,6 @@ Written by: Patrick Sellers and Landon Clark
 
 extern void test();
 
-void debugZ(int a){
-  5+5;
-}
 
 /********Global Module-Level Variables*********/
 int procCnt, sftBlkCnt;  /* keep track process amount & which are waiting for I/O*/
@@ -44,7 +41,6 @@ int main(){
   /******************************POPULATING ROM RESERVED FRAMES******************************/
   /* Here we find the top frame of RAM by adding the size of main RAM
   with the RAM reserved space. */
-  debugZ(5);
 
   regArea = (devregarea_t *) RAMBASEADDR;
   RAMTOP = regArea->rambase + regArea->ramsize;
@@ -52,21 +48,18 @@ int main(){
   /* This sets the location of our syscall exception to the memory address
   of our sysCallHandler method. This is a state that our system can load when
   an exception of this type is triggered */
-  debugZ(10);
   sysCallNew = (state_t *) SYSCALLNEW;
   sysCallNew->s_pc = sysCallNew->s_t9 = (memaddr) sysCallHandler;
   sysCallNew->s_sp = RAMTOP;
   sysCallNew->s_status = INTERMASKED | VMNOTON | PLOCTIMEON | KERNELON | INTEROFF;
 
 /* This is the same as above, except it is for our program traps. */
-  debugZ(15);
   progTrapNew = (state_t *) PROGTRAPNEW;
   progTrapNew->s_pc = progTrapNew->s_t9 = (memaddr) progTrapHandler;
   progTrapNew->s_sp = RAMTOP;
   progTrapNew->s_status = INTERMASKED | VMNOTON | PLOCTIMEON | KERNELON | INTEROFF;
 
 /* This is also the same but this is for when TLB exceptions are raised */
-  debugZ(20);
   tlbTrapNew = (state_t *) TLBMGMTNEW;
   tlbTrapNew->s_pc = tlbTrapNew->s_t9 = (memaddr) tlbTrapHandler;
   tlbTrapNew->s_sp = RAMTOP;
@@ -74,7 +67,6 @@ int main(){
 
 /* Finally, this section is to define the state the machine should wake up
    in for a interupt. */
-  debugZ(25);
   interNew = (state_t *) INTERNEW;
   interNew->s_pc = interNew->s_t9 = (memaddr) ioTrapHandler;
   interNew->s_sp = RAMTOP;
@@ -84,12 +76,10 @@ int main(){
 
   /* Initialize the data structures (Process Control Blocks and Active
   Semephore List) */
-  debugZ(30);
   initPcbs();
   initASL();
 
 /*****************************INIT NUCLEUS-MAINTAINED VARIABLES****************************/
-  debugZ(35);
   procCnt = 0; /* zero processes are handled by the OS at initialization */
   sftBlkCnt = 0; /* zero processes are blocked for I/O at initialization */
   readyQue = mkEmptyProcQ(); /* Instantiates the readyQue as a pointer to a queue of PCBs */
@@ -105,7 +95,6 @@ int main(){
   for(i = 0; i < DEVICECNT; i++){
     semDevArray[i] = 0; /* Set device sema4 vals to 0, used for mutual exclusion */
   }
-  debugZ(45);
   /**********************INSTANTIATE A PROC AND PLACE IT ON THE READY QUEUE******************/
   p = allocPcb(); /* remove a proc from the FreePCB queue */
   (p->p_s).s_pc = (p->p_s).s_t9 = (memaddr) test; /* load that PCB with a address from our test file */
@@ -115,7 +104,6 @@ int main(){
   (p->p_s).s_status = INTERON | VMNOTON | PLOCTIMEON | KERNELON;
 
   /* Put the process onto the ready queue */
-  debugZ(50);
   insertProcQ(&readyQue, p);
   procCnt++;
 
@@ -124,7 +112,6 @@ int main(){
 
   /* Begin clock for total time machine has been on */
   STCK(startTOD);
-  debugZ(55);
 
   /* CALL SCHEDULER */
   scheduler();

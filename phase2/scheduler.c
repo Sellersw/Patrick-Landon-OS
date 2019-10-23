@@ -16,6 +16,9 @@ Written by: Patrick Sellers and Landon Clark
 #include "../e/initial.e"
 #include "/usr/local/include/umps2/umps/libumps.e"
 
+void debugZ(int a){
+  5+5;
+}
 
 int waiting;
 
@@ -26,19 +29,23 @@ int waiting;
     the machine when all processes have terminated. */
 void scheduler(){
   /*****Local Variables*****/
+  debugZ(5);
   pcb_PTR nextProc;
   unsigned int status;
   /*************************/
   waiting = FALSE;
   nextProc = removeProcQ(&readyQue); /* Take a proc off the head of the ready queue */
+  debugZ(10);
 
   if(nextProc != NULL){ /* As long as the head of the ready queue is not NULL... */
     procCnt--; /* Now have one less process, decrement cnt. */
     currentProc = nextProc; /* Global currentProc is now the ready process we dequeued */
     ioProcTime = 0;  /* Reset the time spent in the Interrupt handler.
                         Used for adding back quantum time to the running process. */
+    debugZ(15);
     setTIMER(QUANTUM); /* sets a timer with our quantum time set in const.h */
     STCK(startTOD); /* starts the clock */
+    debugZ(20);
 
     LDST(&(currentProc->p_s)); /* loads our new process into our CPU registers */
   }
