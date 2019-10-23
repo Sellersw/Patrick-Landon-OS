@@ -18,6 +18,7 @@ Written by: Patrick Sellers and Landon Clark
 #include "../e/scheduler.e"
 #include "../e/exceptions.e"
 #include "../e/interrupts.e"
+#include "./p2test.c"
 #include "/usr/local/include/umps2/umps/libumps.e"
 
 extern void test();
