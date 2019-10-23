@@ -10,6 +10,8 @@
 
 #include "../h/types.h"
 
+extern int waiting;
+
 extern void scheduler();
 
 #endif

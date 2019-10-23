@@ -19,6 +19,4 @@ extern cpu_t ioProcTime;
 
 extern semd_PTR semDevArray;
 
-extern void main();
-
 #endif

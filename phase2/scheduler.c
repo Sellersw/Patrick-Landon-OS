@@ -17,6 +17,8 @@ Written by: Patrick Sellers and Landon Clark
 #include "/usr/local/include/umps2/umps/libumps.e"
 
 
+int waiting;
+
 /* A method that handles the transfering of the CPU to the next process that is
     on the ready queue. This uses a round-robin scheduling algorithm to prevent
     starvation, and allows the process a set time-slice based on our quantum length.
@@ -31,6 +33,7 @@ void scheduler(){
   nextProc = removeProcQ(&readyQue); /* Take a proc off the head of the ready queue */
 
   if(nextProc != NULL){ /* As long as the head of the ready queue is not NULL... */
+    waiting = FALSE;
     procCnt--; /* Now have one less process, decrement cnt. */
     currentProc = nextProc; /* Global currentProc is now the ready process we dequeued */
     ioProcTime = 0;  /* Reset the time spent in the Interrupt handler.
@@ -42,6 +45,7 @@ void scheduler(){
   }
   else{
     if(procCnt == 0){ /* if the ready queue was empty and there are no more processes... */
+      waiting = FALSE;
       HALT (); /* stop the machine */
     }
     /* if the ready queue was empty, there are still processes somewhere, and none of
@@ -52,6 +56,7 @@ void scheduler(){
     /* if the ready queue was empty, there are still processes somewhere, and processes
         that are soft blocked waiting for I/O is less than zero... */
     if(sftBlkCnt > 0){
+      waiting = TRUE;
       status = getSTATUS() | INTERON;
       setSTATUS(status); /* Turn interrupts on */
       WAIT (); /* Wait for I/O */

@@ -41,8 +41,29 @@
 /* exception code values for cause register */
 #define RESERVEDINSTR 0x00000048
 
-/* quantum time between interrupts from cpu local timer*/
+/* exception pending line number mnemonics */
+#define LINE0 0x00000100
+#define LINE1 0x00000200
+#define LINE2 0x00000400
+#define LINE3 0x00000800
+#define LINE4 0x00001000
+#define LINE5 0x00002000
+#define LINE6 0x00004000
+#define LINE7 0x00008000
+
+/* exception pending device number mnemonics */
+#define DEV0 0x00000001
+#define DEV1 0x00000002
+#define DEV2 0x00000004
+#define DEV3 0x00000008
+#define DEV4 0x00000010
+#define DEV5 0x00000020
+#define DEV6 0x00000040
+#define DEV7 0x00000080
+
+/* Values for plocal timer and invtimer before causing interrupts */
 #define QUANTUM 5000
+#define INTERVAL 100000
 
 /* timer, timescale, TOD-LO and other bus regs */
 #define RAMBASEADDR	0x10000000
@@ -85,6 +106,9 @@
 
 #define TRAPTYPES	3
 
+/* non-device interrupts */
+#define PLOCINT 1
+#define IVTIMINT 2
 
 /* device interrupts */
 #define DISKINT		3
@@ -92,6 +116,9 @@
 #define NETWINT 	5
 #define PRNTINT 	6
 #define TERMINT		7
+
+
+#define DEVINTBASEADDR 0x1000003C
 
 #define DEVREGLEN	4	/* device register field length in bytes & regs per dev */
 #define DEVREGSIZE	16 	/* device register size in bytes */

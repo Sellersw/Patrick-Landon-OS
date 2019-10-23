@@ -106,11 +106,13 @@ int main(){
   procCnt++;
 
   /* Instantiate pseudo-clock timer */
-  LDIT(INTERVALTMR);
+  LDIT(INTERVAL);
 
   /* Begin clock for total time machine has been on */
   STCK(startTOD);
 
   /* CALL SCHEDULER */
   scheduler();
+
+  return -1;
 }

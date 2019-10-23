@@ -15,18 +15,131 @@ Written by: Patrick Sellers and Landon Clark
 #include "/usr/local/include/umps2/umps/libumps.e"
 
 
+HIDDEN int findLineNo(unsigned int cause);
+HIDDEN int findDevNo(unsigned int bitMap);
+
+
 void ioTrapHandler(){
+  pcb_PTR blockedProc;
+  cpu_t timeStart, timeEnd;
+  devregarea_t *regArea;
+  device_t *devReg;
+  state_t *oldInt;
+  unsigned int cause, status;
+  int lineNo, devNo, index, read;
 
-/* Determine what line the interrupt is on:
-    line 0: multi-core
-    line 1 & 2: clocks
-    line 3: disk device (8)
-    line 4: tape device (8)
-    line 5: network devices (8)
-    line 6: printer devices (8)
-    line 7: terminal devices (8) */
+  STCK(timeStart);
 
-/* Examine the Cause Register in OldINT (pg. 15) */
+
+  /* Determine what line the interrupt is on:
+      line 0: multi-core
+      line 1 & 2: clocks
+      line 3: disk device (8)
+      line 4: tape device (8)
+      line 5: network devices (8)
+      line 6: printer devices (8)
+      line 7: terminal devices (8) */
+
+  /* Examine the Cause Register in OldINT (pg. 15) */
+
+
+  oldInt = (state_t *) INTEROLD;
+  regArea = (devregarea_t *) RAMBASEADDR;
+
+  cause = oldInt->s_cause;
+  lineNo = findLineNo(cause);
+
+  /* We should be able to determine a valid line number. If we cannot, we will
+  consider this an error */
+  if(lineNo == -1){
+    PANIC ();
+  }
+
+
+  if(lineNo < 3){
+    switch(lineNo){
+      case PLOCINT:
+        STCK(timeEnd);
+        currentProc->p_time = currentProc->p_time + (timeEnd - startTOD) - ioProcTime;
+        insertProcQ(&readyQue, currentProc);
+        currentProc = NULL;
+
+        /* scheduler could also load a quantum into the processor local timer,
+        but inserting a time here will acknowledge the given interrupt */
+        /* gonna comment this out for now: setTIMER(QUANTUM); */
+        scheduler();
+        break;
+
+      case IVTIMINT:
+        while(semDevArray[DEVICECNT-1] < 0){
+          semDevArray[DEVICECNT-1]++;
+          blockedProc = removeBlocked(&(semDevArray[DEVICECNT-1]));
+          sftBlkCnt--;
+          insertProcQ(&readyQue, blockedProc);
+        }
+
+        if(semDevArray[DEVICECNT-1] > 0){
+          semDevArray[DEVICECNT-1] = 0;
+        }
+
+        STCK(timeEnd);
+        ioProcTime = ioProcTime + (timeEnd - timeStart);
+        LDIT(INTERVAL);
+        LDST(oldInt);
+        break;
+    }
+  }
+
+  else{
+    devNo = findDevNo(regArea->interrupt_dev[lineNo]);
+
+    /* We should be able to determine the device number. If we cannot, we will
+    consider this an error */
+    if(devNo == -1){
+      PANIC ();
+    }
+
+    devReg = &(regArea->devreg[(8*(lineNo-3)) + devNo]);
+
+    if(lineNo != TERMINT){
+      index = (8*(lineNo-3)) + devNo;
+      semDevArray[index]++;
+      if(semDevArray[index] <= 0){
+        blockedProc = removeBlocked(&(semDevArray[index]));
+        if(blockedProc != NULL){
+          sftBlkCnt--;
+          (blockedProc->p_s).s_v0 = devReg->d_status;
+          insertProcQ(&readyQue, blockedProc);
+        }
+      }
+      devReg->d_command = ACK;
+    }
+
+    else{
+      if((devReg->t_transm_status & 0x0F) == 1){
+        devReg->t_recv_command = ACK;
+        status = devReg->t_recv_status;
+        read = 1;
+      }
+      else{
+        devReg->t_transm_command = ACK;
+        status = devReg->t_transm_status;
+        read = 0;
+      }
+      index = (8*(lineNo-3)) + (2*devNo) + read;
+      semDevArray[index]++;
+      if(semDevArray[index] <= 0){
+        blockedProc = removeBlocked(&(semDevArray[index]));
+        if(blockedProc != NULL){
+          sftBlkCnt--;
+          (blockedProc->p_s).s_v0 = status;
+          insertProcQ(&readyQue, blockedProc);
+        }
+      }
+    }
+  }
+
+
 
 /* Given the line number (3-7), determine which instance
 of that device is generating the interrupt
@@ -43,13 +156,77 @@ of that device is generating the interrupt
     - insertProc(process, ReadyQue)*/
 
 /* ACK the interrupt
-    - setting the command field to "ACK" (always 1)
+    - setting the command field to "ACK" (always 1) */
 
 /* Return control to the proc that was running before the time of the interrupt
     - LDST(oldInt)
     *** Exception: the running job was a "wait state" - set a flag when waiting or inspect OldINT status register
         - call scheduler() */
 
+  STCK(timeEnd);
+  ioProcTime = ioProcTime + (timeStart - timeEnd);
 
+  if(waiting){
+    scheduler();
+  }
+
+  LDST(oldInt);
+}
+
+
+HIDDEN int findLineNo(unsigned int cause){
+  if((cause & LINE1) == LINE1){
+    return PLOCINT;
+  }
+  if((cause & LINE2) == LINE2){
+    return IVTIMINT;
+  }
+  if((cause & LINE3) == LINE3){
+    return DISKINT;
+  }
+  if((cause & LINE4) == LINE4){
+    return TAPEINT;
+  }
+  if((cause & LINE5) == LINE5){
+    return NETWINT;
+  }
+  if((cause & LINE6) == LINE6){
+    return PRNTINT;
+  }
+  if((cause & LINE7) == LINE7){
+    return TERMINT;
+  }
+  /* lineNo should be determinable, if not this is an error */
+  return -1;
+}
+
+
+HIDDEN int findDevNo(unsigned int bitMap){
+  if((bitMap & DEV0) == DEV0){
+    return 0;
+  }
+  if((bitMap & DEV1) == DEV1){
+    return 1;
+  }
+  if((bitMap & DEV2) == DEV2){
+    return 2;
+  }
+  if((bitMap & DEV3) == DEV3){
+    return 3;
+  }
+  if((bitMap & DEV4) == DEV4){
+    return 4;
+  }
+  if((bitMap & DEV5) == DEV5){
+    return 5;
+  }
+  if((bitMap & DEV6) == DEV6){
+    return 6;
+  }
+  if((bitMap & DEV7) == DEV7){
+    return 7;
+  }
+  /* devNo should be determinable, if not this is an error */
+  return -1;
 
 }

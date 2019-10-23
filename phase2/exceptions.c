@@ -274,7 +274,7 @@ HIDDEN void P(state_t *state){
 
 /* SYSCALL 5 helper function */
 HIDDEN void spectrapvec(state_t *state){
-  int type = (int) state->s_a1;
+  unsigned int type = (unsigned int) state->s_a1;
 
   switch(type){
     case TLBTRAP:
@@ -348,7 +348,7 @@ HIDDEN void waitforclock(state_t *state){
 /* SYSCALL 8 helper function */
 HIDDEN void waitio(state_t *state){
   cpu_t currTime;
-  int lineNo, devNo, read, index;
+  unsigned int lineNo, devNo, read, index;
   int *semAdd;
 
   lineNo = state->s_a1;
@@ -361,6 +361,7 @@ HIDDEN void waitio(state_t *state){
   }
 
   /* Determine the index of the device semaphore in device semaphore array */
+  /* Kinda some magic math here... */
   if(lineNo != 7){
     index = (8*(lineNo-3)) + devNo;
   }
