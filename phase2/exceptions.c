@@ -252,12 +252,15 @@ HIDDEN void V(state_t *state){
   (*sem)++;
   debugS(*sem);
   if((*sem) <= 0){
+    debugS(0xFF);
     temp = removeBlocked(sem);
     if(temp != NULL){
+      debugS(0xAA);
       insertProcQ(&readyQue, temp);
       sftBlkCnt--;
     }
   }
+  debugS(0xDD);
   LDST(state);
 }
 
