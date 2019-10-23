@@ -16,7 +16,7 @@ Written by: Patrick Sellers and Landon Clark
 #include "../e/initial.e"
 #include "/usr/local/include/umps2/umps/libumps.e"
 
-void debugZ(int a){
+void debugG(int a){
   5+5;
 }
 
@@ -43,7 +43,7 @@ void scheduler(){
     setTIMER(QUANTUM); /* sets a timer with our quantum time set in const.h */
     STCK(startTOD); /* starts the clock */
 
-    debugZ((currentProc->p_s).s_pc);
+    debugG((currentProc->p_s).s_pc);
     LDST(&(currentProc->p_s)); /* loads our new process into our CPU registers */
   }
   else{
