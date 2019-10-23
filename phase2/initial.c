@@ -27,7 +27,7 @@ extern void test();
 int procCnt, sftBlkCnt;  /* keep track process amount & which are waiting for I/O*/
 pcb_PTR readyQue, currentProc; /* Pointer to the queue of executable procs */
 cpu_t startTOD, ioProcTime; /* Instances our clocks for measuring proc time */
-semd_PTR semDevArray[DEVICECNT]; /* A sema4 array instanced for the 49 Kaya devices */
+int semDevArray[DEVICECNT]; /* A sema4 array instanced for the 49 Kaya devices */
 
 /*******************************************************************************************/
 

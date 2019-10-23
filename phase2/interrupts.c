@@ -75,7 +75,7 @@ void ioTrapHandler(){
         break;
 
       case IVTIMINT:
-        semAdd = (int *) &(semDevArray[DEVICECNT-1]);
+        semAdd = &(semDevArray[DEVICECNT-1]);
         while((*semAdd) < 0){
           (*semAdd)++;
           blockedProc = removeBlocked(semAdd);
@@ -108,7 +108,7 @@ void ioTrapHandler(){
 
     if(lineNo != TERMINT){
       index = (8*(lineNo-3)) + devNo;
-      semAdd = (int *) &(semDevArray[index]);
+      semAdd = &(semDevArray[index]);
       (*semAdd)++;
       if((*semAdd) <= 0){
         blockedProc = removeBlocked(semAdd);
@@ -133,7 +133,7 @@ void ioTrapHandler(){
         read = 0;
       }
       index = (8*(lineNo-3)) + (2*devNo) + read;
-      semAdd = (int *) &(semDevArray[index]);
+      semAdd = &(semDevArray[index]);
       (*semAdd)++;
       if((*semAdd) <= 0){
         blockedProc = removeBlocked(semAdd);
