@@ -128,6 +128,7 @@ void print(char *msg) {
 		*(base + 3) = PRINTCHR | (((devregtr) *s) << BYTELEN);
 		status = SYSCALL(WAITIO, TERMINT, 0, 0);
 		if ((status & TERMSTATMASK) != RECVD)
+			debugZ(10);
 			PANIC();
 		s++;
 	}
@@ -143,7 +144,7 @@ void test() {
 
 	SYSCALL(VERHOGEN, (int)&testsem, 0, 0);					/* V(testsem)   */
 
-	debugZ(10);
+	debugZ(15);
 
 	print("p1 v(testsem)\n");
 
