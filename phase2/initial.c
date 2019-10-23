@@ -22,7 +22,7 @@ Written by: Patrick Sellers and Landon Clark
 
 extern void test();
 
-debugZ(int a){
+void debugZ(int a){
   5+5;
 }
 
