@@ -61,13 +61,16 @@ void ioTrapHandler(){
     switch(lineNo){
       case PLOCINT:
         STCK(timeEnd);
-        currentProc->p_time = currentProc->p_time + (timeEnd - startTOD) - ioProcTime;
-        insertProcQ(&readyQue, currentProc);
-        currentProc = NULL;
+        if(currentProc != NULL){
+          currentProc->p_time = currentProc->p_time + (timeEnd - startTOD) - ioProcTime;
+          insertProcQ(&readyQue, currentProc);
+          procCnt++;
+          currentProc = NULL;
+        }
 
         /* scheduler could also load a quantum into the processor local timer,
         but inserting a time here will acknowledge the given interrupt */
-        /* gonna comment this out for now: setTIMER(QUANTUM); */
+        setTIMER(QUANTUM);
         scheduler();
         break;
 
