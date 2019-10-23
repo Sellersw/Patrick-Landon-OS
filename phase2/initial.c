@@ -99,7 +99,7 @@ int main(){
   (p->p_s).s_sp = RAMTOP - WORDLEN; /* stack pointer is equal to the top of RAM */
 
   /* Establishes a state for the test proc*/
-  (p->p_s).s_status = INTERON | VMNOTON | PLOCTIMEON | KERNELON;
+  (p->p_s).s_status = INTERON | INTERUNMASKED | VMNOTON | PLOCTIMEON | KERNELON;
 
   /* Put the process onto the ready queue */
   insertProcQ(&readyQue, p);

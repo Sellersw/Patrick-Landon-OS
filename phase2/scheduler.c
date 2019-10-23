@@ -16,9 +16,6 @@ Written by: Patrick Sellers and Landon Clark
 #include "../e/initial.e"
 #include "/usr/local/include/umps2/umps/libumps.e"
 
-void debugG(int a){
-  5+5;
-}
 
 int waiting;
 
@@ -43,7 +40,6 @@ void scheduler(){
     setTIMER(QUANTUM); /* sets a timer with our quantum time set in const.h */
     STCK(startTOD); /* starts the clock */
 
-    debugG((currentProc->p_s).s_pc);
     LDST(&(currentProc->p_s)); /* loads our new process into our CPU registers */
   }
   else{
@@ -59,7 +55,7 @@ void scheduler(){
         that are soft blocked waiting for I/O is less than zero... */
     if(sftBlkCnt > 0){
       waiting = TRUE;
-      status = getSTATUS() | INTERON | INTERUNMASKED;
+      status = getSTATUS() | INTERON | INTERUNMASKED | PLOCTIMEON;
       setSTATUS(status); /* Turn interrupts on */
       WAIT (); /* Wait for I/O */
     }
