@@ -391,6 +391,8 @@ HIDDEN void waitio(state_t *state){
     }
   }
 
+  debugS(index);
+
   semAdd = (int *) &(semDevArray[index]);
   debugS(*semAdd);
   (*semAdd)--;
