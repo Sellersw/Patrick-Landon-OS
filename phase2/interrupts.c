@@ -71,15 +71,15 @@ void ioTrapHandler(){
         break;
 
       case IVTIMINT:
-        while(semDevArray[DEVICECNT-1] < 0){
-          semDevArray[DEVICECNT-1]++;
-          blockedProc = removeBlocked(&(semDevArray[DEVICECNT-1]));
+        while((int)semDevArray[DEVICECNT-1] < 0){
+          (int)semDevArray[DEVICECNT-1]++;
+          blockedProc = removeBlocked((int *) &(semDevArray[DEVICECNT-1]));
           sftBlkCnt--;
           insertProcQ(&readyQue, blockedProc);
         }
 
-        if(semDevArray[DEVICECNT-1] > 0){
-          semDevArray[DEVICECNT-1] = 0;
+        if((int)semDevArray[DEVICECNT-1] > 0){
+          (int)semDevArray[DEVICECNT-1] = 0;
         }
 
         STCK(timeEnd);
@@ -103,9 +103,9 @@ void ioTrapHandler(){
 
     if(lineNo != TERMINT){
       index = (8*(lineNo-3)) + devNo;
-      semDevArray[index]++;
-      if(semDevArray[index] <= 0){
-        blockedProc = removeBlocked(&(semDevArray[index]));
+      (int)semDevArray[index]++;
+      if((int)semDevArray[index] <= 0){
+        blockedProc = removeBlocked((int *) &(semDevArray[index]));
         if(blockedProc != NULL){
           sftBlkCnt--;
           (blockedProc->p_s).s_v0 = devReg->d_status;
@@ -127,9 +127,9 @@ void ioTrapHandler(){
         read = 0;
       }
       index = (8*(lineNo-3)) + (2*devNo) + read;
-      semDevArray[index]++;
-      if(semDevArray[index] <= 0){
-        blockedProc = removeBlocked(&(semDevArray[index]));
+      (int)semDevArray[index]++;
+      if((int)semDevArray[index] <= 0){
+        blockedProc = removeBlocked((int *) &(semDevArray[index]));
         if(blockedProc != NULL){
           sftBlkCnt--;
           (blockedProc->p_s).s_v0 = status;
