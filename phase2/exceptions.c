@@ -336,7 +336,7 @@ HIDDEN void getcputime(state_t *state){
 /* SYSCALL 7 helper function */
 HIDDEN void waitforclock(state_t *state){
   cpu_t currTime;
-  int *clockAdd = &(semDevArray[DEVICECNT-1]);
+  int *clockAdd = (int *) &(semDevArray[DEVICECNT-1]);
   (*clockAdd)--;
   if((*clockAdd) < 0){
     /* Calculate time taken up in current quantum minus any time spent handling
@@ -393,7 +393,7 @@ HIDDEN void waitio(state_t *state){
 
   debugS(index);
 
-  semAdd = &(semDevArray[index]);
+  semAdd = (int *) &(semDevArray[index]);
   debugS(*semAdd);
   (*semAdd)--;
   debugS(*semAdd);
