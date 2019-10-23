@@ -56,21 +56,21 @@ int main(){
   sysCallNew = (state_t *) SYSCALLNEW;
   sysCallNew->s_pc = sysCallNew->s_t9 = (memaddr) sysCallHandler;
   sysCallNew->s_sp = RAMTOP;
-  sysCallNew->s_status = INTERMASKED | VMOFF | PLOCTIMEON | KERNELON | INTEROFF;
+  sysCallNew->s_status = INTERMASKED | VMNOTON | PLOCTIMEON | KERNELON | INTEROFF;
 
 /* This is the same as above, except it is for our program traps. */
   debugZ(15);
   progTrapNew = (state_t *) PROGTRAPNEW;
   progTrapNew->s_pc = progTrapNew->s_t9 = (memaddr) progTrapHandler;
   progTrapNew->s_sp = RAMTOP;
-  progTrapNew->s_status = INTERMASKED | VMOFF | PLOCTIMEON | KERNELON | INTEROFF;
+  progTrapNew->s_status = INTERMASKED | VMNOTON | PLOCTIMEON | KERNELON | INTEROFF;
 
 /* This is also the same but this is for when TLB exceptions are raised */
   debugZ(20);
   tlbTrapNew = (state_t *) TLBMGMTNEW;
   tlbTrapNew->s_pc = tlbTrapNew->s_t9 = (memaddr) tlbTrapHandler;
   tlbTrapNew->s_sp = RAMTOP;
-  tlbTrapNew->s_status = INTERMASKED | VMOFF | PLOCTIMEON | KERNELON | INTEROFF;
+  tlbTrapNew->s_status = INTERMASKED | VMNOTON | PLOCTIMEON | KERNELON | INTEROFF;
 
 /* Finally, this section is to define the state the machine should wake up
    in for a interupt. */
@@ -78,7 +78,7 @@ int main(){
   interNew = (state_t *) INTERNEW;
   interNew->s_pc = interNew->s_t9 = (memaddr) ioTrapHandler;
   interNew->s_sp = RAMTOP;
-  interNew->s_status = INTERMASKED | VMOFF | PLOCTIMEON | KERNELON | INTEROFF;
+  interNew->s_status = INTERMASKED | VMNOTON | PLOCTIMEON | KERNELON | INTEROFF;
 
 /******************************************************************************************/
 
@@ -112,7 +112,7 @@ int main(){
   (p->p_s).s_sp = RAMTOP; /* stack pointer is equal to the top of RAM */
 
   /* Establishes a state for the test proc*/
-  (p->p_s).s_status = INTERON | VMOFF | PLOCTIMEON | KERNELON;
+  (p->p_s).s_status = INTERON | VMNOTON | PLOCTIMEON | KERNELON;
 
   /* Put the process onto the ready queue */
   debugZ(50);
