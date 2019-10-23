@@ -391,9 +391,10 @@ HIDDEN void waitio(state_t *state){
     }
   }
 
-
   semAdd = (int *) &(semDevArray[index]);
+  debugS(*semAdd);
   (*semAdd)--;
+  debugS(*semAdd);
   if((*semAdd) < 0){
     /* Calculate time taken up in current quantum minus any time spent handling
     IO interrupts */
