@@ -1,8 +1,14 @@
-/*
+/****************************EXCEPTIONS.C**********************************
 
-Module to handle exceptions. More words to follow.
+Handles Syscall and Breakpoint exceptions when a corresponding assembler 
+instruction is executed on the CPU. Kaya Operating System provides a number
+of syscall operations that are necessary for control flow. This module will
+cover the operations of these 8 processes, as well as decide how to handle any
+instructions with codes 9 and above.
 
-*/
+Written by: Patrick Sellers and Landon Clark
+
+***************************************************************************/
 
 #include "../h/types.h"
 #include "../h/const.h"
@@ -16,7 +22,6 @@ Module to handle exceptions. More words to follow.
 /*****Localized (Private) Methods****/
 HIDDEN void copyState(state_t *orig, state_t *curr);
 HIDDEN void passUpOrDie(int type);
-
 HIDDEN void createprocess(state_t *state);
 HIDDEN void terminateprocess(pcb_PTR p);
 HIDDEN void P(state_t * state);
@@ -25,11 +30,9 @@ HIDDEN void spectrapvec(state_t *state);
 HIDDEN void getcputime(state_t *state);
 HIDDEN void waitforclock(state_t *state);
 HIDDEN void waitio(state_t *state);
-
-
 void progTrapHandler();
 void tlbTrapHandler();
-
+/*************************************/
 
 void sysCallHandler(){
   unsigned int call, status;
