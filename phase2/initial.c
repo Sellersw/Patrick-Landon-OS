@@ -91,7 +91,6 @@ int main(){
   ioProcTime = 0;
 
   /**************************INIT NUCLEUS-MAINTAINED DEVICE SEMEPHORES*************************/
-  debugZ(40);
   for(i = 0; i < DEVICECNT; i++){
     semDevArray[i] = 0; /* Set device sema4 vals to 0, used for mutual exclusion */
   }
