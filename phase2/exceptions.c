@@ -260,7 +260,7 @@ HIDDEN void V(state_t *state){
       sftBlkCnt--;
     }
   }
-  debugS(0xDD);
+  debugS(state->s_a0);
   LDST(state);
 }
 
