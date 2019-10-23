@@ -250,6 +250,7 @@ HIDDEN void V(state_t *state){
   int *sem = (int *) state->s_a1;
   debugS(*sem);
   (*sem)++;
+  debugS(*sem);
   if((*sem) <= 0){
     temp = removeBlocked(sem);
     if(temp != NULL){
@@ -266,7 +267,9 @@ HIDDEN void V(state_t *state){
 HIDDEN void P(state_t *state){
   cpu_t currTime;
   int *sem = (int *) state->s_a1;
+  debugS(*sem);
   (*sem)--;
+  debugS(*sem);
   if((*sem) < 0){
     /* Calculate time taken up in current quantum minus any time spent handling
     IO interrupts */
