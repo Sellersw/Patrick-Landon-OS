@@ -1,6 +1,6 @@
 /****************************EXCEPTIONS.C**********************************
 
-Handles Syscall and Breakpoint exceptions when a corresponding assembler 
+Handles Syscall and Breakpoint exceptions when a corresponding assembler
 instruction is executed on the CPU. Kaya Operating System provides a number
 of syscall operations that are necessary for control flow. This module will
 cover the operations of these 8 processes, as well as decide how to handle any
@@ -19,6 +19,11 @@ Written by: Patrick Sellers and Landon Clark
 #include "/usr/local/include/umps2/umps/libumps.e"
 
 
+void debugS(int a){
+  5+5;
+}
+
+
 /*****Localized (Private) Methods****/
 HIDDEN void copyState(state_t *orig, state_t *curr);
 HIDDEN void passUpOrDie(int type);
@@ -35,6 +40,7 @@ void tlbTrapHandler();
 /*************************************/
 
 void sysCallHandler(){
+  debugS(5);
   unsigned int call, status;
 
   state_t *oldSys, *oldPgm;
@@ -47,6 +53,8 @@ void sysCallHandler(){
   /* Grab relevant information from oldSys registers */
   status = oldSys->s_status;
   call = oldSys->s_a0;
+
+  debugS(call);
 
 
   /* Handle syscalls that are not defined yet */
@@ -240,6 +248,7 @@ HIDDEN void V(state_t *state){
   pcb_PTR temp;
 
   int *sem = (int *) state->s_a1;
+  debugS(*sem);
   (*sem)++;
   if((*sem) <= 0){
     temp = removeBlocked(sem);

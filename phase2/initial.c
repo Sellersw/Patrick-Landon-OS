@@ -18,9 +18,10 @@ Written by: Patrick Sellers and Landon Clark
 #include "../e/scheduler.e"
 #include "../e/exceptions.e"
 #include "../e/interrupts.e"
-#include "../e/p2test.e"
 #include "/usr/local/include/umps2/umps/libumps.e"
 
+
+extern void test();
 
 /********Global Module-Level Variables*********/
 int procCnt, sftBlkCnt;  /* keep track process amount & which are waiting for I/O*/
