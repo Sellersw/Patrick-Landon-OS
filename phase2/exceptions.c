@@ -46,8 +46,6 @@ void sysCallHandler(){
   state_t *oldSys, *oldPgm;
   oldSys = (state_t *) SYSCALLOLD;
 
-  debugS(oldSys->s_pc);
-
   /* We need to make sure we do not return to the instruction that brought
   about this syscall */
   oldSys->s_pc = oldSys->s_pc + WORDLEN;
@@ -250,19 +248,14 @@ HIDDEN void V(state_t *state){
   pcb_PTR temp;
 
   int *sem = (int *) state->s_a1;
-  debugS(*sem);
   (*sem)++;
-  debugS(*sem);
   if((*sem) <= 0){
-    debugS(0xFF);
     temp = removeBlocked(sem);
     if(temp != NULL){
-      debugS(0xAA);
       insertProcQ(&readyQue, temp);
       sftBlkCnt--;
     }
   }
-  debugS(state->s_pc);
   LDST(state);
 }
 
@@ -272,9 +265,7 @@ HIDDEN void V(state_t *state){
 HIDDEN void P(state_t *state){
   cpu_t currTime;
   int *sem = (int *) state->s_a1;
-  debugS(*sem);
   (*sem)--;
-  debugS(*sem);
   if((*sem) < 0){
     /* Calculate time taken up in current quantum minus any time spent handling
     IO interrupts */
@@ -370,10 +361,14 @@ HIDDEN void waitio(state_t *state){
   cpu_t currTime;
   unsigned int lineNo, devNo, read, index;
   int *semAdd;
+  devregarea_t *regArea = (devregarea_t *) RAMBASEADDR;
+  device_t *devReg;
 
   lineNo = state->s_a1;
   devNo = state->s_a2;
   read = state->s_a3;
+
+  devReg = &(regArea->devreg[(8*(lineNo-3)) + devNo]);
 
   /* If we are attempting to wait on a non-device semaphore, panic */
   if(lineNo < 3){
@@ -384,9 +379,16 @@ HIDDEN void waitio(state_t *state){
   /* Kinda some magic math here... */
   if(lineNo != 7){
     index = (8*(lineNo-3)) + devNo;
+    state->s_v0 = devReg->d_status;
   }
   else{
     index = (8*(lineNo-3)) + (2*devNo) + read;
+    if(read == 0){
+      state->s_v0 = devReg->t_transm_status;
+    }
+    else{
+      state->s_v0 = devReg->t_recv_status;
+    }
   }
 
 
