@@ -130,7 +130,7 @@ void print(char *msg) {
 		*(base + 3) = PRINTCHR | (((devregtr) *s) << BYTELEN);
 		status = SYSCALL(WAITIO, TERMINT, 0, 0);
 		if ((status & TERMSTATMASK) != RECVD)
-			debugZ(10);
+			debugZ(30);
 			PANIC();
 		s++;
 	}
