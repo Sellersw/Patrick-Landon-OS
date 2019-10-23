@@ -105,7 +105,7 @@ void ioTrapHandler(){
 
     if(lineNo != TERMINT){
       index = (8*(lineNo-3)) + devNo;
-      semAdd = (int *) &(semDevArray[index])
+      semAdd = (int *) &(semDevArray[index]);
       (*semAdd)++;
       if((*semAdd) <= 0){
         blockedProc = removeBlocked(semAdd);
