@@ -398,7 +398,6 @@ HIDDEN void waitio(state_t *state){
     IO interrupts */
     STCK(currTime);
     currentProc->p_time = (currTime - startTOD) - ioProcTime;
-    (currentProc->p_s).s_v0 = status;
     copyState(state, &(currentProc->p_s));
     insertBlocked(semAdd, currentProc);
     sftBlkCnt++;
@@ -407,7 +406,7 @@ HIDDEN void waitio(state_t *state){
     scheduler();
   }
   else{
-    /* UNSURE */
+    state->s_v0 = status;
   }
   LDST(state);
 }

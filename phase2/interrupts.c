@@ -143,11 +143,12 @@ void ioTrapHandler(){
             blockedProc = removeBlocked(semAdd);
             if(blockedProc != NULL){
               sftBlkCnt--;
+              (blockedProc->p_s).s_v0 = status;
               insertProcQ(&readyQue, blockedProc);
             }
           }
           else{
-            oldInt->s_v0 = status;
+            /* UNSURE */
           }
           break;
         /* Non-terminal device */
@@ -159,11 +160,12 @@ void ioTrapHandler(){
             blockedProc = removeBlocked(semAdd);
             if(blockedProc != NULL){
               sftBlkCnt--;
+              (blockedProc->p_s).s_v0 = (devReg->d_status & 0xFF);
               insertProcQ(&readyQue, blockedProc);
             }
           }
           else{
-            oldInt->s_v0 = (devReg->d_status & 0xFF);
+            /* UNSURE */
           }
           devReg->d_command = ACK;
           break;
