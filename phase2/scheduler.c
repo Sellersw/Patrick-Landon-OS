@@ -17,6 +17,10 @@ Written by: Patrick Sellers and Landon Clark
 #include "/usr/local/include/umps2/umps/libumps.e"
 
 
+debugG(int a){
+  5+5;
+}
+
 int waiting;
 
 
@@ -26,6 +30,8 @@ int waiting;
     It also includes wait handling for when processes are waiting for I/O, and halts
     the machine when all processes have terminated. */
 void scheduler(){
+  debugG(100);
+  debugG(procCnt);
   /*****Local Variables*****/
   pcb_PTR nextProc;
   unsigned int status;
@@ -45,6 +51,7 @@ void scheduler(){
   }
   else{
     if(procCnt == 0){ /* if the ready queue was empty and there are no more processes... */
+      debugG(1);
       HALT (); /* stop the machine */
     }
     /* if the ready queue was empty, there are still processes somewhere, and none of
@@ -55,6 +62,7 @@ void scheduler(){
     /* if the ready queue was empty, there are still processes somewhere, and processes
         that are soft blocked waiting for I/O is less than zero... */
     if(sftBlkCnt > 0){
+      debugG(2);
       waiting = TRUE;
       status = getSTATUS() | INTERON | INTERUNMASKED | PLOCTIMEON;
       setSTATUS(status); /* Turn interrupts on */

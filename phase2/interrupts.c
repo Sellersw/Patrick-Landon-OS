@@ -64,7 +64,6 @@ void ioTrapHandler(){
         if(currentProc != NULL){
           currentProc->p_time = currentProc->p_time + (timeEnd - startTOD) - ioProcTime;
           insertProcQ(&readyQue, currentProc);
-          procCnt++;
           currentProc = NULL;
         }
 
