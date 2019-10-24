@@ -105,6 +105,7 @@ void ioTrapHandler(){
   }
 
   else{
+    debugM(regArea->interrupt_dev[lineNo]);
     devNo = findDevNo(regArea->interrupt_dev[lineNo]);
     debugM(devNo);
 
