@@ -404,6 +404,7 @@ HIDDEN void waitio(state_t *state){
     STCK(currTime);
     currentProc->p_time = (currTime - startTOD) - ioProcTime;
 
+    debugS(45);
     copyState(state, &(currentProc->p_s));
     insertBlocked(semAdd, currentProc);
     sftBlkCnt++;
