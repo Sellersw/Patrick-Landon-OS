@@ -147,7 +147,7 @@ void ioTrapHandler(){
             }
           }
           else{
-            currentProc->p_s).s_v0 = status;
+            (currentProc->p_s).s_v0 = status;
           }
           break;
         /* Non-terminal device */
