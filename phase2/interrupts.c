@@ -55,6 +55,7 @@ void ioTrapHandler(){
 
   cause = oldInt->s_cause;
   lineNo = findLineNo(cause);
+  debugM(lineNo);
 
   /* We should be able to determine a valid line number. If we cannot, we will
   consider this an error */
@@ -62,10 +63,12 @@ void ioTrapHandler(){
     PANIC ();
   }
 
+  debugM(30);
 
   if(lineNo < 3){
     switch(lineNo){
       case PLOCINT:
+        debugM(50);
         STCK(timeEnd);
         if(currentProc != NULL){
           currentProc->p_time = currentProc->p_time + (timeEnd - startTOD) - ioProcTime;
@@ -80,6 +83,7 @@ void ioTrapHandler(){
         break;
 
       case IVTIMINT:
+        debugM(51);
         semAdd = &(semDevArray[DEVICECNT-1]);
         while((*semAdd) < 0){
           (*semAdd)++;
@@ -102,6 +106,7 @@ void ioTrapHandler(){
 
   else{
     devNo = findDevNo(regArea->interrupt_dev[lineNo]);
+    debugM(devNo);
 
     /* We should be able to determine the device number. If we cannot, we will
     consider this an error */
