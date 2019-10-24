@@ -10,6 +10,7 @@
 
 #include "../h/types.h"
 
+
 extern int procCnt;
 extern int sftBlkCnt;
 extern pcb_PTR readyQue;

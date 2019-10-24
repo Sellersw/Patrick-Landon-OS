@@ -10,35 +10,36 @@ DEFS = ../h/const.h ../h/types.h ../e/pcb.e ../e/asl.e ../e/initial.e ../e/inter
 CFLAGS = -ansi -pedantic -Wall -c
 LDAOUTFLAGS = -T $(SUPDIR)/elf32ltsmip.h.umpsaout.x
 LDCOREFLAGS =  -T $(SUPDIR)/elf32ltsmip.h.umpscore.x
-CC = mipsel-linux-gcc 
+CC = mipsel-linux-gcc
 LD = mipsel-linux-ld
 AS = mipsel-linux-as -KPIC
 EF = umps2-elf2umps
 
+
 #main target
-all: kernel.core.umps 
+all: kernel.core.umps
 
 kernel.core.umps: kernel
 	$(EF) -k kernel
 
-kernel: p2test.o initial.o interrupts.o scheduler.o exceptions.o asl.o pcb.o 
+kernel: p2test.o initial.o interrupts.o scheduler.o exceptions.o asl.o pcb.o
 	$(LD) $(LDCOREFLAGS) $(LIBDIR)/crtso.o p2test.o initial.o interrupts.o scheduler.o exceptions.o asl.o pcb.o $(LIBDIR)/libumps.o -o kernel
 
 p2test.o: p2test.c $(DEFS)
 	$(CC) $(CFLAGS) p2test.c
- 
+
 initial.o: initial.c $(DEFS)
 	$(CC) $(CFLAGS) initial.c
 
 interrupts.o: interrupts.c $(DEFS)
 	$(CC) $(CFLAGS) interrupts.c
- 
+
 scheduler.o: scheduler.c $(DEFS)
 	$(CC) $(CFLAGS) scheduler.c
 
 exceptions.o: exceptions.c $(DEFS)
 	$(CC) $(CFLAGS) exceptions.c
- 
+
 asl.o: ../phase1/asl.c $(DEFS)
 	$(CC) $(CFLAGS) ../phase1/asl.c
 
