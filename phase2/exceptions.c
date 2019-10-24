@@ -404,7 +404,7 @@ HIDDEN void waitio(state_t *state){
       state->s_v0 = (devReg->t_recv_status & 0xFF);
     }
     else{
-      state->s_v0 = (devReg->t_tras_status & 0xFF);
+      state->s_v0 = (devReg->t_transm_status & 0xFF);
     }
   }
   else{
