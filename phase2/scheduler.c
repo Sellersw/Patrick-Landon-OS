@@ -17,7 +17,7 @@ Written by: Patrick Sellers and Landon Clark
 #include "/usr/local/include/umps2/umps/libumps.e"
 
 
-debugG(int a){
+void debugG(int a){
   5+5;
 }
 
@@ -40,7 +40,7 @@ void scheduler(){
   nextProc = removeProcQ(&readyQue); /* Take a proc off the head of the ready queue */
 
   if(nextProc != NULL){ /* As long as the head of the ready queue is not NULL... */
-    procCnt--; /* Now have one less process, decrement cnt. */
+
     currentProc = nextProc; /* Global currentProc is now the ready process we dequeued */
     ioProcTime = 0;  /* Reset the time spent in the Interrupt handler.
                         Used for adding back quantum time to the running process. */
