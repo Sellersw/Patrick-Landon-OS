@@ -135,38 +135,28 @@ void ioTrapHandler(){
           debugM(devReg->t_transm_status & 0xFF);
           debugM(devReg->t_recv_status & 0xFF);
 
-
           index = (8*(lineNo-3)) + (2*devNo) + read;
-          semAdd = &(semDevArray[index]);
-          (*semAdd)++;
-          if((*semAdd) <= 0){
-            blockedProc = removeBlocked(semAdd);
-            if(blockedProc != NULL){
-              sftBlkCnt--;
-              insertProcQ(&readyQue, blockedProc);
-            }
-          }
-          else{
-            oldInt->s_v0 = status;
-          }
+
           break;
         /* Non-terminal device */
         default:
+          status = devReg->d_status;
           index = (8*(lineNo-3)) + devNo;
-          semAdd = &(semDevArray[index]);
-          (*semAdd)++;
-          if((*semAdd) <= 0){
-            blockedProc = removeBlocked(semAdd);
-            if(blockedProc != NULL){
-              sftBlkCnt--;
-              insertProcQ(&readyQue, blockedProc);
-            }
-          }
-          else{
-            oldInt->s_v0 = devReg->d_status;
-          }
           devReg->d_command = ACK;
           break;
+      }
+
+      semAdd = &(semDevArray[index]);
+      (*semAdd)++;
+      if((*semAdd) <= 0){
+        blockedProc = removeBlocked(semAdd);
+        if(blockedProc != NULL){
+          sftBlkCnt--;
+          insertProcQ(&readyQue, blockedProc);
+        }
+      }
+      else{
+        oldInt->s_v0 = status;
       }
     }
 
