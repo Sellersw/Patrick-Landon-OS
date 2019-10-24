@@ -14,6 +14,10 @@ Written by: Patrick Sellers and Landon Clark
 #include "../e/scheduler.e"
 #include "/usr/local/include/umps2/umps/libumps.e"
 
+void debugM(int a){
+  5+5;
+}
+
 
 HIDDEN int findLineNo(unsigned int cause);
 HIDDEN int findDevNo(unsigned int bitMap);
@@ -30,6 +34,8 @@ void ioTrapHandler(){
   int *semAdd;
 
   STCK(timeStart);
+
+  debugM(10);
 
 
   /* Determine what line the interrupt is on:
