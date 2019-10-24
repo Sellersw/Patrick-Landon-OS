@@ -383,10 +383,10 @@ HIDDEN void waitio(state_t *state){
   else{
     index = (8*(lineNo-3)) + (2*devNo) + read;
     if(read == 0){
-      state->s_v0 = devReg->t_transm_status;
+      state->s_v0 = (devReg->t_transm_status & 0xFF);
     }
     else{
-      state->s_v0 = devReg->t_recv_status;
+      state->s_v0 = (devReg->t_recv_status & 0xFF);
     }
   }
 

@@ -152,7 +152,9 @@ void ioTrapHandler(){
         blockedProc = removeBlocked(semAdd);
         if(blockedProc != NULL){
           sftBlkCnt--;
-          (blockedProc->p_s).s_v0 = status;
+          if((blockedProc->p_s).s_v0 != 5){
+            (blockedProc->p_s).s_v0 = status;
+          }
           insertProcQ(&readyQue, blockedProc);
         }
       }
