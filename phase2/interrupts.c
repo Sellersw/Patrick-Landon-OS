@@ -105,8 +105,8 @@ void ioTrapHandler(){
   }
 
   else{
-    debugM(regArea->interrupt_dev[lineNo]);
-    devNo = findDevNo(regArea->interrupt_dev[lineNo]);
+    debugM(regArea->interrupt_dev[lineNo-3]);
+    devNo = findDevNo(regArea->interrupt_dev[lineNo-3]);
     debugM(devNo);
 
     /* We should be able to determine the device number. If we cannot, we will
