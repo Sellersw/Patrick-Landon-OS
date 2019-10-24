@@ -358,7 +358,7 @@ HIDDEN void waitforclock(state_t *state){
 /* SYSCALL 8 helper function */
 HIDDEN void waitio(state_t *state){
   cpu_t currTime;
-  unsigned int lineNo, devNo, read, index;
+  unsigned int lineNo, devNo, read, index, status;
   int *semAdd;
   devregarea_t *regArea = (devregarea_t *) RAMBASEADDR;
   device_t *devReg;
@@ -378,19 +378,19 @@ HIDDEN void waitio(state_t *state){
   /* Kinda some magic math here... */
   if(lineNo != 7){
     index = (8*(lineNo-3)) + devNo;
-    state->s_v0 = devReg->d_status;
+    status = devReg->d_status;
   }
   else{
     index = (8*(lineNo-3)) + (2*devNo) + read;
     if(read == 0){
-      state->s_v0 = (devReg->t_transm_status & 0xFF);
+      status = (devReg->t_transm_status & 0xFF);
     }
     else{
-      state->s_v0 = (devReg->t_recv_status & 0xFF);
+      status = (devReg->t_recv_status & 0xFF);
     }
   }
 
-  debugS(state->s_v0);
+  debugS(status);
 
   semAdd = &(semDevArray[index]);
   (*semAdd)--;
@@ -399,7 +399,7 @@ HIDDEN void waitio(state_t *state){
     IO interrupts */
     STCK(currTime);
     currentProc->p_time = (currTime - startTOD) - ioProcTime;
-
+    state->s_v0 = status;
     copyState(state, &(currentProc->p_s));
     insertBlocked(semAdd, currentProc);
     sftBlkCnt++;
