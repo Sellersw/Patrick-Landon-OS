@@ -41,7 +41,6 @@ void tlbTrapHandler();
 /*************************************/
 
 void sysCallHandler(){
-  debugS(5);
   unsigned int call, status;
 
   state_t *oldSys, *oldPgm;
@@ -55,7 +54,6 @@ void sysCallHandler(){
   status = oldSys->s_status;
   call = oldSys->s_a0;
 
-  debugS(call);
 
 
   /* Handle syscalls that are not defined yet */
@@ -392,19 +390,15 @@ HIDDEN void waitio(state_t *state){
     }
   }
 
-  debugS(index);
 
   semAdd = &(semDevArray[index]);
-  debugS(*semAdd);
   (*semAdd)--;
-  debugS(*semAdd);
   if((*semAdd) < 0){
     /* Calculate time taken up in current quantum minus any time spent handling
     IO interrupts */
     STCK(currTime);
     currentProc->p_time = (currTime - startTOD) - ioProcTime;
 
-    debugS(45);
     copyState(state, &(currentProc->p_s));
     insertBlocked(semAdd, currentProc);
     sftBlkCnt++;
