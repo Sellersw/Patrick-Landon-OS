@@ -135,17 +135,16 @@ void ioTrapHandler(){
     else{
       if((devReg->t_transm_status & 0xFF) == 1){
         devReg->t_recv_command = ACK;
-        devReg->t_recv_status = 5;
         status = (devReg->t_recv_status & 0xFF);
         read = TRUE;
       }
       else{
         devReg->t_transm_command = ACK;
-        devReg->t_transm_status = 5;
         status = (devReg->t_transm_status & 0xFF);
         read = FALSE;
       }
-      debugM(status);
+      debugM(devReg->t_transm_status & 0xFF);
+      debugM(devReg->t_recv_status & 0xFF);
       index = (8*(lineNo-3)) + (2*devNo) + read;
       semAdd = &(semDevArray[index]);
       (*semAdd)++;
