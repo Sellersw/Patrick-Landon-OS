@@ -121,6 +121,7 @@ void ioTrapHandler(){
       devReg->d_command = ACK;
     }
 
+
     else{
       if((devReg->t_transm_status & 0x0F) == 1){
         devReg->t_recv_command = ACK;
