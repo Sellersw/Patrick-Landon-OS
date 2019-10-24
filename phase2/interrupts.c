@@ -114,7 +114,7 @@ void ioTrapHandler(){
       PANIC ();
     }
 
-    devReg = (device_t *) (0x1000.0050 + ((lineNo - 3) * 0x80) + (devNo * 0x10));
+    devReg = (device_t *) (0x10000050 + ((lineNo - 3) * 0x80) + (devNo * 0x10));
 
     if(lineNo != TERMINT){
       index = (8*(lineNo-3)) + devNo;
