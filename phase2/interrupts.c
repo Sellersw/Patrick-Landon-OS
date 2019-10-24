@@ -133,15 +133,17 @@ void ioTrapHandler(){
     }
 
     else{
-      if((devReg->t_transm_status & 0x0F) == 1){
+      if((devReg->t_transm_status & 0xFF) == 1){
         devReg->t_recv_command = ACK;
+        devReg->t_recv_status = 5;
         status = (devReg->t_recv_status & 0xFF);
-        read = 1;
+        read = TRUE;
       }
       else{
         devReg->t_transm_command = ACK;
+        devReg->t_transm_status = 5;
         status = (devReg->t_transm_status & 0xFF);
-        read = 0;
+        read = FALSE;
       }
       debugM(status);
       index = (8*(lineNo-3)) + (2*devNo) + read;
