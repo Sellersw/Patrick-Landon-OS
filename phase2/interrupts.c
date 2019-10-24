@@ -147,7 +147,7 @@ void ioTrapHandler(){
             }
           }
           else{
-            (currentProc->p_s).s_v0 = status;
+            currentProc->p_s).s_v0 = status;
           }
           break;
         /* Non-terminal device */
@@ -159,12 +159,11 @@ void ioTrapHandler(){
             blockedProc = removeBlocked(semAdd);
             if(blockedProc != NULL){
               sftBlkCnt--;
-              (blockedProc->p_s).s_v0 = (devReg->d_status & 0xFF);
               insertProcQ(&readyQue, blockedProc);
             }
           }
           else{
-            /* UNSURE */
+            currentProc->p_s).s_v0 = (devReg->d_status & 0xFF);
           }
           devReg->d_command = ACK;
           break;
