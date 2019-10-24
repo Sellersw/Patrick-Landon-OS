@@ -125,8 +125,10 @@ void ioTrapHandler(){
         blockedProc = removeBlocked(semAdd);
         if(blockedProc != NULL){
           sftBlkCnt--;
-          (blockedProc->p_s).s_v0 = devReg->d_status;
           insertProcQ(&readyQue, blockedProc);
+        }
+        else{
+          (currentProc->p_s).s_v0 = (devReg->d_status & 0xFF);
         }
       }
       devReg->d_command = ACK;
@@ -152,10 +154,10 @@ void ioTrapHandler(){
         blockedProc = removeBlocked(semAdd);
         if(blockedProc != NULL){
           sftBlkCnt--;
-          if((blockedProc->p_s).s_v0 != 5){
-            (blockedProc->p_s).s_v0 = status;
-          }
           insertProcQ(&readyQue, blockedProc);
+        }
+        else{
+          (currentProc->p_s).s_v0 = status;
         }
       }
     }

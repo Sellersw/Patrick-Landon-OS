@@ -122,16 +122,13 @@ void print(char *msg) {
 	char * s = msg;
 	devregtr * base = (devregtr *) (TERM0ADDR);
 	devregtr status;
-	debugZ(10);
 
 	SYSCALL(PASSERN, (int)&term_mut, 0, 0);				/* P(term_mut) */
-	debugZ(20);
 	while (*s != EOS) {
 		*(base + 3) = PRINTCHR | (((devregtr) *s) << BYTELEN);
 		status = SYSCALL(WAITIO, TERMINT, 0, 0);
-		debugZ(status);
+		debugZ(status & TERMSTATMASK);
 		if ((status & TERMSTATMASK) != RECVD)
-			debugZ((status & TERMSTATMASK));
 			PANIC();
 		s++;
 	}

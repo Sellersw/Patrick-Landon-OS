@@ -408,7 +408,6 @@ HIDDEN void waitio(state_t *state){
     scheduler();
   }
 
-  /* If our semaphore is greater than 0, this is an error */
-  PANIC ();
+  LDST(state);
 }
 /*******************************************************************************/
