@@ -109,41 +109,40 @@ void ioTrapHandler(){
       debugM(regArea->interrupt_dev[lineNo-3]);
       devNo = findDevNo(regArea->interrupt_dev[lineNo-3]);
 
+      /* We should be able to determine the device number. If we cannot, we will
+      consider this an error */
       if(devNo == -1){
         PANIC ();
       }
 
       debugM(devNo);
+
+      /* Calculate address of device register */
       devReg = (device_t *) (0x10000050 + ((lineNo - 3) * 0x80) + (devNo * 0x10));
 
-      /* We should be able to determine the device number. If we cannot, we will
-      consider this an error */
+      /* Handle terminal interrupt */
+      if(lineNo == TERMINT){
+        if((devReg->t_transm_status & 0xFF) == 1){
+          devReg->t_recv_command = ACK;
+          status = devReg->t_recv_status;
+          read = TRUE;
+        }
+        else{
+          devReg->t_transm_command = ACK;
+          status = devReg->t_transm_status;
+          read = FALSE;
+        }
+        debugM(devReg->t_transm_status & 0xFF);
+        debugM(devReg->t_recv_status & 0xFF);
 
-      switch(lineNo){
-        /* Handle terminal interrupt */
-        case TERMINT:
-          if((devReg->t_transm_status & 0xFF) == 1){
-            devReg->t_recv_command = ACK;
-            status = devReg->t_recv_status;
-            read = TRUE;
-          }
-          else{
-            devReg->t_transm_command = ACK;
-            status = devReg->t_transm_status;
-            read = FALSE;
-          }
-          debugM(devReg->t_transm_status & 0xFF);
-          debugM(devReg->t_recv_status & 0xFF);
+        index = (8*(lineNo-3)) + (2*devNo) + read;
+      }
 
-          index = (8*(lineNo-3)) + (2*devNo) + read;
-
-          break;
-        /* Non-terminal device */
-        default:
-          status = devReg->d_status;
-          index = (8*(lineNo-3)) + devNo;
-          devReg->d_command = ACK;
-          break;
+      /* Non-terminal device */
+      else{
+        status = devReg->d_status;
+        index = (8*(lineNo-3)) + devNo;
+        devReg->d_command = ACK;
       }
 
       semAdd = &(semDevArray[index]);
