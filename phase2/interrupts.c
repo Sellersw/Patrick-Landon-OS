@@ -156,9 +156,9 @@ void ioTrapHandler(){
           sftBlkCnt--;
           insertProcQ(&readyQue, blockedProc);
         }
-        else{
-          (currentProc->p_s).s_v0 = status;
-        }
+      }
+      else{
+        (currentProc->p_s).s_v0 = status;
       }
     }
   }

@@ -196,7 +196,7 @@ HIDDEN void createprocess(state_t *state){
     state->s_v0 = -1;
   }
   else{
-    copyState((state_t *) state->s_a1, (state_t *) &(p->p_s));
+    copyState((state_t *) state->s_a1, &(p->p_s));
     insertChild(currentProc, p);
     insertProcQ(&readyQue, p);
     procCnt++;
@@ -271,7 +271,7 @@ HIDDEN void P(state_t *state){
     STCK(currTime);
     currentProc->p_time = (currTime - startTOD) - ioProcTime;
 
-    copyState(state, (state_t *) &(currentProc->p_s));
+    copyState(state, &(currentProc->p_s));
     insertBlocked(sem, currentProc);
     sftBlkCnt++;
     currentProc = NULL;

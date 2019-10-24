@@ -30,20 +30,18 @@ int waiting;
     It also includes wait handling for when processes are waiting for I/O, and halts
     the machine when all processes have terminated. */
 void scheduler(){
-  debugG(100);
-  debugG(procCnt);
   /*****Local Variables*****/
   pcb_PTR nextProc;
   unsigned int status;
   /*************************/
   waiting = FALSE;
   nextProc = removeProcQ(&readyQue); /* Take a proc off the head of the ready queue */
+  ioProcTime = 0;
 
   if(nextProc != NULL){ /* As long as the head of the ready queue is not NULL... */
 
     currentProc = nextProc; /* Global currentProc is now the ready process we dequeued */
-    ioProcTime = 0;  /* Reset the time spent in the Interrupt handler.
-                        Used for adding back quantum time to the running process. */
+
     setTIMER(QUANTUM); /* sets a timer with our quantum time set in const.h */
     STCK(startTOD); /* starts the clock */
 
@@ -51,7 +49,6 @@ void scheduler(){
   }
   else{
     if(procCnt == 0){ /* if the ready queue was empty and there are no more processes... */
-      debugG(1);
       HALT (); /* stop the machine */
     }
     /* if the ready queue was empty, there are still processes somewhere, and none of
@@ -62,10 +59,8 @@ void scheduler(){
     /* if the ready queue was empty, there are still processes somewhere, and processes
         that are soft blocked waiting for I/O is less than zero... */
     if(sftBlkCnt > 0){
-      debugG(2);
       waiting = TRUE;
       status = getSTATUS() | (INTERON >> 2) | INTERUNMASKED | PLOCTIMEON;
-      debugG(status);
       setSTATUS(status); /* Turn interrupts on */
       WAIT (); /* Wait for I/O */
     }
