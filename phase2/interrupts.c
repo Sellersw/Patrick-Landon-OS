@@ -143,12 +143,11 @@ void ioTrapHandler(){
             blockedProc = removeBlocked(semAdd);
             if(blockedProc != NULL){
               sftBlkCnt--;
-              (blockedProc->p_s).s_v0 = status;
               insertProcQ(&readyQue, blockedProc);
             }
           }
           else{
-            /* UNSURE */
+            (currentProc->p_s).s_v0 = status;
           }
           break;
         /* Non-terminal device */
