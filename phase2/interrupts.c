@@ -124,12 +124,12 @@ void ioTrapHandler(){
         case TERMINT:
           if((devReg->t_transm_status & 0xFF) == 1){
             devReg->t_recv_command = ACK;
-            status = (devReg->t_recv_status & 0xFF);
+            status = devReg->t_recv_status;
             read = TRUE;
           }
           else{
             devReg->t_transm_command = ACK;
-            status = (devReg->t_transm_status & 0xFF);
+            status = devReg->t_transm_status;
             read = FALSE;
           }
           debugM(devReg->t_transm_status & 0xFF);
@@ -163,7 +163,7 @@ void ioTrapHandler(){
             }
           }
           else{
-            oldInt->s_v0 = (devReg->d_status & 0xFF);
+            oldInt->s_v0 = devReg->d_status;
           }
           devReg->d_command = ACK;
           break;

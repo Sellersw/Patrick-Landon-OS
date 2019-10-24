@@ -377,15 +377,15 @@ HIDDEN void waitio(state_t *state){
   /* Kinda some magic math here... */
   if(lineNo != 7){
     index = (8*(lineNo-3)) + devNo;
-    status = (devReg->d_status & 0xFF);
+    status = devReg->d_status;
   }
   else{
     index = (8*(lineNo-3)) + (2*devNo) + read;
     if(read){
-      status = (devReg->t_recv_status & 0xFF);
+      status = devReg->t_recv_status;
     }
     else{
-      status = (devReg->t_transm_status & 0xFF);
+      status = devReg->t_transm_status;
     }
   }
 
