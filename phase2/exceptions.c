@@ -371,18 +371,25 @@ HIDDEN void waitio(state_t *state){
     terminateprocess(currentProc);
   }
 
+  devReg = (device_t *) (0x10000050 + ((lineNo - 3) * 0x80) + (devNo * 0x10));
+
   /* Determine the index of the device semaphore in device semaphore array */
   /* Kinda some magic math here... */
   if(lineNo != 7){
     index = (8*(lineNo-3)) + devNo;
+    status = (devReg->d_status & 0xFF);
   }
   else{
     index = (8*(lineNo-3)) + (2*devNo) + read;
+    if(read){
+      status = (devReg->t_recv_status & 0xFF);
+    }
+    else{
+      status = (devReg->t_transm_status & 0xFF);
+    }
   }
 
   debugS(status);
-
-  devReg = (device_t *) (0x10000050 + ((lineNo - 3) * 0x80) + (devNo * 0x10));
 
   semAdd = &(semDevArray[index]);
   (*semAdd)--;
@@ -391,6 +398,7 @@ HIDDEN void waitio(state_t *state){
     IO interrupts */
     STCK(currTime);
     currentProc->p_time = (currTime - startTOD) - ioProcTime;
+    (currentProc->p_s).s_v0 = status;
     copyState(state, &(currentProc->p_s));
     insertBlocked(semAdd, currentProc);
     sftBlkCnt++;
@@ -398,17 +406,8 @@ HIDDEN void waitio(state_t *state){
 
     scheduler();
   }
-
-  if(lineNo == 7){
-    if(read){
-      state->s_v0 = (devReg->t_recv_status & 0xFF);
-    }
-    else{
-      state->s_v0 = (devReg->t_transm_status & 0xFF);
-    }
-  }
   else{
-    state->s_v0 = (devReg->d_status & 0xFF);
+    /* UNSURE */
   }
   LDST(state);
 }
