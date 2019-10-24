@@ -114,7 +114,7 @@ void ioTrapHandler(){
       PANIC ();
     }
 
-    devReg = &(regArea->devreg[(8*(lineNo-3)) + devNo]);
+    devReg = (device_t *) (0x1000.0050 + ((lineNo - 3) * 0x80) + (devNo * 0x10));
 
     if(lineNo != TERMINT){
       index = (8*(lineNo-3)) + devNo;
@@ -146,6 +146,8 @@ void ioTrapHandler(){
       }
       debugM(devReg->t_transm_status & 0xFF);
       debugM(devReg->t_recv_status & 0xFF);
+
+
       index = (8*(lineNo-3)) + (2*devNo) + read;
       semAdd = &(semDevArray[index]);
       (*semAdd)++;
