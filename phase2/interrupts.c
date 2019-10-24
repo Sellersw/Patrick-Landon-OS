@@ -135,12 +135,12 @@ void ioTrapHandler(){
     else{
       if((devReg->t_transm_status & 0x0F) == 1){
         devReg->t_recv_command = ACK;
-        status = devReg->t_recv_status;
+        status = (devReg->t_recv_status & 0x0F);
         read = 1;
       }
       else{
         devReg->t_transm_command = ACK;
-        status = devReg->t_transm_status;
+        status = (devReg->t_transm_status & 0x0F);
         read = 0;
       }
       index = (8*(lineNo-3)) + (2*devNo) + read;
@@ -181,12 +181,12 @@ of that device is generating the interrupt
     *** Exception: the running job was a "wait state" - set a flag when waiting or inspect OldINT status register
         - call scheduler() */
 
-  STCK(timeEnd);
-  ioProcTime = ioProcTime + (timeStart - timeEnd);
-
   if(waiting){
     scheduler();
   }
+
+  STCK(timeEnd);
+  ioProcTime = ioProcTime + (timeStart - timeEnd);
 
   LDST(oldInt);
 }
