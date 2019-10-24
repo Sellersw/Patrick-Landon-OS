@@ -64,7 +64,7 @@ void scheduler(){
     if(sftBlkCnt > 0){
       debugG(2);
       waiting = TRUE;
-      status = getSTATUS() | INTERON | INTERUNMASKED | PLOCTIMEON;
+      status = getSTATUS() | (INTERON >> 2) | INTERUNMASKED | PLOCTIMEON;
       debugG(status);
       setSTATUS(status); /* Turn interrupts on */
       WAIT (); /* Wait for I/O */
