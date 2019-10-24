@@ -18,7 +18,7 @@ extern pcb_PTR currentProc;
 extern cpu_t startTOD;
 extern cpu_t ioProcTime;
 
-extern int semDevArray;
+extern int semDevArray[DEVICECNT];
 
 
 #endif

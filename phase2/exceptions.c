@@ -211,8 +211,8 @@ HIDDEN void createprocess(state_t *state){
 
 /* SYSCALL 2 helper function */
 HIDDEN void terminateprocess(pcb_PTR p){
-  int *firstDevice = (int *) &(semDevArray[0]);
-  int *lastDevice = (int *) &(semDevArray[DEVICECNT-1]);
+  int *firstDevice = &(semDevArray[0]);
+  int *lastDevice = &(semDevArray[DEVICECNT-1]);
   int *semAdd = p->p_semAdd;
 
   /* Check for children of p. If they exist, kill them first */
@@ -337,7 +337,7 @@ HIDDEN void getcputime(state_t *state){
 /* SYSCALL 7 helper function */
 HIDDEN void waitforclock(state_t *state){
   cpu_t currTime;
-  int *clockAdd = (int *) &(semDevArray[DEVICECNT-1]);
+  int *clockAdd = &(semDevArray[DEVICECNT-1]);
   (*clockAdd)--;
   if((*clockAdd) < 0){
     /* Calculate time taken up in current quantum minus any time spent handling
@@ -394,7 +394,7 @@ HIDDEN void waitio(state_t *state){
 
   debugS(index);
 
-  semAdd = (int *) &(semDevArray[index]);
+  semAdd = &(semDevArray[index]);
   debugS(*semAdd);
   (*semAdd)--;
   debugS(*semAdd);
