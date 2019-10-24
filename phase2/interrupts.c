@@ -75,7 +75,7 @@ void ioTrapHandler(){
         break;
 
       case IVTIMINT:
-        semAdd = &(semDevArray[DEVICECNT-1]);
+        semAdd = &semDevArray[DEVICECNT-1];
         while((*semAdd) < 0){
           (*semAdd)++;
           blockedProc = removeBlocked(semAdd);
