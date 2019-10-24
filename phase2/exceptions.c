@@ -360,12 +360,13 @@ HIDDEN void waitio(state_t *state){
   cpu_t currTime;
   unsigned int lineNo, devNo, read, index, status;
   int *semAdd;
+  device_t *devReg;
 
   lineNo = state->s_a1;
   devNo = state->s_a2;
   read = state->s_a3;
 
-  /* If we are attempting to wait on a non-device semaphore, panic */
+  /* If we are attempting to wait on a non-device semaphore, terminate */
   if(lineNo < 3){
     terminateprocess(currentProc);
   }
@@ -380,6 +381,8 @@ HIDDEN void waitio(state_t *state){
   }
 
   debugS(status);
+
+  devReg = (device_t *) (0x10000050 + ((lineNo - 3) * 0x80) + (devNo * 0x10));
 
   semAdd = &(semDevArray[index]);
   (*semAdd)--;
@@ -396,6 +399,17 @@ HIDDEN void waitio(state_t *state){
     scheduler();
   }
 
+  if(lineNo == 7){
+    if(read){
+      state->s_v0 = (devReg->t_recv_status & 0xFF);
+    }
+    else{
+      state->s_v0 = (devReg->t_tras_status & 0xFF);
+    }
+  }
+  else{
+    state->s_v0 = (devReg->d_status & 0xFF);
+  }
   LDST(state);
 }
 /*******************************************************************************/
