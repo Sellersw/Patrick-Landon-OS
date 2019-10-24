@@ -85,16 +85,15 @@ void ioTrapHandler(){
       case IVTIMINT:
         debugM(51);
         semAdd = &(semDevArray[DEVICECNT-1]);
-        while((*semAdd) < 0){
-          (*semAdd)++;
+        while(headBlocked(semAdd) != NULL){
           blockedProc = removeBlocked(semAdd);
-          sftBlkCnt--;
-          insertProcQ(&readyQue, blockedProc);
+          if(blockedProc != NULL){
+            sftBlkCnt--;
+            insertProcQ(&readyQue, blockedProc);
+          }
         }
 
-        if((*semAdd) > 0){
-          (*semAdd) = 0;
-        }
+        (*semAdd) = 0;
 
         STCK(timeEnd);
         ioProcTime = ioProcTime + (timeEnd - timeStart);
@@ -154,11 +153,12 @@ void ioTrapHandler(){
         blockedProc = removeBlocked(semAdd);
         if(blockedProc != NULL){
           sftBlkCnt--;
+          (blockedProc->p_s).s_v0 = status;
           insertProcQ(&readyQue, blockedProc);
         }
       }
       else{
-        (currentProc->p_s).s_v0 = status;
+        /* Not sure */
       }
     }
   }

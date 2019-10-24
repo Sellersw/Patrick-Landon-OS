@@ -360,34 +360,23 @@ HIDDEN void waitio(state_t *state){
   cpu_t currTime;
   unsigned int lineNo, devNo, read, index, status;
   int *semAdd;
-  devregarea_t *regArea = (devregarea_t *) RAMBASEADDR;
-  device_t *devReg;
 
   lineNo = state->s_a1;
   devNo = state->s_a2;
   read = state->s_a3;
 
-  devReg = &(regArea->devreg[(8*(lineNo-3)) + devNo]);
-
   /* If we are attempting to wait on a non-device semaphore, panic */
   if(lineNo < 3){
-    PANIC ();
+    terminateprocess(currentProc);
   }
 
   /* Determine the index of the device semaphore in device semaphore array */
   /* Kinda some magic math here... */
   if(lineNo != 7){
     index = (8*(lineNo-3)) + devNo;
-    status = devReg->d_status;
   }
   else{
     index = (8*(lineNo-3)) + (2*devNo) + read;
-    if(read == 0){
-      status = (devReg->t_transm_status & 0xFF);
-    }
-    else{
-      status = (devReg->t_recv_status & 0xFF);
-    }
   }
 
   debugS(status);
@@ -399,7 +388,6 @@ HIDDEN void waitio(state_t *state){
     IO interrupts */
     STCK(currTime);
     currentProc->p_time = (currTime - startTOD) - ioProcTime;
-    state->s_v0 = status;
     copyState(state, &(currentProc->p_s));
     insertBlocked(semAdd, currentProc);
     sftBlkCnt++;
