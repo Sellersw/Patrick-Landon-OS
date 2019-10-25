@@ -233,11 +233,7 @@ void test() {
 	/* create process p2 */
 	SYSCALL(CREATETHREAD, (int)&p2state,0 , 0);				/* start p2     */
 
-	debugZ(-1);
-
 	print("p2 was started\n");
-
-	debugZ(-2);
 
 	SYSCALL(VERHOGEN, (int)&startp2, 0, 0);					/* V(startp2)   */
 
@@ -250,6 +246,8 @@ void test() {
 	/* make sure we really blocked */
 	if (p1p2synch == 0)
 		print("error: p1/p2 synchronization bad\n");
+
+	debugZ(-10);
 
 	SYSCALL(CREATETHREAD, (int)&p3state, 0, 0);				/* start p3     */
 
@@ -298,11 +296,7 @@ void p2() {
 	cpu_t	now1,now2;		/* times of day        */
 	cpu_t	cpu_t1,cpu_t2;	/* cpu time used       */
 
-	debugZ(-55);
-
 	SYSCALL(PASSERN, (int)&startp2, 0, 0);				/* P(startp2)   */
-
-	debugZ(-34);
 
 	print("p2 starts\n");
 
@@ -343,9 +337,12 @@ void p2() {
 		print("p2 blew it!\n");
 	}
 
+	debugZ(200);
 	p1p2synch = 1;				/* p1 will check this */
 
 	SYSCALL(VERHOGEN, (int)&endp2, 0, 0);				/* V(endp2)     */
+
+	debugZ(1);
 
 	SYSCALL(TERMINATETHREAD, 0, 0, 0);			/* terminate p2 */
 
