@@ -127,10 +127,11 @@ void print(char *msg) {
 	while (*s != EOS) {
 		*(base + 3) = PRINTCHR | (((devregtr) *s) << BYTELEN);
 		status = SYSCALL(WAITIO, TERMINT, 0, 0);
-		debugZ(status & TERMSTATMASK);
 		if ((status & TERMSTATMASK) != RECVD)
 			PANIC();
 		s++;
+		debugZ((int)*s);
+		debugZ((int)EOS);
 	}
 	SYSCALL(VERHOGEN, (int)&term_mut, 0, 0);				/* V(term_mut) */
 }
@@ -141,7 +142,7 @@ void print(char *msg) {
 /*                 p1 -- the root process                            */
 /*                                                                   */
 void test() {
-	debugZ(5);
+	debugZ(10);
 
 	SYSCALL(VERHOGEN, (int)&testsem, 0, 0);					/* V(testsem)   */
 
