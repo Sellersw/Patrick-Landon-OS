@@ -71,7 +71,7 @@ void ioTrapHandler(){
       PANIC ();
 
     case PLOCINT:
-      debugD(50);
+      debugM(50);
       STCK(timeEnd);
       if(currentProc != NULL){
         ioProcTime = ioProcTime + (timeEnd - timeStart);
@@ -82,12 +82,12 @@ void ioTrapHandler(){
 
       /* scheduler could also load a quantum into the processor local timer,
       but inserting a time here will acknowledge the given interrupt */
-      /* setTIMER(QUANTUM); */
+      setTIMER(QUANTUM);
       scheduler();
       break;
 
     case IVTIMINT:
-      debugM(51);
+      debugD(51);
       semAdd = &(semDevArray[DEVICECNT-1]);
       while(headBlocked(semAdd) != NULL){
         blockedProc = removeBlocked(semAdd);
