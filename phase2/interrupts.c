@@ -135,8 +135,6 @@ void ioTrapHandler(){
           devReg->t_transm_command = ACK;
           read = FALSE;
         }
-        debugM(devReg->t_transm_status & 0xFF);
-        debugM(devReg->t_recv_status & 0xFF);
 
         index = (8*(lineNo-3)) + (2*devNo) + read;
       }

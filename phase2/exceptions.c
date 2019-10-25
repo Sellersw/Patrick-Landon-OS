@@ -58,6 +58,7 @@ void sysCallHandler(){
 
   /* Handle syscalls that are not defined yet */
   if(call >= 9){
+    debugS(66);
     passUpOrDie(SYSTRAP);
   }
 
@@ -67,6 +68,7 @@ void sysCallHandler(){
     oldPgm = (state_t *) PROGTRAPOLD;
     copyState(oldSys, oldPgm);
     oldPgm->s_cause = RESERVEDINSTR;
+    debugS(100);
     progTrapHandler();
   }
 
@@ -121,10 +123,12 @@ void sysCallHandler(){
 }
 
 void progTrapHandler(){
+  debugS(10);
   passUpOrDie(PROGTRAP);
 }
 
 void tlbTrapHandler(){
+  debugS(15);
   passUpOrDie(TLBTRAP);
 }
 
