@@ -168,6 +168,7 @@ pcb_PTR outBlocked(pcb_PTR p){
   if(s_current->s_semAdd == s_add){
     debugO(5);
     p_return = outProcQ(&(s_current->s_procQ), p);
+    debugO(10);
     if(emptyProcQ(s_current->s_procQ)){
       debugO(6);
       s_prev->s_next = s_current->s_next;
