@@ -141,14 +141,15 @@ return NULL; otherwise, return p. */
 pcb_PTR outBlocked(pcb_PTR p){
   pcb_PTR p_return;
   int *s_add = p->p_semAdd;
+  semd_PTR s_prev, s_current;
 
   if(s_add == NULL){
     return NULL;
   }
 
   /* Find the semaphore being pointed to by the process p */
-  semd_PTR s_prev = findASemd(s_add);
-  semd_PTR s_current = s_prev->s_next;
+  s_prev = findASemd(s_add);
+  s_current = s_prev->s_next;
 
   /* If we have found the semaphore we were looking for, attempt to remove the
   process p from the semaphore's procQ. Return the result of the attempted
