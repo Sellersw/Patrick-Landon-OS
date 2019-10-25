@@ -18,6 +18,10 @@ void debugM(int a){
   5+5;
 }
 
+void debugD(int a){
+  5+5;
+}
+
 
 HIDDEN int findLineNo(unsigned int cause);
 HIDDEN int findDevNo(unsigned int bitMap);
@@ -67,7 +71,7 @@ void ioTrapHandler(){
       PANIC ();
 
     case PLOCINT:
-      debugM(50);
+      debugD(50);
       STCK(timeEnd);
       if(currentProc != NULL){
         currentProc->p_time = currentProc->p_time + (timeEnd - startTOD) - ioProcTime;
