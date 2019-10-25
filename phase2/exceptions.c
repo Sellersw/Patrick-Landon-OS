@@ -192,6 +192,7 @@ HIDDEN void passUpOrDie(int type){
 /****************************SYSCALL FUNCTIONS*****************************/
 /* SYSCALL 1 helper function */
 HIDDEN void createprocess(state_t *state){
+  debugS(12);
   pcb_PTR p = allocPcb();
 
   /* If an error occurs when attempting to create a new PCB, return error
