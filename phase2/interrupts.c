@@ -25,6 +25,7 @@ void debugD(int a){
 
 HIDDEN int findLineNo(unsigned int cause);
 HIDDEN int findDevNo(unsigned int bitMap);
+HIDDEN void copyState(state_t *orig, state_t *curr);
 
 
 void ioTrapHandler(){
@@ -77,6 +78,7 @@ void ioTrapHandler(){
       if(currentProc != NULL){
         ioProcTime = ioProcTime + (timeEnd - timeStart);
         currentProc->p_time = currentProc->p_time + (timeEnd - startTOD) - ioProcTime;
+        copyState(oldInt, &(currentProc->p_s));
         insertProcQ(&readyQue, currentProc);
         currentProc = NULL;
       }
@@ -237,4 +239,19 @@ HIDDEN int findDevNo(unsigned int bitMap){
   /* devNo should be determinable, if not this is an error */
   return -1;
 
+}
+
+
+HIDDEN void copyState(state_t *orig, state_t *curr){
+  int i;
+  /* Copy state values over to new state */
+  curr->s_asid = orig->s_asid;
+  curr->s_cause = orig->s_cause;
+  curr->s_status = orig->s_status;
+  curr->s_pc = orig->s_pc;
+
+  /* Copy previous register vaules to new state registers */
+  for(i = 0; i < STATEREGNUM; i++){
+    curr->s_reg[i] = orig->s_reg[i];
+  }
 }
