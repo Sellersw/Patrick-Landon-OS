@@ -192,7 +192,6 @@ HIDDEN void passUpOrDie(int type){
 /****************************SYSCALL FUNCTIONS*****************************/
 /* SYSCALL 1 helper function */
 HIDDEN void createprocess(state_t *state){
-  debugS(12);
   pcb_PTR p = allocPcb();
 
   /* If an error occurs when attempting to create a new PCB, return error
@@ -218,8 +217,10 @@ HIDDEN void terminateprocess(pcb_PTR p){
   int *lastDevice = &(semDevArray[DEVICECNT-1]);
   int *semAdd = p->p_semAdd;
 
+  debugS(3);
+
   /* Check for children of p. If they exist, kill them first */
-  while(emptyChild(p) != NULL){
+  while(emptyChild(p) != TRUE){
     terminateprocess(removeChild(p));
   }
 
@@ -271,7 +272,6 @@ HIDDEN void P(state_t *state){
   cpu_t currTime;
   int *sem = (int *) state->s_a1;
   (*sem)--;
-  debugS(*sem);
   if((*sem) < 0){
     /* Calculate time taken up in current quantum minus any time spent handling
     IO interrupts */
