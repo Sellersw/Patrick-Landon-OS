@@ -84,6 +84,7 @@ void sysCallHandler(){
     of that process */
     case TERMINATEPROCESS:
       terminateprocess(currentProc);
+      currentProc = NULL;
       scheduler();
       break;
 
@@ -154,6 +155,7 @@ HIDDEN void passUpOrDie(int type){
     case TLBTRAP:
       if(currentProc->p_newTlb == NULL){
         terminateprocess(currentProc);
+        currentProc = NULL;
         scheduler();
       }
       else{
@@ -166,6 +168,7 @@ HIDDEN void passUpOrDie(int type){
     case PROGTRAP:
       if(currentProc->p_newPgm == NULL){
         terminateprocess(currentProc);
+        currentProc = NULL;
         scheduler();
       }
       else{
@@ -178,6 +181,7 @@ HIDDEN void passUpOrDie(int type){
     case SYSTRAP:
       if(currentProc->p_newSys == NULL){
         terminateprocess(currentProc);
+        currentProc = NULL;
         scheduler();
       }
       else{
@@ -229,7 +233,11 @@ HIDDEN void terminateprocess(pcb_PTR p){
     outChild(p);
   }
 
-  else if((outProcQ(&readyQue, p)) == NULL){
+  else if((outProcQ(&readyQue, p)) != NULL){
+    outChild(p);
+  }
+
+  else{
     outBlocked(p);
 
     /* Check to see if p's semaphore was a device semaphore */
@@ -295,6 +303,7 @@ HIDDEN void spectrapvec(state_t *state){
     case TLBTRAP:
       if(currentProc->p_newTlb != NULL){
         terminateprocess(currentProc);
+        currentProc = NULL;
         scheduler();
       }
       else{
@@ -306,6 +315,7 @@ HIDDEN void spectrapvec(state_t *state){
     case PROGTRAP:
       if(currentProc->p_newPgm != NULL){
         terminateprocess(currentProc);
+        currentProc = NULL;
         scheduler();
       }
       else{
@@ -317,6 +327,7 @@ HIDDEN void spectrapvec(state_t *state){
     case SYSTRAP:
       if(currentProc->p_newSys != NULL){
         terminateprocess(currentProc);
+        currentProc = NULL;
         scheduler();
       }
       else{
@@ -373,6 +384,8 @@ HIDDEN void waitio(state_t *state){
   /* If we are attempting to wait on a non-device semaphore, terminate */
   if(lineNo < 3){
     terminateprocess(currentProc);
+    currentProc = NULL;
+    scheduler();
   }
 
   /* Determine the index of the device semaphore in device semaphore array */

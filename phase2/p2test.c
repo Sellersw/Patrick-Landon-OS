@@ -241,11 +241,11 @@ void test() {
 
 	SYSCALL(VERHOGEN, (int)&startp2, 0, 0);					/* V(startp2)   */
 
-	debugZ(-2);
+	debugZ(-3);
 
 	SYSCALL(PASSERN, (int)&endp2, 0, 0);					/* P(endp2)     */
 
-	debugZ(-2);
+	debugZ(-4);
 
 	/* make sure we really blocked */
 	if (p1p2synch == 0)

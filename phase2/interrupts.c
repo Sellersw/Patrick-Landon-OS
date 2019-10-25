@@ -83,7 +83,7 @@ void ioTrapHandler(){
 
       /* scheduler could also load a quantum into the processor local timer,
       but inserting a time here will acknowledge the given interrupt */
-      /* setTIMER(QUANTUM); */
+      setTIMER(QUANTUM);
       scheduler();
       break;
 
@@ -125,14 +125,14 @@ void ioTrapHandler(){
 
       /* Handle terminal interrupt */
       if(lineNo == TERMINT){
-        if((devReg->t_transm_status & 0xFF) == 1){
-          status = devReg->t_recv_status;
-          devReg->t_recv_command = ACK;
+        if((devReg->t_recv_status & 0xFF) == 1){
+          status = devReg->t_transm_status;
+          devReg->t_transm_command = ACK;
           read = TRUE;
         }
         else{
-          status = devReg->t_transm_status;
-          devReg->t_transm_command = ACK;
+          status = devReg->t_recv_status;
+          devReg->t_recv_command = ACK;
           read = FALSE;
         }
 
