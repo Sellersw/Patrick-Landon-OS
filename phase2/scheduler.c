@@ -60,7 +60,7 @@ void scheduler(){
         that are soft blocked waiting for I/O is less than zero... */
     if(sftBlkCnt > 0){
       waiting = TRUE;
-      status = getSTATUS() | INTERON | (INTERON >> 2) | INTERUNMASKED | PLOCTIMEON;
+      status = getSTATUS() | (INTERON >> 2) | INTERUNMASKED | PLOCTIMEON;
       setSTATUS(status); /* Turn interrupts on */
       WAIT (); /* Wait for I/O */
     }

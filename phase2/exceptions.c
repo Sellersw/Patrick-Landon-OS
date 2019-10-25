@@ -255,6 +255,7 @@ HIDDEN void V(state_t *state){
   int *sem = (int *) state->s_a1;
   (*sem)++;
   if((*sem) <= 0){
+    debugS(-5);
     temp = removeBlocked(sem);
     if(temp != NULL){
       insertProcQ(&readyQue, temp);
