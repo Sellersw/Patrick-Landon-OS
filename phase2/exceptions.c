@@ -198,6 +198,7 @@ HIDDEN void createprocess(state_t *state){
   code of -1 in the v0 register of oldSys */
   if(p == NULL){
     state->s_v0 = -1;
+    debugS(1);
   }
   else{
     copyState((state_t *) state->s_a1, &(p->p_s));
