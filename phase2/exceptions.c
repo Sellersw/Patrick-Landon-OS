@@ -331,7 +331,12 @@ HIDDEN void spectrapvec(state_t *state){
 HIDDEN void getcputime(state_t *state){
   cpu_t currTime;
   STCK(currTime);
-  state->s_v0 = currentProc->p_time + currTime - startTOD - ioProcTime;
+  currentProc->p_time = currentProc->p_time + currTime - startTOD - ioProcTime;
+  state->s_v0 = currentProc->p_time;
+
+  STCK(startTOD);
+  ioProcTime = 0;
+  
   LDST(state);
 }
 
