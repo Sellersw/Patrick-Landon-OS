@@ -121,13 +121,6 @@ pcb_PTR removeBlocked(int *semAdd){
 
   if(s_current->s_semAdd == semAdd){
     /* If the semaphore at semAdd is on the ASL and the semaphore's procQ is
-    empty, remove the semaphore from the ASL and return NULL */
-    if(emptyProcQ(s_current->s_procQ)){
-      s_prev->s_next = s_current->s_next;
-      freeSemd(s_current);
-      return NULL;
-    }
-    /* If the semaphore at semAdd is on the ASL and the semaphore's procQ is
     not empty, remove the head of the semaphore's procQ and return this process */
     p_return = removeProcQ(&(s_current->s_procQ));
     if(emptyProcQ(s_current->s_procQ)){
@@ -148,6 +141,10 @@ return NULL; otherwise, return p. */
 pcb_PTR outBlocked(pcb_PTR p){
   pcb_PTR p_return;
   int *s_add = p->p_semAdd;
+
+  if(s_add == NULL){
+    return NULL;
+  }
 
   /* Find the semaphore being pointed to by the process p */
   semd_PTR s_prev = findASemd(s_add);
