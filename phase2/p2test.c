@@ -119,6 +119,7 @@ void	p5sys(),p8root(),child1(),child2(),p8leaf();
 /* a procedure to print on terminal 0 */
 void print(char *msg) {
 
+	debugZ(20);
 	char * s = msg;
 	devregtr * base = (devregtr *) (TERM0ADDR);
 	devregtr status;
@@ -133,6 +134,7 @@ void print(char *msg) {
 	}
 	debugZ(100);
 	SYSCALL(VERHOGEN, (int)&term_mut, 0, 0);				/* V(term_mut) */
+	debugZ(50);
 }
 
 
