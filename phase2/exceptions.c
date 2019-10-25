@@ -237,7 +237,7 @@ HIDDEN void terminateprocess(pcb_PTR p){
       sftBlkCnt--;
     }
     else{
-      *(semAdd)++;
+      (*semAdd)++;
     }
   }
 

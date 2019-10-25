@@ -157,6 +157,9 @@ void ioTrapHandler(){
           insertProcQ(&readyQue, blockedProc);
         }
       }
+      else{
+        oldInt->s_v0 = status;
+      }
       break;
     }
 
