@@ -217,39 +217,28 @@ HIDDEN void terminateprocess(pcb_PTR p){
   int *lastDevice = &(semDevArray[DEVICECNT-1]);
   int *semAdd = p->p_semAdd;
 
-  debugS(3);
-
   /* Check for children of p. If they exist, kill them first */
   while(emptyChild(p) != TRUE){
-    debugS(4);
     terminateprocess(removeChild(p));
   }
 
   /* Handle removing the given process: */
-  debugS(5);
   if(p == currentProc){
-    debugS(6);
     outChild(p);
-    debugS(7);
     currentProc = NULL;
   }
 
   else if(outProcQ(&readyQue, p) == NULL){
-    debugS(9);
     outBlocked(p);
-    debugS(10);
     /* Check to see if p's semaphore was a device semaphore */
     if((semAdd >= firstDevice) && (semAdd <= lastDevice)){
-      debugS(11);
       sftBlkCnt--;
     }
     else{
-      debugS(12);
       (*semAdd)++;
     }
   }
 
-  debugS(13);
   procCnt--;
   freePcb(p);
 }

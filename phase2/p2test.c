@@ -140,14 +140,11 @@ void print(char *msg) {
 /*                 p1 -- the root process                            */
 /*                                                                   */
 void test() {
-	debugZ(10);
 
 	SYSCALL(VERHOGEN, (int)&testsem, 0, 0);					/* V(testsem)   */
 
 
 	print("p1 v(testsem)\n");
-
-	debugZ(15);
 
 	/* set up states of the other processes */
 
@@ -235,17 +232,12 @@ void test() {
 
 	SYSCALL(VERHOGEN, (int)&startp2, 0, 0);					/* V(startp2)   */
 
-	debugZ(-3);
-
 	SYSCALL(PASSERN, (int)&endp2, 0, 0);					/* P(endp2)     */
 
-	debugZ(-4);
 
 	/* make sure we really blocked */
 	if (p1p2synch == 0)
 		print("error: p1/p2 synchronization bad\n");
-
-	debugZ(-10);
 
 	SYSCALL(CREATETHREAD, (int)&p3state, 0, 0);				/* start p3     */
 
@@ -275,8 +267,9 @@ void test() {
 			print("error in process termination\n");
 			PANIC();
 		}
-
+		debugZ(endp8);
 		SYSCALL(PASSERN, (int)&endp8, 0, 0);
+		debugZ(endp8);
 	}
 
 	print("p1 finishes OK -- TTFN\n");
@@ -335,12 +328,9 @@ void p2() {
 		print("p2 blew it!\n");
 	}
 
-	debugZ(200);
 	p1p2synch = 1;				/* p1 will check this */
 
 	SYSCALL(VERHOGEN, (int)&endp2, 0, 0);				/* V(endp2)     */
-
-	debugZ(1);
 
 	SYSCALL(TERMINATETHREAD, 0, 0, 0);			/* terminate p2 */
 
@@ -376,6 +366,9 @@ void p3() {
 		SYSCALL(WAITCLOCK, 0, 0, 0);
 
 	cpu_t2 = SYSCALL(GETCPUTIME, 0, 0, 0);
+
+	debugZ(cpu_t2 - cpu_t1);
+	debugZ((MINCLOCKLOOP / (* ((cpu_t *) TIMESCALEADDR))));
 
 	if (cpu_t2 - cpu_t1 < (MINCLOCKLOOP / (* ((cpu_t *) TIMESCALEADDR))))
 		print("error: p3 - CPU time incorrectly maintained\n");
