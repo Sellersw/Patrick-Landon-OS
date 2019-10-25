@@ -69,6 +69,7 @@ void ioTrapHandler(){
     consider this an error */
     case -1:
       PANIC ();
+      break;
 
     case PLOCINT:
       debugM(50);
@@ -99,10 +100,7 @@ void ioTrapHandler(){
 
       (*semAdd) = 0;
 
-      STCK(timeEnd);
-      ioProcTime = ioProcTime + (timeEnd - timeStart);
       LDIT(INTERVAL);
-      LDST(oldInt);
       break;
 
     /* Given the line number (3-7), determine which instance
@@ -161,6 +159,7 @@ void ioTrapHandler(){
           insertProcQ(&readyQue, blockedProc);
         }
       }
+      break;
     }
 
   if(waiting){
