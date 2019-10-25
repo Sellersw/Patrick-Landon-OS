@@ -358,9 +358,8 @@ HIDDEN void waitforclock(state_t *state){
 /* SYSCALL 8 helper function */
 HIDDEN void waitio(state_t *state){
   cpu_t currTime;
-  unsigned int lineNo, devNo, read, index, status;
+  unsigned int lineNo, devNo, read, index;
   int *semAdd;
-  device_t *devReg;
 
   lineNo = state->s_a1;
   devNo = state->s_a2;
@@ -371,25 +370,14 @@ HIDDEN void waitio(state_t *state){
     terminateprocess(currentProc);
   }
 
-  devReg = (device_t *) (0x10000050 + ((lineNo - 3) * 0x80) + (devNo * 0x10));
-
   /* Determine the index of the device semaphore in device semaphore array */
   /* Kinda some magic math here... */
   if(lineNo != 7){
     index = (8*(lineNo-3)) + devNo;
-    status = devReg->d_status;
   }
   else{
     index = (8*(lineNo-3)) + (2*devNo) + read;
-    if(read){
-      status = devReg->t_recv_status;
-    }
-    else{
-      status = devReg->t_transm_status;
-    }
   }
-
-  debugS(status);
 
   semAdd = &(semDevArray[index]);
   (*semAdd)--;
@@ -399,15 +387,11 @@ HIDDEN void waitio(state_t *state){
     STCK(currTime);
     currentProc->p_time = (currTime - startTOD) - ioProcTime;
     copyState(state, &(currentProc->p_s));
-    (currentProc->p_s).s_v0 = status;
     insertBlocked(semAdd, currentProc);
     sftBlkCnt++;
     currentProc = NULL;
 
     scheduler();
-  }
-  else{
-    /* UNSURE */
   }
   LDST(state);
 }

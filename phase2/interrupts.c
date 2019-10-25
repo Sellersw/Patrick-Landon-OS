@@ -123,13 +123,13 @@ void ioTrapHandler(){
       /* Handle terminal interrupt */
       if(lineNo == TERMINT){
         if((devReg->t_transm_status & 0xFF) == 1){
-          devReg->t_recv_command = ACK;
           status = devReg->t_recv_status;
+          devReg->t_recv_command = ACK;
           read = TRUE;
         }
         else{
-          devReg->t_transm_command = ACK;
           status = devReg->t_transm_status;
+          devReg->t_transm_command = ACK;
           read = FALSE;
         }
         debugM(devReg->t_transm_status & 0xFF);
@@ -141,8 +141,9 @@ void ioTrapHandler(){
       /* Non-terminal device */
       else{
         status = devReg->d_status;
-        index = (8*(lineNo-3)) + devNo;
         devReg->d_command = ACK;
+
+        index = (8*(lineNo-3)) + devNo;
       }
 
       semAdd = &(semDevArray[index]);
@@ -151,11 +152,9 @@ void ioTrapHandler(){
         blockedProc = removeBlocked(semAdd);
         if(blockedProc != NULL){
           sftBlkCnt--;
+          (blockedProc->p_s).s_v0 = status;
           insertProcQ(&readyQue, blockedProc);
         }
-      }
-      else{
-        oldInt->s_v0 = status;
       }
     }
 
