@@ -175,7 +175,7 @@ void freePcb(pcb_PTR p){
   p->p_newTlb = NULL;
 
   /* If no current head on free list, insert p as next. */
-  if(pcbFree_h == NULL){
+  if(emptyProcQ(pcbFree_h)){
     p->p_prev = NULL;
     p->p_next = NULL;
     pcbFree_h = p;
@@ -195,7 +195,7 @@ return a pointer to the removed element. */
 pcb_PTR allocPcb(){
   pcb_PTR p_ret = pcbFree_h;
   /* If pcbFree list is empty, return NULL. */
-  if(pcbFree_h == NULL){
+  if(emptyProcQ(pcbFree_h)){
     return NULL;
   }
 
