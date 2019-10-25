@@ -128,12 +128,12 @@ void ioTrapHandler(){
         if((devReg->t_recv_status & 0xFF) == 1){
           status = devReg->t_transm_status;
           devReg->t_transm_command = ACK;
-          read = TRUE;
+          read = FALSE;
         }
         else{
           status = devReg->t_recv_status;
           devReg->t_recv_command = ACK;
-          read = FALSE;
+          read = TRUE;
         }
 
         index = (8*(lineNo-3)) + (2*devNo) + read;
