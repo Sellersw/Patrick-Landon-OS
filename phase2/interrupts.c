@@ -83,7 +83,7 @@ void ioTrapHandler(){
 
       /* scheduler could also load a quantum into the processor local timer,
       but inserting a time here will acknowledge the given interrupt */
-      setTIMER(QUANTUM);
+      /* setTIMER(QUANTUM); */
       scheduler();
       break;
 
@@ -153,12 +153,12 @@ void ioTrapHandler(){
         blockedProc = removeBlocked(semAdd);
         if(blockedProc != NULL){
           sftBlkCnt--;
-          (blockedProc->p_s).s_v0 = status;
+          (blockedProc->p_s).s_v0 = (status & 0xFF);
           insertProcQ(&readyQue, blockedProc);
         }
       }
       else{
-        oldInt->s_v0 = status;
+        oldInt->s_v0 = (status & 0xFF);
       }
       break;
     }
