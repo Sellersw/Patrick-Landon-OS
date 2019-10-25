@@ -127,7 +127,6 @@ void print(char *msg) {
 	while (*s != EOS) {
 		*(base + 3) = PRINTCHR | (((devregtr) *s) << BYTELEN);
 		status = SYSCALL(WAITIO, TERMINT, 0, 0);
-		debugZ(status);
 		if ((status & TERMSTATMASK) != RECVD)
 			PANIC();
 		s++;
@@ -299,7 +298,11 @@ void p2() {
 	cpu_t	now1,now2;		/* times of day        */
 	cpu_t	cpu_t1,cpu_t2;	/* cpu time used       */
 
+	debugZ(-55);
+
 	SYSCALL(PASSERN, (int)&startp2, 0, 0);				/* P(startp2)   */
+
+	debugZ(-34);
 
 	print("p2 starts\n");
 
