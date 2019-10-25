@@ -130,9 +130,8 @@ void print(char *msg) {
 		if ((status & TERMSTATMASK) != RECVD)
 			PANIC();
 		s++;
-		debugZ((int)*s);
-		debugZ((int)EOS);
 	}
+	debugZ(100);
 	SYSCALL(VERHOGEN, (int)&term_mut, 0, 0);				/* V(term_mut) */
 }
 
