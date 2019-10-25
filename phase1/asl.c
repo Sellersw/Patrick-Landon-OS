@@ -14,6 +14,11 @@ AUTHORS: Patrick Sellers and Landon Clark
 HIDDEN semd_PTR semdActive_h, semdFree_h;
 
 
+void debugO(int a){
+  5+5;
+}
+
+
 /*******************************HELPER FUNCTIONS**********************************/
 
 
@@ -140,15 +145,18 @@ semaphore (p→ p_semAdd) on the ASL. If ProcBlk pointed to by p does not appear
 in the process queue associated with p’s semaphore, which is an error condition,
 return NULL; otherwise, return p. */
 pcb_PTR outBlocked(pcb_PTR p){
+  debugO(1);
   pcb_PTR p_return;
   int *s_add = p->p_semAdd;
   semd_PTR s_prev, s_current;
+  debugO(2);
 
   if(s_add == NULL){
     return NULL;
   }
 
   /* Find the semaphore being pointed to by the process p */
+  debugO(3);
   s_prev = findASemd(s_add);
   s_current = s_prev->s_next;
 
@@ -156,15 +164,20 @@ pcb_PTR outBlocked(pcb_PTR p){
   process p from the semaphore's procQ. Return the result of the attempted
   removal - which will be the process p if the removal was successful and
   NULL otherwise */
+  debugO(4);
   if(s_current->s_semAdd == s_add){
+    debugO(5);
     p_return = outProcQ(&(s_current->s_procQ), p);
     if(emptyProcQ(s_current->s_procQ)){
+      debugO(6);
       s_prev->s_next = s_current->s_next;
       freeSemd(s_current);
     }
+    debugO(7);
     p_return->p_semAdd = NULL;
     return p_return;
   }
+  debugO(8);
   /* Return NULL if the semaphore pointed to by p is not on the ASL */
   return NULL;
 }
