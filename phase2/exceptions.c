@@ -219,7 +219,7 @@ HIDDEN void terminateprocess(pcb_PTR p){
   int *semAdd = p->p_semAdd;
 
   /* Check for children of p. If they exist, kill them first */
-  while(!emptyChild(p)){
+  while(emptyChild(p) != NULL){
     terminateprocess(removeChild(p));
   }
 
