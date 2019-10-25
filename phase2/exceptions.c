@@ -198,7 +198,6 @@ HIDDEN void createprocess(state_t *state){
   code of -1 in the v0 register of oldSys */
   if(p == NULL){
     state->s_v0 = -1;
-    debugS(1);
   }
   else{
     copyState((state_t *) state->s_a1, &(p->p_s));
@@ -219,20 +218,25 @@ HIDDEN void terminateprocess(pcb_PTR p){
   int *semAdd = p->p_semAdd;
 
   /* Check for children of p. If they exist, kill them first */
+  debugS(1);
   while(emptyChild(p) != TRUE){
+    debugS(2);
     terminateprocess(removeChild(p));
   }
 
   /* Handle removing the given process: */
   if(p == currentProc){
+    debugS(5);
     outChild(p);
     currentProc = NULL;
   }
 
   else if(outProcQ(&readyQue, p) == NULL){
+    debugS(6);
     outBlocked(p);
     /* Check to see if p's semaphore was a device semaphore */
     if((semAdd >= firstDevice) && (semAdd <= lastDevice)){
+      debugS(7);
       sftBlkCnt--;
     }
     else{
@@ -240,6 +244,7 @@ HIDDEN void terminateprocess(pcb_PTR p){
     }
   }
 
+  debugS(8);
   procCnt--;
   freePcb(p);
 }
