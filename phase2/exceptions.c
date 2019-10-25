@@ -274,7 +274,7 @@ HIDDEN void P(state_t *state){
     /* Calculate time taken up in current quantum minus any time spent handling
     IO interrupts */
     STCK(currTime);
-    currentProc->p_time = (currTime - startTOD) - ioProcTime;
+    currentProc->p_time = currentProc->p_time + (currTime - startTOD) - ioProcTime;
 
     copyState(state, &(currentProc->p_s));
     insertBlocked(sem, currentProc);
@@ -346,7 +346,7 @@ HIDDEN void waitforclock(state_t *state){
     /* Calculate time taken up in current quantum minus any time spent handling
     IO interrupts */
     STCK(currTime);
-    currentProc->p_time = (currTime - startTOD) - ioProcTime;
+    currentProc->p_time = currentProc->p_time + (currTime - startTOD) - ioProcTime;
 
     copyState(state, (state_t *) &(currentProc->p_s));
     insertBlocked(clockAdd, currentProc);
@@ -391,7 +391,7 @@ HIDDEN void waitio(state_t *state){
     /* Calculate time taken up in current quantum minus any time spent handling
     IO interrupts */
     STCK(currTime);
-    currentProc->p_time = (currTime - startTOD) - ioProcTime;
+    currentProc->p_time = currentProc->p_time + (currTime - startTOD) - ioProcTime;
     copyState(state, &(currentProc->p_s));
     insertBlocked(semAdd, currentProc);
     sftBlkCnt++;
