@@ -235,7 +235,7 @@ HIDDEN void terminateprocess(pcb_PTR p){
   }
 
   debugS(8);
-  if(outProcQ(&readyQue, p) == NULL){
+  else if(outProcQ(&readyQue, p) == NULL){
     debugS(9);
     outBlocked(p);
     debugS(10);
