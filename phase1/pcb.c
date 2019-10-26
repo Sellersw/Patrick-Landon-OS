@@ -109,12 +109,10 @@ cannot be matched in the provided queue, and otherwise returns "p". */
 pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
   pcb_PTR current = *tp;
 
-  debugP(4);
   /* If the procQ at tp is empty, return NULL */
   if(emptyProcQ(*tp)){
     return NULL;
   }
-  debugP(5);
   /* if the tail pointer is the only process in the procQ and it is also p,
   remove it from the procQ and return it */
   else if(*tp == p){
