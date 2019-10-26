@@ -9,15 +9,12 @@ AUTHORS: Patrick Sellers and Landon Clark
 #include "../h/const.h"
 
 
-void debugP(int a){
-  5+5;
-}
-
-
-
 HIDDEN pcb_PTR pcbFree_h;
 
 
+void debugP(int a){
+  5+5;
+}
 
 /*-------- FUNCTION TO RESET STATE TO 0 VALUES ---------*/
 
