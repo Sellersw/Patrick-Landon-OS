@@ -107,7 +107,7 @@ pcb_PTR removeProcQ(pcb_PTR *tp){
 Updates the tail pointer of the queue if necessary. Returns NULL if the given address
 cannot be matched in the provided queue, and otherwise returns "p". */
 pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
-  pcb_PTR current;
+  pcb_PTR current = *tp;
 
   debugP(4);
   /* If the procQ at tp is empty, return NULL */
@@ -124,7 +124,6 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
   /* If there are more than one processes in the procQ, search through the
   procQ for p */
   debugP(6);
-  current = *tp;
   while(current != p){
     debugP(7);
     current = current->p_next;
