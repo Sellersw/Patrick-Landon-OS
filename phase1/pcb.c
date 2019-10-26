@@ -8,6 +8,13 @@ AUTHORS: Patrick Sellers and Landon Clark
 #include "../h/types.h"
 #include "../h/const.h"
 
+
+void debugP(int a){
+  5+5;
+}
+
+
+
 HIDDEN pcb_PTR pcbFree_h;
 
 
@@ -105,11 +112,12 @@ cannot be matched in the provided queue, and otherwise returns "p". */
 pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
   pcb_PTR current;
 
+  debugP(4);
   /* If the procQ at tp is empty, return NULL */
   if(emptyProcQ(*tp)){
     return NULL;
   }
-
+  debugP(5);
   /* if the tail pointer is the only process in the procQ and it is also p,
   remove it from the procQ and return it */
   else if(*tp == p){
@@ -118,11 +126,14 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
 
   /* If there are more than one processes in the procQ, search through the
   procQ for p */
+  debugP(6);
   current = *tp;
   while(current != p){
+    debugP(7);
     current = current->p_next;
     /* if we loop all the way back to tp, p in not in the procQ so return
     NULL */
+    debugP(8);
     if(current == *tp){
       return NULL;
     }
@@ -130,6 +141,7 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
 
   /* Once p has been found, remove it from the procQ, set its fields to
   NULL and return it */
+  debugP(9);
   current->p_next->p_prev = current->p_prev;
   current->p_prev->p_next = current->p_next;
   current->p_next = NULL;
