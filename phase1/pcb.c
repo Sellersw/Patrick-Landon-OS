@@ -111,11 +111,13 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
 
   /* If the procQ at tp is empty, return NULL */
   if(emptyProcQ(*tp)){
+    debugP(4);
     return NULL;
   }
   /* if the tail pointer is the only process in the procQ and it is also p,
   remove it from the procQ and return it */
   else if(*tp == p){
+    debugP(5);
     return removeProcQ(tp);
   }
 
