@@ -6,7 +6,6 @@ to the scheduler. This sets up the nucleus of basic Operating System functionali
 which includes global variables and data structures that handle the flow of our
 processes (readyQue, procCnt, semArray, etc.)
 
-More words to follow.
 Written by: Patrick Sellers and Landon Clark
 
 *******************************************************************************************/

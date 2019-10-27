@@ -1,4 +1,4 @@
-/****************************EXCEPTIONS.C**********************************
+/**************************************EXCEPTIONS.C**************************************
 
 Handles Syscall and Breakpoint exceptions when a corresponding assembler
 instruction is executed on the CPU. Kaya Operating System provides a number
@@ -8,7 +8,7 @@ instructions with codes 9 and above.
 
 Written by: Patrick Sellers and Landon Clark
 
-***************************************************************************/
+******************************************************************************************/
 
 #include "../h/types.h"
 #include "../h/const.h"
