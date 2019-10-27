@@ -126,6 +126,7 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
   debugP(6);
   while(current != p){
     debugP(7);
+    debugP((int) current);
     current = current->p_next;
     /* if we loop all the way back to tp, p in not in the procQ so return
     NULL */

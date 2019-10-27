@@ -229,15 +229,15 @@ HIDDEN void terminateprocess(pcb_PTR p){
   }
 
   else if(outProcQ(&readyQue, p) == NULL){
-    debugS((int) semAdd);
-    debugS((*semAdd));
-    outBlocked(p);
-    /* Check to see if p's semaphore was a device semaphore */
-    if((semAdd >= firstDevice) && (semAdd <= lastDevice)){
-      sftBlkCnt--;
-    }
-    else{
-      (*semAdd)++;
+    debugO(1);
+    if(outBlocked(p) != NULL){
+      /* Check to see if p's semaphore was a device semaphore */
+      if((semAdd >= firstDevice) && (semAdd <= lastDevice)){
+        sftBlkCnt--;
+      }
+      else{
+        (*semAdd)++;
+      }
     }
   }
 
