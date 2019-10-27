@@ -96,6 +96,7 @@ void sysCallHandler(){
       P(oldSys);
       break;
 
+    /* Syscall 5:  */
     case SPECTRAPVEC:
       spectrapvec(oldSys);
       break;
@@ -108,11 +109,13 @@ void sysCallHandler(){
     /* Syscall 7: Performs a P (Wait) operation on the pseudo-clock timer semephore. This
     semephore will be V'ed (Signal) every 100 milliseconds automatically by the nucleus. */
     case WAITCLOCK:
-      /* Perform a p operation on interval timer (nucleus maintained device
-      semaphore) */
       waitforclock(oldSys);
       break;
 
+    /* Syscall 8: Performs a P (Wait) operation on a semephore in the device semephore
+    array instantied in initial.c. This is the set of I/O devices supported by the
+    operating system. The process that is told to wait here will wake up in the
+    interrupt handler once the I/O resolves. */
     case WAITIO:
       waitio(oldSys);
       break;
