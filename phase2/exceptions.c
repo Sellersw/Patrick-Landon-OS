@@ -270,17 +270,15 @@ HIDDEN void P(state_t *state){
   if((*sem) < 0){
     /* Calculate time taken up in current quantum minus any time spent handling
     IO interrupts */
-    if(currentProc != NULL){
-      STCK(currTime);
-      currentProc->p_time = currentProc->p_time + (currTime - startTOD) - ioProcTime;
+    STCK(currTime);
+    currentProc->p_time = currentProc->p_time + (currTime - startTOD) - ioProcTime;
 
-      copyState(state, &(currentProc->p_s));
-      insertBlocked(sem, currentProc);
-      sftBlkCnt++;
-      currentProc = NULL;
+    copyState(state, &(currentProc->p_s));
+    insertBlocked(sem, currentProc);
+    sftBlkCnt++;
+    currentProc = NULL;
 
-      scheduler();
-    }
+    scheduler();
   }
   LDST(state);
 }

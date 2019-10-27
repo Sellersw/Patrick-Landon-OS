@@ -27,6 +27,8 @@ by the global semdFree_h. */
 void freeSemd(semd_PTR s){
   /* if the list is not empty, s's next is head of semdFree and semdFree points
   to s */
+  s->s_semAdd = NULL;
+  s->s_procQ = mkEmptyProcQ();
   s->s_next = semdFree_h;
   semdFree_h = s;
 }
@@ -84,6 +86,10 @@ int insertBlocked(int *semAdd, pcb_PTR p){
   semd_PTR s_prev = findASemd(semAdd);
   semd_PTR s_current = s_prev->s_next;
   semd_PTR s_insert;
+
+  if(p == NULL){
+    return TRUE;
+  }
 
   /* If the semAdd is on the ASL, add the process p to the procQ of this semaphore
   and return FALSE */
