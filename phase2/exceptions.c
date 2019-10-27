@@ -1,4 +1,4 @@
-/****************************EXCEPTIONS.C**********************************
+/**************************************EXCEPTIONS.C**************************************
 
 Handles Syscall and Breakpoint exceptions when a corresponding assembler
 instruction is executed on the CPU. Kaya Operating System provides a number
@@ -8,7 +8,7 @@ instructions with codes 9 and above.
 
 Written by: Patrick Sellers and Landon Clark
 
-***************************************************************************/
+******************************************************************************************/
 
 #include "../h/types.h"
 #include "../h/const.h"
@@ -18,12 +18,9 @@ Written by: Patrick Sellers and Landon Clark
 #include "../e/scheduler.e"
 #include "/usr/local/include/umps2/umps/libumps.e"
 
-
-
 void debugS(int a){
   5+5;
 }
-
 
 /*****Localized (Private) Methods****/
 HIDDEN void copyState(state_t *orig, state_t *curr);
@@ -40,11 +37,16 @@ void progTrapHandler();
 void tlbTrapHandler();
 /*************************************/
 
+/* A method that is activated by the OS when the instruction for syscall is
+    executed. This loads a call code into the a0 register so that we can
+    execute the requested operation that is protected by the operating
+    system. */
 void sysCallHandler(){
-  unsigned int call, status;
-
-  state_t *oldSys, *oldPgm;
-  oldSys = (state_t *) SYSCALLOLD;
+ /**************PRIVATE VARIABLES**************/
+  unsigned int call, status;       /* placeholders to store our call code & status */
+  state_t *oldSys, *oldPgm;        /* pointers to relevant state */
+  oldSys = (state_t *) SYSCALLOLD; /* point our  */
+  /*********************************************/
 
   /* We need to make sure we do not return to the instruction that brought
   about this syscall */
@@ -53,8 +55,6 @@ void sysCallHandler(){
   /* Grab relevant information from oldSys registers */
   status = oldSys->s_status;
   call = oldSys->s_a0;
-
-
 
   /* Handle syscalls that are not defined yet */
   if(call >= 9){
@@ -72,9 +72,7 @@ void sysCallHandler(){
     progTrapHandler();
   }
 
-
   switch(call){
-
     /* Syscall 1: Creates a new child process for the currentProc */
     case CREATEPROCESS:
       createprocess(oldSys);
@@ -98,6 +96,7 @@ void sysCallHandler(){
       P(oldSys);
       break;
 
+    /* Syscall 5:  */
     case SPECTRAPVEC:
       spectrapvec(oldSys);
       break;
@@ -110,15 +109,16 @@ void sysCallHandler(){
     /* Syscall 7: Performs a P (Wait) operation on the pseudo-clock timer semephore. This
     semephore will be V'ed (Signal) every 100 milliseconds automatically by the nucleus. */
     case WAITCLOCK:
-      /* Perform a p operation on interval timer (nucleus maintained device
-      semaphore) */
       waitforclock(oldSys);
       break;
 
+    /* Syscall 8: Performs a P (Wait) operation on a semephore in the device semephore
+    array instantied in initial.c. This is the set of I/O devices supported by the
+    operating system. The process that is told to wait here will wake up in the
+    interrupt handler once the I/O resolves. */
     case WAITIO:
       waitio(oldSys);
       break;
-
   }
 }
 
@@ -210,7 +210,6 @@ HIDDEN void createprocess(state_t *state){
   LDST(state);
 }
 
-
 /* SYSCALL 2 helper function */
 HIDDEN void terminateprocess(pcb_PTR p){
   int *firstDevice = &(semDevArray[0]);
@@ -245,7 +244,6 @@ HIDDEN void terminateprocess(pcb_PTR p){
   freePcb(p);
 }
 
-
 /* SYSCALL 3 helper function */
 /* SIGNAL */
 HIDDEN void V(state_t *state){
@@ -262,7 +260,6 @@ HIDDEN void V(state_t *state){
   }
   LDST(state);
 }
-
 
 /* SYSCALL 4 helper function */
 /* WAIT */
@@ -285,7 +282,6 @@ HIDDEN void P(state_t *state){
   }
   LDST(state);
 }
-
 
 /* SYSCALL 5 helper function */
 HIDDEN void spectrapvec(state_t *state){
@@ -347,12 +343,10 @@ HIDDEN void waitforclock(state_t *state){
     IO interrupts */
     STCK(currTime);
     currentProc->p_time = currentProc->p_time + (currTime - startTOD) - ioProcTime;
-
     copyState(state, (state_t *) &(currentProc->p_s));
     insertBlocked(clockAdd, currentProc);
     sftBlkCnt++;
     currentProc = NULL;
-
     scheduler();
   }
   LDST(state);
@@ -365,7 +359,6 @@ HIDDEN void waitio(state_t *state){
   cpu_t currTime;
   unsigned int lineNo, devNo, read, index;
   int *semAdd;
-
   lineNo = state->s_a1;
   devNo = state->s_a2;
   read = state->s_a3;
@@ -396,7 +389,6 @@ HIDDEN void waitio(state_t *state){
     insertBlocked(semAdd, currentProc);
     sftBlkCnt++;
     currentProc = NULL;
-
     scheduler();
   }
   LDST(state);
