@@ -16,6 +16,14 @@ void debugP(int a){
   5+5;
 }
 
+void debugOutProc(pcb_PTR c){
+  pcb_PTR current = c->p_next;
+  while(current != c){
+    debugP((int) current->p_next);
+    current = current->p_next;
+  }
+}
+
 /*-------- FUNCTION TO RESET STATE TO 0 VALUES ---------*/
 
 void resetState(state_t *state){
@@ -41,7 +49,7 @@ void resetState(state_t *state){
 /* Initializes an empty Process Queue by setting a variable to be a tail pointer to a
 new process queue. Returns a tail pointer. */
 pcb_PTR mkEmptyProcQ(){
-  return(NULL); /* returns a place in memory that is a pointer to a empty pcb.*/
+  return NULL; /* returns a place in memory that is a pointer to a empty pcb.*/
 }
 
 
@@ -84,7 +92,7 @@ pcb_PTR removeProcQ(pcb_PTR *tp){
   /* If tp points back to itself, it is the only process in the procQ, so we
   set the tp (and therefore procQ) to NULL, set the process' pointers to NULL,
   then returns it */
-  else if((*tp)->p_next == *tp){
+  if((*tp)->p_next == *tp){
     head = *tp;
     *tp = NULL;
   }
@@ -110,20 +118,19 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
   pcb_PTR current = *tp;
 
   /* If the procQ at tp is empty, return NULL */
-  if(emptyProcQ(*tp)){
+  if(emptyProcQ(*tp) || (p == NULL)){
     return NULL;
   }
   /* if the tail pointer is the only process in the procQ and it is also p,
   remove it from the procQ and return it */
-  else if(*tp == p){
+  if(*tp == p){
     return removeProcQ(tp);
   }
 
   /* If there are more than one processes in the procQ, search through the
   procQ for p */
-  debugP(6);
+  debugOutProc(current);
   while(current != p){
-    debugP(7);
     current = current->p_next;
     /* if we loop all the way back to tp, p in not in the procQ so return
     NULL */
@@ -298,6 +305,7 @@ pcb_PTR removeChild(pcb_PTR p){
     else{
       p->p_child = NULL;
     }
+    child->p_prnt = NULL;
     return child;
   }
 }

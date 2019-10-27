@@ -98,24 +98,22 @@ int insertBlocked(int *semAdd, pcb_PTR p){
     insertProcQ(&(s_current->s_procQ), p);
     return FALSE;
   }
-  else{
-    /* If the semaphore we were looking for is not in the ASL, and there are no
-    more free semaphores, then return TRUE */
-    if(semdFree_h == NULL){
-      return TRUE;
-    }
-    /* If the semaphore we were looking for is not in the ASL, and there is at
-    least on free semaphore, set the semAdd of the process p, remove the next
-    semaphore from the free list and set the address to semAdd, and insert
-    p into the semaphore's procQ and finally returning FALSE */
-    p->p_semAdd = semAdd;
-    s_insert = allocSemd(semAdd);
-    s_insert->s_next = s_current;
-    s_prev->s_next = s_insert;
-    s_insert->s_procQ = mkEmptyProcQ();
-    insertProcQ(&(s_insert->s_procQ), p);
-    return FALSE;
+  /* If the semaphore we were looking for is not in the ASL, and there are no
+  more free semaphores, then return TRUE */
+  if(semdFree_h == NULL){
+    return TRUE;
   }
+  /* If the semaphore we were looking for is not in the ASL, and there is at
+  least on free semaphore, set the semAdd of the process p, remove the next
+  semaphore from the free list and set the address to semAdd, and insert
+  p into the semaphore's procQ and finally returning FALSE */
+  p->p_semAdd = semAdd;
+  s_insert = allocSemd(semAdd);
+  s_insert->s_next = s_current;
+  s_prev->s_next = s_insert;
+  s_insert->s_procQ = mkEmptyProcQ();
+  insertProcQ(&(s_insert->s_procQ), p);
+  return FALSE;
 }
 
 
