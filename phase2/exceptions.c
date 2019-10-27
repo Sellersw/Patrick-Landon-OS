@@ -67,7 +67,7 @@ void sysCallHandler(){
     /* Handle user mode priveleged instruction */
     oldPgm = (state_t *) PROGTRAPOLD;
     copyState(oldSys, oldPgm);
-    oldPgm->s_cause = RESERVEDINSTR;
+    oldPgm->s_cause = (oldPgm->s_cause & CAUSEREGMASK) | RESERVEDINSTR;
     debugS(100);
     progTrapHandler();
   }

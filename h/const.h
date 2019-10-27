@@ -39,7 +39,8 @@
 #define PLOCTIMEOFF 0x00000000
 
 /* exception code values for cause register */
-#define RESERVEDINSTR 0x00000048
+#define RESERVEDINSTR (10 << 2)
+#define CAUSEREGMASK 0xFFFFFF00
 
 /* exception pending line number mnemonics */
 #define LINE0 0x00000100
