@@ -16,6 +16,19 @@ void debugP(int a){
   5+5;
 }
 
+void debugOutProc(pcb_PTR p){
+  pcb_PTR current = p->p_next;
+  while(current != p){
+    debugP((int) current);
+    current = current->p_next;
+    /* if we loop all the way back to tp, p in not in the procQ so return
+    NULL */
+    if(current == *tp){
+      return NULL;
+    }
+  }
+}
+
 /*-------- FUNCTION TO RESET STATE TO 0 VALUES ---------*/
 
 void resetState(state_t *state){
@@ -111,22 +124,20 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
 
   /* If the procQ at tp is empty, return NULL */
   if(emptyProcQ(*tp)){
-    debugP(4);
     return NULL;
   }
   /* if the tail pointer is the only process in the procQ and it is also p,
   remove it from the procQ and return it */
   else if(*tp == p){
-    debugP(5);
     return removeProcQ(tp);
   }
 
   /* If there are more than one processes in the procQ, search through the
   procQ for p */
+  debugOutProc(*tp);
   debugP(6);
   while(current != p){
     debugP(7);
-    debugP((int) current);
     current = current->p_next;
     /* if we loop all the way back to tp, p in not in the procQ so return
     NULL */
