@@ -122,17 +122,22 @@ void sysCallHandler(){
   }
 }
 
+/* A publically available function for handling a program trap. It simply
+  triggers a pass up or die with the call code for a program trap. */
 void progTrapHandler(){
   debugS(10);
   passUpOrDie(PROGTRAP);
 }
 
+/* A publically available function for handling a TLB trap. I simply
+  triggers a pass up or die with the call code for a TLB trap.*/
 void tlbTrapHandler(){
   debugS(15);
   passUpOrDie(TLBTRAP);
 }
 
 /****************************HELPER FUNCTIONS******************************/
+/* A simple helper function for copying the fields of one state to another. */
 HIDDEN void copyState(state_t *orig, state_t *curr){
   int i;
   /* Copy state values over to new state */
@@ -141,15 +146,18 @@ HIDDEN void copyState(state_t *orig, state_t *curr){
   curr->s_status = orig->s_status;
   curr->s_pc = orig->s_pc;
 
-  /* Copy previous register vaules to new state registers */
+  /* Copy previous register values to new state registers */
   for(i = 0; i < STATEREGNUM; i++){
     curr->s_reg[i] = orig->s_reg[i];
   }
 }
 
+/* A method that handles three different types of exceptions beyond
+  sys 1-8 (TLB, ProgramTrap, and SYS/Breakpoint). This will either
+  terminate the process and its children when the selected trap state
+  is not empty, or will load it onto the CPU. */
 HIDDEN void passUpOrDie(int type){
-  state_t *state;
-
+  state_t *state; /* placeholder for saving the old proc */
   switch(type){
     case TLBTRAP:
       if(currentProc->p_newTlb == NULL){
@@ -190,7 +198,7 @@ HIDDEN void passUpOrDie(int type){
 }
 
 /****************************SYSCALL FUNCTIONS*****************************/
-/* SYSCALL 1 helper function */
+/* SYSCALL 1 helper function: Creates a new PCB */
 HIDDEN void createprocess(state_t *state){
   pcb_PTR p = allocPcb();
 
@@ -200,11 +208,13 @@ HIDDEN void createprocess(state_t *state){
     state->s_v0 = -1;
   }
   else{
+    /* copy the state passed in at a1 into the PCB's state var, make it
+    a child of the current process, and then insert it onto the process
+    queue. */
     copyState((state_t *) state->s_a1, &(p->p_s));
     insertChild(currentProc, p);
     insertProcQ(&readyQue, p);
     procCnt++;
-
     state->s_v0 = 0;
   }
   LDST(state);
@@ -239,7 +249,6 @@ HIDDEN void terminateprocess(pcb_PTR p){
       }
     }
   }
-
   procCnt--;
   freePcb(p);
 }
