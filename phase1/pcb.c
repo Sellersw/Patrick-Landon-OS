@@ -23,7 +23,7 @@ void debugOutProc(pcb_PTR p){
     current = current->p_next;
     /* if we loop all the way back to tp, p in not in the procQ so return
     NULL */
-    if(current == *tp){
+    if(current == p){
       return NULL;
     }
   }
