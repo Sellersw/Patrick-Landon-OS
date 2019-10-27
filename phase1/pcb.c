@@ -127,7 +127,6 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
     current = current->p_next;
     /* if we loop all the way back to tp, p in not in the procQ so return
     NULL */
-    debugP(8);
     if(current == *tp){
       return NULL;
     }
@@ -317,7 +316,13 @@ pcb_PTR outChild(pcb_PTR p){
     prnt = p->p_prnt;
     /* if p is its parent's first child, remove and return it */
     if(prnt->p_child == p){
-      prnt->p_child = p->p_sib;
+      if(p->p_sib == NULL){
+        prnt->p_child = NULL;
+      }
+      else{
+        prnt->p_child = p->p_sib;
+      }
+      p->p_prnt = NULL;
       return p;
     }
     else{
@@ -333,6 +338,7 @@ pcb_PTR outChild(pcb_PTR p){
       else{
         current->p_sib = NULL;
       }
+      p->p_prnt = NULL;
       return p;
     }
   }
