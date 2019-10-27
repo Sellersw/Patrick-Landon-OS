@@ -19,7 +19,7 @@ void debugP(int a){
 void debugOutProc(pcb_PTR c){
   pcb_PTR current = c->p_next;
   while(current != c){
-    debugP((int) current->p_next);
+    debugP((int) current);
     current = current->p_next;
   }
 }
