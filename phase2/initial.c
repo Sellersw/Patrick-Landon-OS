@@ -39,6 +39,8 @@ int semDevArray[DEVICECNT]; /* A sema4 array for the 49 Kaya devices */
 HIDDEN void populate(state_t * state, memaddr memLoc);
 /******************************************************************************/
 
+
+/*************************MAIN ENTRY POINT OF KAYA OS**************************/
 int main(){
   state_t *setupState;
   memaddr setupMem;
@@ -47,7 +49,7 @@ int main(){
   int i;
   pcb_PTR p; /* our placeholder proc that will be placed on the ready queue. */
 
-  /*******************POPULATING ROM RESERVED FRAMES***************************/
+  /************************POPULATING ROM RESERVED FRAMES**********************/
   /* Here we find the top page of RAM by adding the size of main RAM to the RAM
   base address. */
 

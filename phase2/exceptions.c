@@ -1,4 +1,4 @@
-/**************************************EXCEPTIONS.C**************************************
+/*******************************EXCEPTIONS.C************************************
 
 Handles Syscall and Breakpoint exceptions when a corresponding assembler
 instruction is executed on the CPU. Kaya Operating System provides a number
@@ -8,8 +8,10 @@ instructions with codes 9 and above.
 
 Written by: Patrick Sellers and Landon Clark
 
-******************************************************************************************/
+*******************************************************************************/
 
+
+/*************************INCLUDE MODULES**************************************/
 #include "../h/types.h"
 #include "../h/const.h"
 #include "../e/pcb.e"
@@ -17,9 +19,10 @@ Written by: Patrick Sellers and Landon Clark
 #include "../e/initial.e"
 #include "../e/scheduler.e"
 #include "/usr/local/include/umps2/umps/libumps.e"
+/******************************************************************************/
 
 
-/*****Localized (Private) Methods****/
+/***********************Localized (Private) Methods****************************/
 HIDDEN void copyState(state_t *orig, state_t *curr);
 HIDDEN void passUpOrDie(int type);
 HIDDEN void passUpOrDieHelper(state_t * new, state_t * old, state_t *trap);
@@ -31,16 +34,19 @@ HIDDEN void spectrapvec(state_t *state);
 HIDDEN void getcputime(state_t *state);
 HIDDEN void waitforclock(state_t *state);
 HIDDEN void waitio(state_t *state);
+/******************************************************************************/
+
+/* Declarations for public functions used in sysCallHandler but defined later */
 void progTrapHandler();
 void tlbTrapHandler();
-/*************************************/
+
 
 /* A method that is activated by the OS when the instruction for syscall is
-    executed. This loads a call code into the a0 register so that we can
-    execute the requested operation that is protected by the operating
-    system. */
+executed. This loads a call code into the a0 register so that we can execute the
+requested operation that is protected by the operating system. */
 void sysCallHandler(){
- /**************PRIVATE VARIABLES**************/
+
+  /**************PRIVATE VARIABLES**************/
   unsigned int call, status;       /* placeholders to store our call code & status */
   state_t *oldSys, *oldPgm;        /* pointers to relevant state */
   oldSys = (state_t *) SYSCALLOLD; /* point our  */
@@ -50,11 +56,12 @@ void sysCallHandler(){
   about this syscall */
   oldSys->s_pc = oldSys->s_pc + WORDLEN;
 
-  /* Grab relevant information from oldSys registers */
+  /* Grab relevant information from oldSys registers about who is making the
+  call and what the call is */
   status = oldSys->s_status;
   call = oldSys->s_a0;
 
-  /* Handle syscalls that are not defined yet */
+  /* Handle syscalls that are not yet defined */
   if(call >= 9){
     passUpOrDie(SYSTRAP);
   }
@@ -81,13 +88,14 @@ void sysCallHandler(){
       scheduler();
       break;
 
-    /* Syscall 3: Signal that the process is done working with a shared piece of data */
+    /* Syscall 3: Signal that the process is done working with a shared piece of
+    data */
     case VERHOGEN:
       V(oldSys);
       break;
 
-    /* Syscall 4: Tell any process that wants to play with a shared piece of data that
-    they must wait until a process signals it is clear (Verhogen) */
+    /* Syscall 4: Tell any process that wants to play with a shared piece of
+    data that they must wait until a process signals it is clear (Verhogen) */
     case PASSEREN:
       P(oldSys);
       break;
@@ -102,16 +110,17 @@ void sysCallHandler(){
       getcputime(oldSys);
       break;
 
-    /* Syscall 7: Performs a P (Wait) operation on the pseudo-clock timer semephore. This
-    semephore will be V'ed (Signal) every 100 milliseconds automatically by the nucleus. */
+    /* Syscall 7: Performs a P (Wait) operation on the pseudo-clock timer
+    semephore. This semephore will be V'ed (Signal) every 100 milliseconds
+    automatically by the nucleus. */
     case WAITCLOCK:
       waitforclock(oldSys);
       break;
 
-    /* Syscall 8: Performs a P (Wait) operation on a semephore in the device semephore
-    array instantied in initial.c. This is the set of I/O devices supported by the
-    operating system. The process that is told to wait here will wake up in the
-    interrupt handler once the I/O resolves. */
+    /* Syscall 8: Performs a P (Wait) operation on a semephore in the device
+    semephore array instantied in initial.c. This is the set of I/O devices
+    supported by the operating system. The process that is told to wait here
+    will wake up in the interrupt handler once the I/O resolves. */
     case WAITIO:
       waitio(oldSys);
       break;
@@ -119,18 +128,22 @@ void sysCallHandler(){
 }
 
 /* A publically available function for handling a program trap. It simply
-  triggers a pass up or die with the call code for a program trap. */
+triggers a pass up or die with the call code for a program trap. */
 void progTrapHandler(){
   passUpOrDie(PROGTRAP);
 }
 
-/* A publically available function for handling a TLB trap. I simply
-  triggers a pass up or die with the call code for a TLB trap.*/
+/* A publically available function for handling a TLB trap. It simply triggers a
+pass up or die with the call code for a TLB trap.*/
 void tlbTrapHandler(){
   passUpOrDie(TLBTRAP);
 }
 
-/****************************HELPER FUNCTIONS******************************/
+/******************************************************************************/
+
+
+/****************************HELPER FUNCTIONS**********************************/
+
 /* A simple helper function for copying the fields of one state to another. */
 HIDDEN void copyState(state_t *orig, state_t *curr){
   int i;
@@ -146,10 +159,10 @@ HIDDEN void copyState(state_t *orig, state_t *curr){
   }
 }
 
-/* A method that handles three different types of exceptions beyond
-  sys 1-8 (TLB, ProgramTrap, and SYS/Breakpoint). This will either
-  terminate the process and its children when the selected trap state
-  is not empty, or will load it onto the CPU. */
+/* A method that handles three different types of exceptions beyond sys 1-8
+(TLB, ProgramTrap, and SYS/Breakpoint). This will either terminate the process
+and its children when the selected trap state is not empty, or will load it onto
+the CPU. */
 HIDDEN void passUpOrDie(int type){
   state_t *state; /* placeholder for passing the old proc */
   state_t *next;
@@ -178,11 +191,10 @@ HIDDEN void passUpOrDie(int type){
   }
 }
 
-/* A method to generalize the pass up or die process. Takes
-  three state pointers associated with the memory location
-  of a particular trap type and the old and new state areas in the
-  current process. The passUpOrDie function is the only
-  place that this should be called. */
+/* A method to generalize the pass up or die process. Takes three state pointers
+associated with the memory location of a particular trap type and the old and
+new state areas in the current process. The passUpOrDie function is the only
+place that this should be called. */
 HIDDEN void passUpOrDieHelper(state_t * new, state_t * old, state_t *trap){
   if(new == NULL){
       terminateprocess(currentProc);
@@ -194,7 +206,12 @@ HIDDEN void passUpOrDieHelper(state_t * new, state_t * old, state_t *trap){
     }
 }
 
-/****************************SYSCALL FUNCTIONS*****************************/
+/******************************************************************************/
+
+
+
+/****************************SYSCALL FUNCTIONS*********************************/
+
 /* SYSCALL 1 helper function: Creates a new PCB */
 HIDDEN void createprocess(state_t *state){
   pcb_PTR p = allocPcb();
@@ -275,7 +292,7 @@ HIDDEN void P(state_t *state){
     /* Calculate time taken up in current quantum minus any time spent handling
     IO interrupts */
     STCK(currTime);
-    currentProc->p_time = currentProc->p_time + (currTime - startTOD) - ioProcTime;
+    currentProc->p_time += (currTime - startTOD) - ioProcTime;
     copyState(state, &(currentProc->p_s));
     insertBlocked(sem, currentProc);
     sftBlkCnt++;
@@ -343,7 +360,7 @@ HIDDEN void waitforclock(state_t *state){
     /* Calculate time taken up in current quantum minus any time spent handling
     IO interrupts */
     STCK(currTime);
-    currentProc->p_time = currentProc->p_time + (currTime - startTOD) - ioProcTime;
+    currentProc->p_time += (currTime - startTOD) - ioProcTime;
     copyState(state, (state_t *) &(currentProc->p_s));
     insertBlocked(clockAdd, currentProc);
     sftBlkCnt++;
@@ -385,7 +402,7 @@ HIDDEN void waitio(state_t *state){
     /* Calculate time taken up in current quantum minus any time spent handling
     IO interrupts */
     STCK(currTime);
-    currentProc->p_time = currentProc->p_time + (currTime - startTOD) - ioProcTime;
+    currentProc->p_time += (currTime - startTOD) - ioProcTime;
     copyState(state, &(currentProc->p_s));
     insertBlocked(semAdd, currentProc);
     sftBlkCnt++;
@@ -394,4 +411,4 @@ HIDDEN void waitio(state_t *state){
   }
   LDST(state);
 }
-/*******************************************************************************/
+/******************************************************************************/
