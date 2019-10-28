@@ -23,7 +23,6 @@ Written by: Patrick Sellers and Landon Clark
 #include "/usr/local/include/umps2/umps/libumps.e"
 /******************************************************************************/
 
-
 /* This will allow us to grab the memory address of the test function in p2test
 so we can set the pc of our first process to this address */
 extern void test();
@@ -60,24 +59,28 @@ int main(){
   of our sysCallHandler method. This is a state that our system can load when
   an exception of this type is triggered */
   setupState = (state_t *) SYSCALLNEW;
-  setupMem = (memaddr) sysCallHandler;
-  populate(setupState, setupMem, RAMTOP);
+  setupState->s_pc = setupState->s_t9 = (memaddr) sysCallHandler;
+  setupState->s_sp = RAMTOP;
+  setupState->s_status = ALLOFF | PLOCTIMEON;
 
   /* This is the same as above, except it is for our program traps. */
   setupState = (state_t *) PROGTRAPNEW;
-  setupMem = (memaddr) progTrapHandler;
-  populate(setupState, setupMem, RAMTOP);
+  setupState->s_pc = setupState->s_t9 = (memaddr) progTrapHandler;
+  setupState->s_sp = RAMTOP;
+  setupState->s_status = ALLOFF | PLOCTIMEON;
 
   /* This is also the same but this is for when TLB exceptions are raised */
   setupState = (state_t *) TLBMGMTNEW;
-  setupMem = (memaddr) tlbTrapHandler;
-  populate(setupState, setupMem, RAMTOP);
+  setupState->s_pc = setupState->s_t9 = (memaddr) tlbTrapHandler;
+  setupState->s_sp = RAMTOP;
+  setupState->s_status = ALLOFF | PLOCTIMEON;
 
   /* Finally, this section is to define the state the machine should wake up
   in for a interupt. */
   setupState = (state_t *) INTERNEW;
-  setupMem = (memaddr) tlbTrapHandler;
-  populate(setupState, setupMem, RAMTOP);
+  setupState->s_pc = setupState->s_t9 = (memaddr) ioTrapHandler;
+  setupState->s_sp = RAMTOP;
+  setupState->s_status = ALLOFF | PLOCTIMEON;
 
   /****************************************************************************/
 
@@ -131,16 +134,4 @@ int main(){
   scheduler();
 
   return -1;
-}
-
-/******************Helper Functions*********************/
-
-/* Used for populating the ROM Reserved Frames in memory.
-Given a state of the machine, directs its memory address
-location for a context switch to the associated Operating
-System handler, and defines what status registers are on. */
-HIDDEN void populate(state_t *state, memaddr memLoc, memaddr topOfRAM){
-  state->s_pc = state->s_t9 = memLoc;
-  state->s_sp = topOfRAM;
-  state->s_status = ALLOFF | PLOCTIMEON;
 }
