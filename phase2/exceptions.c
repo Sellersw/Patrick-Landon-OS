@@ -153,41 +153,32 @@ HIDDEN void passUpOrDie(int type){
   state_t *state; /* placeholder for saving the old proc */
   switch(type){
     case TLBTRAP:
-      if(currentProc->p_newTlb == NULL){
-        terminateprocess(currentProc);
-        scheduler();
-      }
-      else{
-        state = (state_t *) TLBMGMTOLD;
-        copyState(state, currentProc->p_oldTlb);
-        LDST(currentProc->p_newTlb);
-      }
+      passUpOrDieHelper(currentProc, TLBMGMTOLD);
       break;
 
     case PROGTRAP:
-      if(currentProc->p_newPgm == NULL){
-        terminateprocess(currentProc);
-        scheduler();
-      }
-      else{
-        state = (state_t *) PROGTRAPOLD;
-        copyState(state, currentProc->p_oldPgm);
-        LDST(currentProc->p_newPgm);
-      }
+      passUpOrDieHelper(currentProc, PROGTRAPOLD);
       break;
 
     case SYSTRAP:
-      if(currentProc->p_newSys == NULL){
-        terminateprocess(currentProc);
+      passUpOrDieHelper(currentProc, SYSCALLOLD);
+      break;
+  }
+}
+
+/* A method to generalize the pass up or die process. Takes
+  a process and a hex value associated with the memory location
+  of a particular trap type. The passUpOrDie function is the only
+  place that this should be called. */
+HIDDEN void passUpOrDieHelper(pcb_PTR proc, int trap){
+   if(proc->p_newSys == NULL){
+        terminateprocess(proc);
         scheduler();
       }
       else{
-        state = (state_t *) SYSCALLOLD;
-        copyState(state, currentProc->p_oldSys);
-        LDST(currentProc->p_newSys);
-      }
-      break;
-  }
+        state = (state_t *) trap;
+        copyState(state, proc->p_oldSys);
+        LDST(proc->p_newSys);
 }
 
 /****************************SYSCALL FUNCTIONS*****************************/
