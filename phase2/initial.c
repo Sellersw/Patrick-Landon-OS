@@ -61,23 +61,23 @@ int main(){
   an exception of this type is triggered */
   setupState = (state_t *) SYSCALLNEW;
   setupMem = (memaddr) sysCallHandler;
-  populate(setupState, setupMem);
+  populate(setupState, setupMem, RAMTOP);
 
   /* This is the same as above, except it is for our program traps. */
   setupState = (state_t *) PROGTRAPNEW;
   setupMem = (memaddr) progTrapHandler;
-  populate(setupState, setupMem);
+  populate(setupState, setupMem, RAMTOP);
 
   /* This is also the same but this is for when TLB exceptions are raised */
   setupState = (state_t *) TLBMGMTNEW;
   setupMem = (memaddr) tlbTrapHandler;
-  populate(setupState, setupMem);
+  populate(setupState, setupMem, RAMTOP);
 
   /* Finally, this section is to define the state the machine should wake up
   in for a interupt. */
   setupState = (state_t *) INTERNEW;
   setupMem = (memaddr) tlbTrapHandler;
-  populate(setupState, setupMem);
+  populate(setupState, setupMem, RAMTOP);
 
   /****************************************************************************/
 
@@ -139,9 +139,7 @@ int main(){
 Given a state of the machine, directs its memory address
 location for a context switch to the associated Operating
 System handler, and defines what status registers are on. */
-HIDDEN void populate(state_t * state, memaddr memLoc){
-  memaddr RAMTOP;
-  RAMTOP = regArea->rambase + regArea->ramsize;
+HIDDEN void populate(state_t * state, memaddr memLoc, RAMTOP){
   state->s_pc = state->s_t9 = memLoc;
   state->s_sp = RAMTOP;
   state->s_status = ALLOFF | PLOCTIMEON;
