@@ -1,4 +1,4 @@
-/*********************************SCHEDULER.C*************************************
+/*********************************SCHEDULER.C***********************************
 
 This module handles the scheduling of a new process after the previous
 process is finished using the CPU. If no processes are ready, it makes sure
@@ -7,7 +7,7 @@ to load.
 
 Written by: Patrick Sellers and Landon Clark
 
-**********************************************************************************/
+*******************************************************************************/
 
 
 /*************************INCLUDE MODULES**************************************/
