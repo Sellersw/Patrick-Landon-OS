@@ -16,13 +16,6 @@ void debugP(int a){
   5+5;
 }
 
-void debugOutProc(pcb_PTR c){
-  pcb_PTR current = c->p_next;
-  while(current != c){
-    debugP((int) current);
-    current = current->p_next;
-  }
-}
 
 /*-------- FUNCTION TO RESET STATE TO 0 VALUES ---------*/
 
@@ -129,25 +122,24 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
 
   /* If there are more than one processes in the procQ, search through the
   procQ for p */
-  debugOutProc(current);
-  while(current != p){
-    current = current->p_next;
+  while(current != NULL){
+    /* Once p has been found, remove it from the procQ, set its fields to
+    NULL and return it */
+    if(current == p){
+      current->p_next->p_prev = current->p_prev;
+      current->p_prev->p_next = current->p_next;
+      current->p_next = NULL;
+      current->p_prev = NULL;
+      return current;
+    }
     /* if we loop all the way back to tp, p in not in the procQ so return
     NULL */
     if(current == *tp){
       return NULL;
     }
+    current = current->p_next;
   }
-
-  /* Once p has been found, remove it from the procQ, set its fields to
-  NULL and return it */
-  debugP(9);
-  current->p_next->p_prev = current->p_prev;
-  current->p_prev->p_next = current->p_next;
-  current->p_next = NULL;
-  current->p_prev = NULL;
-  return current;
-
+  return NULL;
 }
 
 
@@ -320,34 +312,30 @@ pcb_PTR outChild(pcb_PTR p){
   if(p->p_prnt == NULL){
     return NULL;
   }
-  else{
-    prnt = p->p_prnt;
-    /* if p is its parent's first child, remove and return it */
-    if(prnt->p_child == p){
-      if(p->p_sib == NULL){
-        prnt->p_child = NULL;
-      }
-      else{
-        prnt->p_child = p->p_sib;
-      }
-      p->p_prnt = NULL;
-      return p;
+  prnt = p->p_prnt;
+  /* if p is its parent's first child, remove and return it */
+  if(prnt->p_child == p){
+    if(p->p_sib == NULL){
+      prnt->p_child = NULL;
     }
     else{
-      /* Search through all of prnt's children, find p and remove it from the
-      list of siblings before returning it */
-      current = prnt->p_child;
-      while(current->p_sib != p){
-        current = current->p_sib;
-      }
-      if(p->p_sib != NULL){
-        current->p_sib = p->p_sib;
-      }
-      else{
-        current->p_sib = NULL;
-      }
-      p->p_prnt = NULL;
-      return p;
+      prnt->p_child = p->p_sib;
     }
+    p->p_prnt = NULL;
+    return p;
   }
+  /* Search through all of prnt's children, find p and remove it from the
+  list of siblings before returning it */
+  current = prnt->p_child;
+  while(current->p_sib != p){
+    current = current->p_sib;
+  }
+  if(p->p_sib != NULL){
+    current->p_sib = p->p_sib;
+  }
+  else{
+    current->p_sib = NULL;
+  }
+  p->p_prnt = NULL;
+  return p;
 }
