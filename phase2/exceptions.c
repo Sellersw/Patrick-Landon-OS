@@ -22,7 +22,7 @@ Written by: Patrick Sellers and Landon Clark
 /*****Localized (Private) Methods****/
 HIDDEN void copyState(state_t *orig, state_t *curr);
 HIDDEN void passUpOrDie(int type);
-HIDDEN void passUpOrDieHelper(pcb_PTR proc, state_t *trap);
+HIDDEN void passUpOrDieHelper(state_t * new, state_t * old, state_t *trap);
 HIDDEN void createprocess(state_t *state);
 HIDDEN void terminateprocess(pcb_PTR p);
 HIDDEN void P(state_t * state);
@@ -151,37 +151,46 @@ HIDDEN void copyState(state_t *orig, state_t *curr){
   terminate the process and its children when the selected trap state
   is not empty, or will load it onto the CPU. */
 HIDDEN void passUpOrDie(int type){
-  state_t *state; /* placeholder for saving the old proc */
+  state_t *state; /* placeholder for passing the old proc */
+  state_t *next;
+  state_t *old;
   switch(type){
     case TLBTRAP:
       state = (state_t *) TLBMGMTOLD;
-      passUpOrDieHelper(currentProc, state);
+      next = currentProc->p_newTlb;
+      old = currentProc->p_oldTlb;
+      passUpOrDieHelper(next, old, state);
       break;
 
     case PROGTRAP:
       state = (state_t *) PROGTRAPOLD;
-      passUpOrDieHelper(currentProc, state);
+      next = currentProc->p_newPgm;
+      old = currentProc->p_oldPgm;
+      passUpOrDieHelper(next, old, state);
       break;
 
     case SYSTRAP:
       state = (state_t *) SYSCALLOLD;
-      passUpOrDieHelper(currentProc, state);
+      next = currentProc->p_newSys;
+      old = currentProc->p_oldSys;
+      passUpOrDieHelper(next, old, state);
       break;
   }
 }
 
 /* A method to generalize the pass up or die process. Takes
-  a process and a state pointer associated with the memory location
-  of a particular trap type. The passUpOrDie function is the only
+  three state pointers associated with the memory location
+  of a particular trap type and the old and new state areas in the
+  current process. The passUpOrDie function is the only
   place that this should be called. */
-HIDDEN void passUpOrDieHelper(pcb_PTR proc, state_t *trap){
-  if(proc->p_newSys == NULL){
-      terminateprocess(proc);
+HIDDEN void passUpOrDieHelper(state_t * new, state_t * old, state_t *trap){
+  if(new == NULL){
+      terminateprocess(currentProc);
       scheduler();
     }
     else{
-      copyState(trap, proc->p_oldSys);
-      LDST(proc->p_newSys);
+      copyState(trap, old);
+      LDST(new);
     }
 }
 
