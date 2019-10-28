@@ -35,11 +35,13 @@ pcb_PTR readyQue, currentProc; /* Pointer to the queue of executable procs */
 cpu_t startTOD, ioProcTime; /* Instances our clocks for measuring proc time */
 int semDevArray[DEVICECNT]; /* A sema4 array for the 49 Kaya devices */
 
+/*************************Private Function Declaration*************************/
+HIDDEN void populate(state_t * state, memaddr memLoc);
 /******************************************************************************/
-
 
 int main(){
   state_t *setupState;
+  memaddr setupMem;
   devregarea_t *regArea;
   memaddr RAMTOP;
   int i;
@@ -56,28 +58,24 @@ int main(){
   of our sysCallHandler method. This is a state that our system can load when
   an exception of this type is triggered */
   setupState = (state_t *) SYSCALLNEW;
-  setupState->s_pc = setupState->s_t9 = (memaddr) sysCallHandler;
-  setupState->s_sp = RAMTOP;
-  setupState->s_status = ALLOFF | PLOCTIMEON;
+  setupMem = (memaddr) sysCallHandler;
+  populate(setupState, setupMem);
 
   /* This is the same as above, except it is for our program traps. */
   setupState = (state_t *) PROGTRAPNEW;
-  setupState->s_pc = setupState->s_t9 = (memaddr) progTrapHandler;
-  setupState->s_sp = RAMTOP;
-  setupState->s_status = ALLOFF | PLOCTIMEON;
+  setupMem = (memaddr) progTrapHandler;
+  populate(setupState, setupMem);
 
   /* This is also the same but this is for when TLB exceptions are raised */
   setupState = (state_t *) TLBMGMTNEW;
-  setupState->s_pc = setupState->s_t9 = (memaddr) tlbTrapHandler;
-  setupState->s_sp = RAMTOP;
-  setupState->s_status = ALLOFF | PLOCTIMEON;
+  setupMem = (memaddr) tlbTrapHandler;
+  populate(setupState, setupMem);
 
   /* Finally, this section is to define the state the machine should wake up
   in for a interupt. */
   setupState = (state_t *) INTERNEW;
-  setupState->s_pc = setupState->s_t9 = (memaddr) ioTrapHandler;
-  setupState->s_sp = RAMTOP;
-  setupState->s_status = ALLOFF | PLOCTIMEON;
+  setupMem = (memaddr) tlbTrapHandler;
+  populate(setupState, setupMem);
 
   /****************************************************************************/
 
@@ -131,4 +129,16 @@ int main(){
   scheduler();
 
   return -1;
+}
+
+/******************Helper Functions*********************/
+
+/* Used for populating the ROM Reserved Frames in memory.
+Given a state of the machine, directs its memory address
+location for a context switch to the associated Operating
+System handler, and defines what status registers are on. */
+HIDDEN void populate(state_t * state, memaddr memLoc){
+  state->s_pc = state->s_t9 = memLoc;
+  state->s_sp = RAMTOP;
+  state->s_status = ALLOFF | PLOCTIMEON;
 }
