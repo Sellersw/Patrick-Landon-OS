@@ -78,9 +78,6 @@ typedef unsigned int devregtr;
 #define MAXSEM			20
 
 
-void debugZ(int a){
-	5+5;
-}
 
 SEMAPHORE term_mut=1,	/* for mutual exclusion on terminal */
 		s[MAXSEM+1],	/* semaphore array */
@@ -267,9 +264,7 @@ void test() {
 			print("error in process termination\n");
 			PANIC();
 		}
-		debugZ(endp8);
 		SYSCALL(PASSERN, (int)&endp8, 0, 0);
-		debugZ(endp8);
 	}
 
 	print("p1 finishes OK -- TTFN\n");
@@ -367,8 +362,6 @@ void p3() {
 
 	cpu_t2 = SYSCALL(GETCPUTIME, 0, 0, 0);
 
-	debugZ(cpu_t2 - cpu_t1);
-	debugZ((MINCLOCKLOOP / (* ((cpu_t *) TIMESCALEADDR))));
 
 	if (cpu_t2 - cpu_t1 < (MINCLOCKLOOP / (* ((cpu_t *) TIMESCALEADDR))))
 		print("error: p3 - CPU time incorrectly maintained\n");

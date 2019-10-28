@@ -17,10 +17,6 @@ Written by: Patrick Sellers and Landon Clark
 #include "/usr/local/include/umps2/umps/libumps.e"
 
 
-void debugG(int a){
-  5+5;
-}
-
 int waiting;
 
 

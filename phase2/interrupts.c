@@ -14,14 +14,6 @@ Written by: Patrick Sellers and Landon Clark
 #include "../e/scheduler.e"
 #include "/usr/local/include/umps2/umps/libumps.e"
 
-void debugM(int a){
-  5+5;
-}
-
-void debugD(int a){
-  5+5;
-}
-
 
 HIDDEN int findLineNo(unsigned int cause);
 HIDDEN int findDevNo(unsigned int bitMap);
@@ -39,8 +31,6 @@ void ioTrapHandler(){
   int *semAdd;
 
   STCK(timeStart);
-
-  debugM(10);
 
 
   /* Determine what line the interrupt is on:
@@ -60,9 +50,6 @@ void ioTrapHandler(){
 
   cause = oldInt->s_cause;
   lineNo = findLineNo(cause);
-  debugM(lineNo);
-
-  debugM(30);
 
   switch(lineNo){
 
@@ -73,7 +60,6 @@ void ioTrapHandler(){
       break;
 
     case PLOCINT:
-      debugM(50);
       STCK(timeEnd);
       if(currentProc != NULL){
         ioProcTime = ioProcTime + (timeEnd - timeStart);
@@ -90,7 +76,6 @@ void ioTrapHandler(){
       break;
 
     case IVTIMINT:
-      debugD(51);
       semAdd = &(semDevArray[DEVICECNT-1]);
       while(headBlocked(semAdd) != NULL){
         blockedProc = removeBlocked(semAdd);
@@ -111,7 +96,6 @@ void ioTrapHandler(){
         register
         - and the index of the seme4 for that device. */
     default:
-      debugM(regArea->interrupt_dev[lineNo-3]);
       devNo = findDevNo(regArea->interrupt_dev[lineNo-3]);
 
       /* We should be able to determine the device number. If we cannot, we will
@@ -119,8 +103,6 @@ void ioTrapHandler(){
       if(devNo == -1){
         PANIC ();
       }
-
-      debugM(devNo);
 
       /* Calculate address of device register */
       devReg = (device_t *) (0x10000050 + ((lineNo - 3) * 0x80) + (devNo * 0x10));

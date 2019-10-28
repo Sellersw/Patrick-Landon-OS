@@ -18,9 +18,6 @@ Written by: Patrick Sellers and Landon Clark
 #include "../e/scheduler.e"
 #include "/usr/local/include/umps2/umps/libumps.e"
 
-void debugS(int a){
-  5+5;
-}
 
 /*****Localized (Private) Methods****/
 HIDDEN void copyState(state_t *orig, state_t *curr);
@@ -58,7 +55,6 @@ void sysCallHandler(){
 
   /* Handle syscalls that are not defined yet */
   if(call >= 9){
-    debugS(66);
     passUpOrDie(SYSTRAP);
   }
 
@@ -68,7 +64,6 @@ void sysCallHandler(){
     oldPgm = (state_t *) PROGTRAPOLD;
     copyState(oldSys, oldPgm);
     oldPgm->s_cause = (oldPgm->s_cause & CAUSEREGMASK) | RESERVEDINSTR;
-    debugS(100);
     progTrapHandler();
   }
 
@@ -125,14 +120,12 @@ void sysCallHandler(){
 /* A publically available function for handling a program trap. It simply
   triggers a pass up or die with the call code for a program trap. */
 void progTrapHandler(){
-  debugS(10);
   passUpOrDie(PROGTRAP);
 }
 
 /* A publically available function for handling a TLB trap. I simply
   triggers a pass up or die with the call code for a TLB trap.*/
 void tlbTrapHandler(){
-  debugS(15);
   passUpOrDie(TLBTRAP);
 }
 
@@ -238,7 +231,6 @@ HIDDEN void terminateprocess(pcb_PTR p){
   }
 
   else if(outProcQ(&readyQue, p) == NULL){
-    debugO(1);
     if(outBlocked(p) != NULL){
       /* Check to see if p's semaphore was a device semaphore */
       if((semAdd >= firstDevice) && (semAdd <= lastDevice)){
