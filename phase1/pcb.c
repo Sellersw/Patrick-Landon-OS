@@ -116,8 +116,19 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
   }
   /* if the tail pointer is the only process in the procQ and it is also p,
   remove it from the procQ and return it */
-  if(*tp == p){
-    return removeProcQ(tp);
+  if(*tp == p && *tp == (*tp)->p_next){
+    *tp = NULL;
+    current->p_next = NULL;
+    current->p_prev = NULL;
+    return current;
+  }
+
+  if(*tp == p && *tp != (*tp)->p_next){
+    (*tp)->p_next = (*tp)->p_next->p_next;
+    (*tp)->p_next->p_prev = (*tp)->p_prev;
+    current->p_next = NULL;
+    current->p_prev = NULL;
+    return current;
   }
 
   /* If there are more than one processes in the procQ, search through the
