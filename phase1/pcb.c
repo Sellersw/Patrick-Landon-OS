@@ -124,8 +124,9 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
   }
 
   if(*tp == p && *tp != (*tp)->p_next){
-    (*tp)->p_next = (*tp)->p_next->p_next;
+    (*tp)->p_prev->p_next = (*tp)->p_next;
     (*tp)->p_next->p_prev = (*tp)->p_prev;
+    *tp = (*tp)->p_prev;
     current->p_next = NULL;
     current->p_prev = NULL;
     return current;
