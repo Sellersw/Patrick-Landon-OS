@@ -172,14 +172,16 @@ HIDDEN void passUpOrDie(int type){
   of a particular trap type. The passUpOrDie function is the only
   place that this should be called. */
 HIDDEN void passUpOrDieHelper(pcb_PTR proc, int trap){
-   if(proc->p_newSys == NULL){
-        terminateprocess(proc);
-        scheduler();
-      }
-      else{
-        state = (state_t *) trap;
-        copyState(state, proc->p_oldSys);
-        LDST(proc->p_newSys);
+  state_t *state; /* placeholder for saving the old proc */
+  if(proc->p_newSys == NULL){
+      terminateprocess(proc);
+      scheduler();
+    }
+    else{
+      state = (state_t *) trap;
+      copyState(state, proc->p_oldSys);
+      LDST(proc->p_newSys);
+    }
 }
 
 /****************************SYSCALL FUNCTIONS*****************************/
