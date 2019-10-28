@@ -1,11 +1,13 @@
-/*******************************INTERRUPTS.C********************************
+/*******************************INTERRUPTS.C************************************
 
 Module to handle interrupts. More words to follow.
 
 Written by: Patrick Sellers and Landon Clark
 
-****************************************************************************/
+*******************************************************************************/
 
+
+/*************************INCLUDE MODULES**************************************/
 #include "../h/types.h"
 #include "../h/const.h"
 #include "../e/pcb.e"
@@ -13,14 +15,18 @@ Written by: Patrick Sellers and Landon Clark
 #include "../e/initial.e"
 #include "../e/scheduler.e"
 #include "/usr/local/include/umps2/umps/libumps.e"
+/******************************************************************************/
 
 
+/***********************Localized (Private) Methods****************************/
 HIDDEN int findLineNo(unsigned int cause);
 HIDDEN int findDevNo(unsigned int bitMap);
 HIDDEN void copyState(state_t *orig, state_t *curr);
 HIDDEN device_t* getDeviceReg(int lineNo, int devNo);
+/******************************************************************************/
 
 
+/********************INTERRUPT HANDLER*****************************************/
 void ioTrapHandler(){
   pcb_PTR blockedProc;
   cpu_t timeStart, timeEnd;
@@ -158,11 +164,11 @@ void ioTrapHandler(){
   LDST(oldInt);
 }
 
+/******************************************************************************/
 
 
 
-
-/* --------- HELPER FUNCTIONS ---------------- */
+/***************************HELPER FUNCTIONS***********************************/
 
 
 /* Find interrupt line number */
@@ -242,3 +248,5 @@ HIDDEN void copyState(state_t *orig, state_t *curr){
 HIDDEN device_t* getDeviceReg(int lineNo, int devNo){
   return (device_t *) (0x10000050 + ((lineNo-3) * 0x80) + (devNo*0x10));
 }
+
+/******************************************************************************/

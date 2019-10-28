@@ -9,22 +9,25 @@ Written by: Patrick Sellers and Landon Clark
 
 **********************************************************************************/
 
+
+/*************************INCLUDE MODULES**************************************/
 #include "../h/types.h"
 #include "../h/const.h"
 #include "../e/pcb.e"
 #include "../e/asl.e"
 #include "../e/initial.e"
 #include "/usr/local/include/umps2/umps/libumps.e"
+/******************************************************************************/
 
 
 int waiting;
 
 
 /* A method that handles the transfering of the CPU to the next process that is
-    on the ready queue. This uses a round-robin scheduling algorithm to prevent
-    starvation, and allows the process a set time-slice based on our quantum length.
-    It also includes wait handling for when processes are waiting for I/O, and halts
-    the machine when all processes have terminated. */
+on the ready queue. This uses a round-robin scheduling algorithm to prevent
+starvation, and allows the process a set time-slice based on our quantum length.
+It also includes wait handling for when processes are waiting for I/O, and halts
+the machine when all processes have terminated. */
 void scheduler(){
   /*****Local Variables*****/
   pcb_PTR nextProc;
