@@ -39,7 +39,7 @@ int semDevArray[DEVICECNT]; /* A sema4 array for the 49 Kaya devices */
 
 
 int main(){
-  state_t *setupState
+  state_t *setupState;
   devregarea_t *regArea;
   memaddr RAMTOP;
   int i;
