@@ -128,13 +128,13 @@ void sysCallHandler(){
 }
 
 /* A publically available function for handling a program trap. It simply
-  triggers a pass up or die with the call code for a program trap. */
+triggers a pass up or die with the call code for a program trap. */
 void progTrapHandler(){
   passUpOrDie(PROGTRAP);
 }
 
-/* A publically available function for handling a TLB trap. I simply
-  triggers a pass up or die with the call code for a TLB trap.*/
+/* A publically available function for handling a TLB trap. It simply triggers a
+pass up or die with the call code for a TLB trap.*/
 void tlbTrapHandler(){
   passUpOrDie(TLBTRAP);
 }
@@ -191,23 +191,13 @@ HIDDEN void passUpOrDie(int type){
   }
 }
 
-<<<<<<< HEAD
-/* A method to generalize the pass up or die process. Takes a process and a
-state pointer associated with the memory location of a particular trap type.
-The passUpOrDie function is the only place that this should be called. */
-HIDDEN void passUpOrDieHelper(pcb_PTR proc, state_t *trap){
-  if(proc->p_newSys == NULL){
-      terminateprocess(proc);
-=======
-/* A method to generalize the pass up or die process. Takes
-  three state pointers associated with the memory location
-  of a particular trap type and the old and new state areas in the
-  current process. The passUpOrDie function is the only
-  place that this should be called. */
+/* A method to generalize the pass up or die process. Takes three state pointers
+associated with the memory location of a particular trap type and the old and
+new state areas in the current process. The passUpOrDie function is the only
+place that this should be called. */
 HIDDEN void passUpOrDieHelper(state_t * new, state_t * old, state_t *trap){
   if(new == NULL){
       terminateprocess(currentProc);
->>>>>>> e28c3d65ac96f10a1833b74d2286a5a8841d966b
       scheduler();
     }
     else{

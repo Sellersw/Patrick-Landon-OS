@@ -18,6 +18,7 @@ Written by: Patrick Sellers and Landon Clark
 HIDDEN int findLineNo(unsigned int cause);
 HIDDEN int findDevNo(unsigned int bitMap);
 HIDDEN void copyState(state_t *orig, state_t *curr);
+HIDDEN device_t* getDeviceReg(int lineNo, int devNo);
 
 
 void ioTrapHandler(){
@@ -105,7 +106,7 @@ void ioTrapHandler(){
       }
 
       /* Calculate address of device register */
-      devReg = (device_t *) (0x10000050 + ((lineNo - 3) * 0x80) + (devNo * 0x10));
+      devReg = getDeviceReg(lineNo, devNo);
 
       /* Handle terminal interrupt */
       if(lineNo == TERMINT){
@@ -236,4 +237,8 @@ HIDDEN void copyState(state_t *orig, state_t *curr){
   for(i = 0; i < STATEREGNUM; i++){
     curr->s_reg[i] = orig->s_reg[i];
   }
+}
+
+HIDDEN device_t* getDeviceReg(int lineNo, int devNo){
+  return (device_t *) (0x10000050 + ((lineNo-3) * 0x80) + (devNo*0x10));
 }
