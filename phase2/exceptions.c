@@ -22,6 +22,7 @@ Written by: Patrick Sellers and Landon Clark
 /*****Localized (Private) Methods****/
 HIDDEN void copyState(state_t *orig, state_t *curr);
 HIDDEN void passUpOrDie(int type);
+HIDDEN void passUpOrDieHelper(pcb_PTR proc, int trap);
 HIDDEN void createprocess(state_t *state);
 HIDDEN void terminateprocess(pcb_PTR p);
 HIDDEN void P(state_t * state);
