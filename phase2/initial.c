@@ -38,6 +38,7 @@ int semDevArray[DEVICECNT]; /* A sema4 array for the 49 Kaya devices */
 /******************************************************************************/
 
 
+/**MAIN ENTRY POINT OF KAYA OS*************************************************/
 int main(){
   state_t *setupState;
   devregarea_t *regArea;
