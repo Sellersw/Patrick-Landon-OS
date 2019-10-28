@@ -139,8 +139,8 @@ int main(){
 Given a state of the machine, directs its memory address
 location for a context switch to the associated Operating
 System handler, and defines what status registers are on. */
-HIDDEN void populate(state_t * state, memaddr memLoc, memaddr RAMTOP){
+HIDDEN void populate(state_t *state, memaddr memLoc, memaddr topOfRAM){
   state->s_pc = state->s_t9 = memLoc;
-  state->s_sp = RAMTOP;
+  state->s_sp = topOfRAM;
   state->s_status = ALLOFF | PLOCTIMEON;
 }
