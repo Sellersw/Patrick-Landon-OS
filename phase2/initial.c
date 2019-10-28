@@ -34,10 +34,6 @@ pcb_PTR readyQue, currentProc; /* Pointer to the queue of executable procs */
 cpu_t startTOD, ioProcTime; /* Instances our clocks for measuring proc time */
 int semDevArray[DEVICECNT]; /* A sema4 array for the 49 Kaya devices */
 
-/*************************Private Function Declaration*************************/
-HIDDEN void populate(state_t * state, memaddr memLoc, memaddr RAMTOP);
-/******************************************************************************/
-
 
 /*************************MAIN ENTRY POINT OF KAYA OS**************************/
 int main(){
