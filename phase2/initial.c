@@ -140,6 +140,8 @@ Given a state of the machine, directs its memory address
 location for a context switch to the associated Operating
 System handler, and defines what status registers are on. */
 HIDDEN void populate(state_t * state, memaddr memLoc){
+  memaddr RAMTOP;
+  RAMTOP = regArea->rambase + regArea->ramsize;
   state->s_pc = state->s_t9 = memLoc;
   state->s_sp = RAMTOP;
   state->s_status = ALLOFF | PLOCTIMEON;
