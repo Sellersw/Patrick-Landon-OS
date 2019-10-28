@@ -154,32 +154,33 @@ HIDDEN void passUpOrDie(int type){
   state_t *state; /* placeholder for saving the old proc */
   switch(type){
     case TLBTRAP:
-      passUpOrDieHelper(currentProc, TLBMGMTOLD);
+      state = (state_t *) TLBMGMTOLD;
+      passUpOrDieHelper(currentProc, state);
       break;
 
     case PROGTRAP:
-      passUpOrDieHelper(currentProc, PROGTRAPOLD);
+      state = (state_t *) PROGTRAPOLD;
+      passUpOrDieHelper(currentProc, state);
       break;
 
     case SYSTRAP:
-      passUpOrDieHelper(currentProc, SYSCALLOLD);
+      state = (state_t *) SYSCALLOLD;
+      passUpOrDieHelper(currentProc, state);
       break;
   }
 }
 
 /* A method to generalize the pass up or die process. Takes
-  a process and a hex value associated with the memory location
+  a process and a state pointer associated with the memory location
   of a particular trap type. The passUpOrDie function is the only
   place that this should be called. */
-HIDDEN void passUpOrDieHelper(pcb_PTR proc, int trap){
-  state_t *state; /* placeholder for saving the old proc */
+HIDDEN void passUpOrDieHelper(pcb_PTR proc, state_t *trap){
   if(proc->p_newSys == NULL){
       terminateprocess(proc);
       scheduler();
     }
     else{
-      state = (state_t *) trap;
-      copyState(state, proc->p_oldSys);
+      copyState(trap, proc->p_oldSys);
       LDST(proc->p_newSys);
     }
 }
@@ -243,7 +244,6 @@ HIDDEN void terminateprocess(pcb_PTR p){
 /* SIGNAL */
 HIDDEN void V(state_t *state){
   pcb_PTR temp;
-
   int *sem = (int *) state->s_a1;
   (*sem)++;
   if((*sem) <= 0){
@@ -267,12 +267,10 @@ HIDDEN void P(state_t *state){
     IO interrupts */
     STCK(currTime);
     currentProc->p_time = currentProc->p_time + (currTime - startTOD) - ioProcTime;
-
     copyState(state, &(currentProc->p_s));
     insertBlocked(sem, currentProc);
     sftBlkCnt++;
     currentProc = NULL;
-
     scheduler();
   }
   LDST(state);
@@ -281,7 +279,6 @@ HIDDEN void P(state_t *state){
 /* SYSCALL 5 helper function */
 HIDDEN void spectrapvec(state_t *state){
   unsigned int type = (unsigned int) state->s_a1;
-
   switch(type){
     case TLBTRAP:
       if(currentProc->p_newTlb != NULL){
