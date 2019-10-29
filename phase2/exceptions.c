@@ -25,7 +25,7 @@ Written by: Patrick Sellers and Landon Clark
 /***********************Localized (Private) Methods****************************/
 HIDDEN void copyState(state_t *orig, state_t *curr);
 HIDDEN void passUpOrDie(int type);
-HIDDEN void passUpOrDieHelper(state_t * new, state_t * old, state_t *trap);
+HIDDEN void pUoDHelper(state_t * new, state_t * old, memaddr trapLoc);
 HIDDEN void createprocess(state_t *state);
 HIDDEN void terminateprocess(pcb_PTR p);
 HIDDEN void P(state_t * state);
@@ -41,16 +41,19 @@ void progTrapHandler();
 void tlbTrapHandler();
 
 
+/*************************SYSCALL HANDLER**************************************/
+
 /* A method that is activated by the OS when the instruction for syscall is
 executed. This loads a call code into the a0 register so that we can execute the
 requested operation that is protected by the operating system. */
 void sysCallHandler(){
 
-  /**************PRIVATE VARIABLES**************/
-  unsigned int call, status;       /* placeholders to store our call code & status */
-  state_t *oldSys, *oldPgm;        /* pointers to relevant state */
-  oldSys = (state_t *) SYSCALLOLD; /* point our  */
-  /*********************************************/
+  /**************LOCAL VARIABLES**************/
+  unsigned int call, status;
+  state_t *oldSys, *oldPgm;
+  /* Grab the state which was responsible for calling the syscall */
+  oldSys = (state_t *) SYSCALLOLD;
+  /*******************************************/
 
   /* We need to make sure we do not return to the instruction that brought
   about this syscall */
@@ -127,11 +130,22 @@ void sysCallHandler(){
   }
 }
 
+/******************************************************************************/
+
+
+
+/************************PROGRAM TRAP HANDLER**********************************/
+
 /* A publically available function for handling a program trap. It simply
 triggers a pass up or die with the call code for a program trap. */
 void progTrapHandler(){
   passUpOrDie(PROGTRAP);
 }
+
+/******************************************************************************/
+
+
+/**************************TLB TRAP HANDLER************************************/
 
 /* A publically available function for handling a TLB trap. It simply triggers a
 pass up or die with the call code for a TLB trap.*/
@@ -140,6 +154,8 @@ void tlbTrapHandler(){
 }
 
 /******************************************************************************/
+
+
 
 
 /****************************HELPER FUNCTIONS**********************************/
@@ -164,29 +180,17 @@ HIDDEN void copyState(state_t *orig, state_t *curr){
 and its children when the selected trap state is not empty, or will load it onto
 the CPU. */
 HIDDEN void passUpOrDie(int type){
-  state_t *state; /* placeholder for passing the old proc */
-  state_t *next;
-  state_t *old;
   switch(type){
     case TLBTRAP:
-      state = (state_t *) TLBMGMTOLD;
-      next = currentProc->p_newTlb;
-      old = currentProc->p_oldTlb;
-      passUpOrDieHelper(next, old, state);
+      pUoDHelper(currentProc->p_newTlb, currentProc->p_oldTlb, TLBMGMTOLD);
       break;
 
     case PROGTRAP:
-      state = (state_t *) PROGTRAPOLD;
-      next = currentProc->p_newPgm;
-      old = currentProc->p_oldPgm;
-      passUpOrDieHelper(next, old, state);
+      pUoDHelper(currentProc->p_newPgm, currentProc->p_oldPgm, PROGTRAPOLD);
       break;
 
     case SYSTRAP:
-      state = (state_t *) SYSCALLOLD;
-      next = currentProc->p_newSys;
-      old = currentProc->p_oldSys;
-      passUpOrDieHelper(next, old, state);
+      pUoDHelper(currentProc->p_newSys, currentProc->p_oldSys, SYSCALLOLD);
       break;
   }
 }
@@ -195,12 +199,14 @@ HIDDEN void passUpOrDie(int type){
 associated with the memory location of a particular trap type and the old and
 new state areas in the current process. The passUpOrDie function is the only
 place that this should be called. */
-HIDDEN void passUpOrDieHelper(state_t * new, state_t * old, state_t *trap){
+HIDDEN void pUoDHelper(state_t * new, state_t * old, memaddr trapLoc){
+  state_t *trap;
   if(new == NULL){
       terminateprocess(currentProc);
       scheduler();
     }
     else{
+      trap = (state_t *) trapLoc
       copyState(trap, old);
       LDST(new);
     }
@@ -228,9 +234,12 @@ HIDDEN void createprocess(state_t *state){
     copyState((state_t *) state->s_a1, &(p->p_s));
     insertChild(currentProc, p);
     insertProcQ(&readyQue, p);
+
+    /* acknowledge that we have added a process, return success code in v0 */
     procCnt++;
     state->s_v0 = 0;
   }
+  /* Return control to state that called this syscall */
   LDST(state);
 }
 
@@ -279,6 +288,7 @@ HIDDEN void V(state_t *state){
       sftBlkCnt--;
     }
   }
+  /* Return control to state that called this syscall */
   LDST(state);
 }
 
@@ -299,6 +309,7 @@ HIDDEN void P(state_t *state){
     currentProc = NULL;
     scheduler();
   }
+  /* Return control to state that called this syscall */
   LDST(state);
 }
 
@@ -339,6 +350,7 @@ HIDDEN void spectrapvec(state_t *state){
       }
       break;
   }
+  /* Return control to state that called this syscall */
   LDST(state);
 }
 
@@ -348,6 +360,8 @@ HIDDEN void getcputime(state_t *state){
   cpu_t currTime;
   STCK(currTime);
   state->s_v0 = currentProc->p_time + currTime - startTOD - ioProcTime;
+
+  /* Return control to state that called this syscall */
   LDST(state);
 }
 
@@ -367,6 +381,7 @@ HIDDEN void waitforclock(state_t *state){
     currentProc = NULL;
     scheduler();
   }
+  /* Return control to state that called this syscall */
   LDST(state);
 }
 
@@ -409,6 +424,7 @@ HIDDEN void waitio(state_t *state){
     currentProc = NULL;
     scheduler();
   }
+  /* Return control to state that called this syscall */
   LDST(state);
 }
 /******************************************************************************/

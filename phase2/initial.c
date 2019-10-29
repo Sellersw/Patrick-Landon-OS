@@ -4,7 +4,9 @@ Main entry point of the Kaya operating system. Properly initializes necessary
 data structures, global control data, and physical memory locations before
 passing control to the scheduler. This sets up the nucleus of basic Operating
 System functionality which includes global variables and data structures that
-handle the flow of our processes (readyQue, procCnt, semDevArray, etc.)
+handle the flow of our processes (readyQue, procCnt, semDevArray, etc). The
+areas in memory that will be accessed when interrupts and exceptions occur are
+intiailized to 'point' to our interrupt and exception handlers.
 
 Written by: Patrick Sellers and Landon Clark
 
@@ -29,24 +31,32 @@ extern void test();
 
 /***********************Global Module-Level Variables**************************/
 
-int procCnt, sftBlkCnt;  /* keep count of processes and count waiting on IO */
-pcb_PTR readyQue, currentProc; /* Pointer to the queue of executable procs */
-cpu_t startTOD, ioProcTime; /* Instances our clocks for measuring proc time */
-int semDevArray[DEVICECNT]; /* A sema4 array for the 49 Kaya devices */
+/* Keep count of processes and count waiting on I/O */
+int procCnt, sftBlkCnt;
+/* Pointer to the queue of executable processes and current executing process */
+pcb_PTR readyQue, currentProc;
+/* Values used for measuring proc time and time spent in I/O */
+cpu_t startTOD, ioProcTime;
+/* A sema4 array for the 49 Kaya devices */
+int semDevArray[DEVICECNT];
 
 
 /*************************MAIN ENTRY POINT OF KAYA OS**************************/
 int main(){
+
+  /**************LOCAL VARIABLES**************/
   state_t *setupState;
   devregarea_t *regArea;
   memaddr RAMTOP;
   int i;
-  pcb_PTR p; /* our placeholder proc that will be placed on the ready queue. */
+  pcb_PTR p;
+  /*******************************************/
+
 
   /************************POPULATING ROM RESERVED FRAMES**********************/
+
   /* Here we find the top page of RAM by adding the size of main RAM to the RAM
   base address. */
-
   regArea = (devregarea_t *) RAMBASEADDR;
   RAMTOP = regArea->rambase + regArea->ramsize;
 
@@ -122,11 +132,12 @@ int main(){
   /* Instantiate pseudo-clock timer */
   LDIT(INTERVAL);
 
-  /* Begin clock for total time machine has been on */
+  /* Initialize startTOD value with current TOD */
   STCK(startTOD);
 
   /* CALL SCHEDULER */
   scheduler();
 
+  /* We should never reach this, so it seems fitting that we return -1 */
   return -1;
 }
