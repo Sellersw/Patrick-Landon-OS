@@ -206,7 +206,7 @@ HIDDEN void pUoDHelper(state_t * new, state_t * old, memaddr trapLoc){
       scheduler();
     }
     else{
-      trap = (state_t *) trapLoc
+      trap = (state_t *) trapLoc;
       copyState(trap, old);
       LDST(new);
     }
