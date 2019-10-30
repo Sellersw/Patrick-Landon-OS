@@ -96,6 +96,8 @@
 #define MININT  ((int*)0x0)
 #define NULL ((void *)0xFFFFFFFF)
 #define DEVICECNT 49
+#define SUCCESS 0
+#define FAIL -1
 
 
 /* vectors number and type */

@@ -4,7 +4,11 @@ This module handles the scheduling of a new process after the previous process
 is finished using the CPU. If no processes are ready, it makes sure the
 interrupt handler can trigger, and halts if there are no more processes to load.
 We use a round-robin scheduling algorithm to prevent starvation, and allows the
-process a set time-slice based on a pre-defined quantum length of 5ms.
+process a set time-slice based on a pre-defined quantum length of 5ms. It
+should be noted that we make the assumption that our currentProc has been
+properly deallocated/blocked in either the exceptions or interrupts module, so
+we do not handle any process time handling in this module - we only load our
+timers.
 
 Written by: Patrick Sellers and Landon Clark
 

@@ -36,9 +36,27 @@ HIDDEN void waitforclock(state_t *state);
 HIDDEN void waitio(state_t *state);
 /******************************************************************************/
 
-/* Declarations for public functions used in sysCallHandler but defined later */
-void progTrapHandler();
-void tlbTrapHandler();
+
+/************************PROGRAM TRAP HANDLER**********************************/
+
+/* A publically available function for handling a program trap. It simply
+triggers a pass up or die with the call code for a program trap. */
+void progTrapHandler(){
+  passUpOrDie(PROGTRAP);
+}
+
+/******************************************************************************/
+
+
+/**************************TLB TRAP HANDLER************************************/
+
+/* A publically available function for handling a TLB trap. It simply triggers a
+pass up or die with the call code for a TLB trap.*/
+void tlbTrapHandler(){
+  passUpOrDie(TLBTRAP);
+}
+
+/******************************************************************************/
 
 
 /*************************SYSCALL HANDLER**************************************/
@@ -70,8 +88,12 @@ void sysCallHandler(){
   }
 
   /* Check the KUp bit to determine if we were working in Kernel mode */
-  if((status & KERNELOFF) == KERNELOFF){
-    /* Handle user mode priveleged instruction */
+  if(((status & KERNELOFF) == KERNELOFF) && (call <= 8)){
+
+    /* Handle user mode priveleged instruction - this is considered a program
+    trap, so we copy the state that caused this trap into oldPgm, reset the
+    cause exception code value in the cause register to indicate a priveleged
+    instruction was called in user mode, and finally call the progTrapHandler */
     oldPgm = (state_t *) PROGTRAPOLD;
     copyState(oldSys, oldPgm);
     oldPgm->s_cause = (oldPgm->s_cause & CAUSEREGMASK) | RESERVEDINSTR;
@@ -88,22 +110,25 @@ void sysCallHandler(){
     of that process */
     case TERMINATEPROCESS:
       terminateprocess(currentProc);
+      /* We need to call the scheduler after killing the currentProc */
       scheduler();
       break;
 
-    /* Syscall 3: Signal that the process is done working with a shared piece of
-    data */
+    /* Syscall 3: Signal that the process is done working with a shared set of
+    resources */
     case VERHOGEN:
       V(oldSys);
       break;
 
-    /* Syscall 4: Tell any process that wants to play with a shared piece of
-    data that they must wait until a process signals it is clear (Verhogen) */
+    /* Syscall 4: Tell the given process that wants to use a shared set of
+    resources that they must wait until a process signals the resources are
+    available, i.e. it is V'd */
     case PASSEREN:
       P(oldSys);
       break;
 
-    /* Syscall 5:  */
+    /* Syscall 5: Specify the exception states that the currentProc will use
+    when we hit a case that causes a Pass Up Or Die */
     case SPECTRAPVEC:
       spectrapvec(oldSys);
       break;
@@ -133,34 +158,9 @@ void sysCallHandler(){
 /******************************************************************************/
 
 
-
-/************************PROGRAM TRAP HANDLER**********************************/
-
-/* A publically available function for handling a program trap. It simply
-triggers a pass up or die with the call code for a program trap. */
-void progTrapHandler(){
-  passUpOrDie(PROGTRAP);
-}
-
-/******************************************************************************/
-
-
-/**************************TLB TRAP HANDLER************************************/
-
-/* A publically available function for handling a TLB trap. It simply triggers a
-pass up or die with the call code for a TLB trap.*/
-void tlbTrapHandler(){
-  passUpOrDie(TLBTRAP);
-}
-
-/******************************************************************************/
-
-
-
-
 /****************************HELPER FUNCTIONS**********************************/
 
-/* A simple helper function for copying the fields of one state to another. */
+/* A simple helper function for copying the fields of one state to another */
 HIDDEN void copyState(state_t *orig, state_t *curr){
   int i;
   /* Copy state values over to new state */
@@ -195,10 +195,10 @@ HIDDEN void passUpOrDie(int type){
   }
 }
 
-/* A method to generalize the pass up or die process. Takes three state pointers
-associated with the memory location of a particular trap type and the old and
-new state areas in the current process. The passUpOrDie function is the only
-place that this should be called. */
+/* A method to generalize the pass up or die process. Takes the values
+currentProc holds for its new and old trap handler of a given type as parameters
+as well as the location of the place in memory holding the state prior to the
+given trap. */
 HIDDEN void pUoDHelper(state_t * new, state_t * old, memaddr trapLoc){
   state_t *trap;
   if(new == NULL){
@@ -215,29 +215,29 @@ HIDDEN void pUoDHelper(state_t * new, state_t * old, memaddr trapLoc){
 /******************************************************************************/
 
 
-
 /****************************SYSCALL FUNCTIONS*********************************/
 
 /* SYSCALL 1 helper function: Creates a new PCB */
 HIDDEN void createprocess(state_t *state){
+  /* Attempt to pull a procBlk off the PCB free list */
   pcb_PTR p = allocPcb();
 
-  /* If an error occurs when attempting to create a new PCB, return error
-  code of -1 in the v0 register of oldSys */
+  /* If an error occurs when attempting to create a new PCB, return error code
+  of -1 in the v0 register of oldSys */
   if(p == NULL){
-    state->s_v0 = -1;
+    state->s_v0 = FAIL;
   }
+  /* Handle successfully intiailized process */
   else{
-    /* copy the state passed in at a1 into the PCB's state var, make it
-    a child of the current process, and then insert it onto the process
-    queue. */
+    /* copy the state passed in at a1 into the PCB's state var, make it a child
+    of the current process, and then insert it onto the process queue. */
     copyState((state_t *) state->s_a1, &(p->p_s));
     insertChild(currentProc, p);
     insertProcQ(&readyQue, p);
 
     /* acknowledge that we have added a process, return success code in v0 */
     procCnt++;
-    state->s_v0 = 0;
+    state->s_v0 = SUCCESS;
   }
   /* Return control to state that called this syscall */
   LDST(state);
@@ -249,7 +249,7 @@ HIDDEN void terminateprocess(pcb_PTR p){
   int *lastDevice = &(semDevArray[DEVICECNT-1]);
   int *semAdd = p->p_semAdd;
 
-  /* Check for children of p. If they exist, kill them first */
+  /* Check for children of p. If they exist, recursively kill them first */
   while(emptyChild(p) != TRUE){
     terminateprocess(removeChild(p));
   }
@@ -318,40 +318,34 @@ HIDDEN void spectrapvec(state_t *state){
   unsigned int type = (unsigned int) state->s_a1;
   switch(type){
     case TLBTRAP:
-      if(currentProc->p_newTlb != NULL){
-        terminateprocess(currentProc);
-        scheduler();
-      }
-      else{
+      if(currentProc->p_newTlb == NULL){
         currentProc->p_oldTlb = (state_t *) state->s_a2;
         currentProc->p_newTlb = (state_t *) state->s_a3;
+        /* Return control to state that called this syscall */
+        LDST(state);
       }
       break;
 
     case PROGTRAP:
-      if(currentProc->p_newPgm != NULL){
-        terminateprocess(currentProc);
-        scheduler();
-      }
-      else{
+      if(currentProc->p_newPgm == NULL){
         currentProc->p_oldPgm = (state_t *) state->s_a2;
         currentProc->p_newPgm = (state_t *) state->s_a3;
+        /* Return control to state that called this syscall */
+        LDST(state);
       }
       break;
 
     case SYSTRAP:
-      if(currentProc->p_newSys != NULL){
-        terminateprocess(currentProc);
-        scheduler();
-      }
-      else{
+      if(currentProc->p_newSys == NULL){
         currentProc->p_oldSys = (state_t *) state->s_a2;
         currentProc->p_newSys = (state_t *) state->s_a3;
+        /* Return control to state that called this syscall */
+        LDST(state);
       }
       break;
   }
-  /* Return control to state that called this syscall */
-  LDST(state);
+  terminateprocess(currentProc);
+  scheduler();
 }
 
 
