@@ -72,9 +72,10 @@ void sysCallHandler(){
   /**************LOCAL VARIABLES**************/
   unsigned int call, status;
   state_t *oldSys, *oldPgm;
+  /*******************************************/
+
   /* Grab the state which was responsible for calling the syscall */
   oldSys = (state_t *) SYSCALLOLD;
-  /*******************************************/
 
   /* We need to make sure we do not return to the instruction that brought
   about this syscall */
