@@ -243,6 +243,7 @@ HIDDEN void createprocess(state_t *state){
   LDST(state);
 }
 
+
 /* SYSCALL 2 helper function */
 HIDDEN void terminateprocess(pcb_PTR p){
   int *firstDevice = &(semDevArray[0]);
@@ -275,6 +276,7 @@ HIDDEN void terminateprocess(pcb_PTR p){
   freePcb(p);
 }
 
+
 /* SYSCALL 3 helper function */
 /* SIGNAL */
 HIDDEN void V(state_t *state){
@@ -291,6 +293,7 @@ HIDDEN void V(state_t *state){
   /* Return control to state that called this syscall */
   LDST(state);
 }
+
 
 /* SYSCALL 4 helper function */
 /* WAIT */
@@ -312,6 +315,7 @@ HIDDEN void P(state_t *state){
   /* Return control to state that called this syscall */
   LDST(state);
 }
+
 
 /* SYSCALL 5 helper function */
 HIDDEN void spectrapvec(state_t *state){
@@ -344,6 +348,8 @@ HIDDEN void spectrapvec(state_t *state){
       }
       break;
   }
+  /* If the given trap type was already specified, terminate the running
+  process */
   terminateprocess(currentProc);
   scheduler();
 }
@@ -353,11 +359,12 @@ HIDDEN void spectrapvec(state_t *state){
 HIDDEN void getcputime(state_t *state){
   cpu_t currTime;
   STCK(currTime);
-  state->s_v0 = currentProc->p_time + currTime - startTOD - ioProcTime;
+  state->s_v0 = currentProc->p_time + (currTime - startTOD) - ioProcTime;
 
   /* Return control to state that called this syscall */
   LDST(state);
 }
+
 
 /* SYSCALL 7 helper function */
 HIDDEN void waitforclock(state_t *state){
@@ -380,7 +387,6 @@ HIDDEN void waitforclock(state_t *state){
 }
 
 
-
 /* SYSCALL 8 helper function */
 HIDDEN void waitio(state_t *state){
   cpu_t currTime;
@@ -391,18 +397,18 @@ HIDDEN void waitio(state_t *state){
   read = state->s_a3;
 
   /* If we are attempting to wait on a non-device semaphore, terminate */
-  if(lineNo < 3){
+  if(lineNo < DISKINT){
     terminateprocess(currentProc);
     scheduler();
   }
 
   /* Determine the index of the device semaphore in device semaphore array */
   /* Kinda some magic math here... */
-  if(lineNo != 7){
-    index = (8*(lineNo-3)) + devNo;
+  if(lineNo != TERMINT){
+    index = (DEVCNT*(lineNo-DEVINTOFFSET)) + devNo;
   }
   else{
-    index = (8*(lineNo-3)) + (2*devNo) + read;
+    index = (DEVCNT*(lineNo-DEVINTOFFSET)) + (TERMCNT*devNo) + read;
   }
 
   semAdd = &(semDevArray[index]);
@@ -421,4 +427,5 @@ HIDDEN void waitio(state_t *state){
   /* Return control to state that called this syscall */
   LDST(state);
 }
+
 /******************************************************************************/

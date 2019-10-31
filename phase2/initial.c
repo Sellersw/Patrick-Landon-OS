@@ -13,7 +13,6 @@ Written by: Patrick Sellers and Landon Clark
 *******************************************************************************/
 
 
-
 /*************************INCLUDE MODULES**************************************/
 #include "../h/types.h"
 #include "../h/const.h"
@@ -25,9 +24,11 @@ Written by: Patrick Sellers and Landon Clark
 #include "/usr/local/include/umps2/umps/libumps.e"
 /******************************************************************************/
 
+
 /* This will allow us to grab the memory address of the test function in p2test
 so we can set the pc of our first process to this address */
 extern void test();
+
 
 /***********************Global Module-Level Variables**************************/
 
@@ -42,6 +43,8 @@ int semDevArray[DEVICECNT];
 
 
 /*************************MAIN ENTRY POINT OF KAYA OS**************************/
+
+/* First function called in Kaya. Handles initialization of the OS */
 int main(){
 
   /**************LOCAL VARIABLES**************/
@@ -141,3 +144,5 @@ int main(){
   /* We should never reach this, so it seems fitting that we return -1 */
   return -1;
 }
+
+/******************************************************************************/

@@ -120,6 +120,9 @@
 #define PRNTINT 	6
 #define TERMINT		7
 
+#define DEVINTOFFSET 3
+#define DEVCNT 8
+#define TERMCNT 3
 
 #define DEVINTBASEADDR 0x1000003C
 
@@ -138,6 +141,7 @@
 #define TRANSTATUS      2
 #define TRANCOMMAND     3
 
+#define STATUSMASK 0xFF
 
 /* device common STATUS codes */
 #define UNINSTALLED	0

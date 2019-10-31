@@ -25,7 +25,7 @@ Written by: Patrick Sellers and Landon Clark
 /******************************************************************************/
 
 
-/* Wait flag that will allow our interrupt handler to make an informed decision
+/* Wait flag that will allow our interrupt handler to make informed decisions
 based on whether or not our scheduler was previously waiting */
 int waiting;
 
@@ -64,32 +64,37 @@ void scheduler(){
     /* loads our new process into our CPU registers */
     LDST(&(currentProc->p_s));
   }
-  else{
-    /* if the ready queue was empty and there are no more processes... */
-    if(procCnt == 0){
-      /* stop the machine */
-      HALT ();
-    }
-    /* if the ready queue was empty, there are still processes somewhere, and
-    none of them are soft blocked waiting for I/O... */
-    if(sftBlkCnt == 0){
-      /* Something is broken :( */
-      PANIC ();
-    }
-    /* if the ready queue was empty, there are still processes somewhere, and
-    processes that are soft blocked waiting for I/O is less than zero... */
-    if(sftBlkCnt > 0){
-      waiting = TRUE;
-      /* We want to make sure that interrupts are enabled when we enter our wait
-      state so we are not perpetually waiting. The magic number here is used to
-      move the INTERON value that sets IEp to instead set the IEc bit, which is
-      2 bits to the right of the IEp bit */
-      status = getSTATUS() | (INTERON >> 2) | INTERUNMASKED | PLOCTIMEON;
-      setSTATUS(status);
 
-      /* Wait for I/O */
-      WAIT ();
-    }
+  /* if the ready queue was empty and there are no more processes... */
+  if(procCnt == 0){
+    /* stop the machine */
+    HALT ();
+  }
+
+  /* if the ready queue was empty, there are still processes somewhere, and
+  none of them are soft blocked waiting for I/O... */
+  if(sftBlkCnt == 0){
+    /* Something is broken :( */
+    PANIC ();
+  }
+
+  /* if the ready queue was empty, there are still processes somewhere, and
+  processes that are soft blocked waiting for I/O is less than zero... */
+  if(sftBlkCnt > 0){
+    
+    /* We are about to begin waiting */
+    waiting = TRUE;
+
+    /* We want to make sure that interrupts are enabled when we enter our wait
+    state so we are not perpetually waiting. The magic number here is used to
+    move the INTERON value that sets IEp to instead set the IEc bit, which is
+    2 bits to the right of the IEp bit */
+    status = getSTATUS() | (INTERON >> 2) | INTERUNMASKED | PLOCTIMEON;
+    setSTATUS(status);
+
+    /* Wait for I/O */
+    WAIT ();
   }
 }
+
 /******************************************************************************/

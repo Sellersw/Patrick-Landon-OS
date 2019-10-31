@@ -2,6 +2,21 @@
 
 Module to handle interrupts. More words to follow.
 
+Determine what line the interrupt is on:
+    line 0: multi-core
+    line 1 & 2: clocks
+    line 3: disk device (8)
+    line 4: tape device (8)
+    line 5: network devices (8)
+    line 6: printer devices (8)
+    line 7: terminal devices (8)
+
+    Given the line number (3-7), determine which instance
+    of that device is generating the interrupt
+        - from this, should be able to determine the device's device
+        register
+        - and the index of the seme4 for that device.
+
 Written by: Patrick Sellers and Landon Clark
 
 *******************************************************************************/
@@ -27,37 +42,31 @@ HIDDEN device_t* getDeviceReg(int lineNo, int devNo);
 
 
 /********************INTERRUPT HANDLER*****************************************/
+
 void ioTrapHandler(){
+
+  /**************LOCAL VARIABLES**************/
   pcb_PTR blockedProc;
   cpu_t timeStart, timeEnd;
   devregarea_t *regArea;
   device_t *devReg;
   state_t *oldInt;
   unsigned int cause, status;
-  int lineNo, devNo, index, read;
-  int *semAdd;
+  int lineNo, devNo, index, read, *semAdd;
+  /*******************************************/
 
+  /* Record the time we enter the interrupt handler */
   STCK(timeStart);
 
-
-  /* Determine what line the interrupt is on:
-      line 0: multi-core
-      line 1 & 2: clocks
-      line 3: disk device (8)
-      line 4: tape device (8)
-      line 5: network devices (8)
-      line 6: printer devices (8)
-      line 7: terminal devices (8) */
-
-  /* Examine the Cause Register in OldINT (pg. 15) */
-
-
+  /* Grab the state prior to entering the interrupt */
   oldInt = (state_t *) INTEROLD;
-  regArea = (devregarea_t *) RAMBASEADDR;
 
+  /* Find the cause of the interrupt and use it to determine the device line
+  number which cause it */
   cause = oldInt->s_cause;
   lineNo = findLineNo(cause);
 
+  /* Handle each device that may cause an interrupt */
   switch(lineNo){
 
     /* We should be able to determine a valid line number. If we cannot, we will
@@ -66,44 +75,69 @@ void ioTrapHandler(){
       PANIC ();
       break;
 
+    /* Process a processor local interrupt. This means that currentProc's time
+    quantum is up, so we need to store it back on the readyQue */
     case PLOCINT:
+
+      /* Find the time which we are (almost) done processing this interrupt */
       STCK(timeEnd);
       if(currentProc != NULL){
-        ioProcTime = ioProcTime + (timeEnd - timeStart);
-        currentProc->p_time = currentProc->p_time + (timeEnd - startTOD) - ioProcTime;
+
+        /* Calculate the total time this process has spent in the ioTrapHandler
+        and removed this from the total time the process has been running */
+        ioProcTime += (timeEnd - timeStart);
+        currentProc->p_time += (timeEnd - startTOD) - ioProcTime;
+
+        /* Store the previous state of the currentProc in currentProc, insert
+        it back onto the readyQue, and prepare for re-entering the scheduler by
+        nullifying our currentProc */
         copyState(oldInt, &(currentProc->p_s));
         insertProcQ(&readyQue, currentProc);
         currentProc = NULL;
       }
 
       /* scheduler could also load a quantum into the processor local timer,
-      but inserting a time here will acknowledge the given interrupt */
+      but inserting a time here will acknowledge the given interrupt just to be
+      safe */
       setTIMER(QUANTUM);
       scheduler();
       break;
 
     case IVTIMINT:
+
+      /* Grab the semaphore address of the interval timer (the last semaphore
+      on our semDevArray) */
       semAdd = &(semDevArray[DEVICECNT-1]);
+
+      /* While processes are blocked on the interval timer, unblock them */
       while(headBlocked(semAdd) != NULL){
         blockedProc = removeBlocked(semAdd);
+
+        /* If we successfully unblocked a process from the interval timer, add
+        it to the readyQue and decrement the number of blockd processes */
         if(blockedProc != NULL){
           sftBlkCnt--;
           insertProcQ(&readyQue, blockedProc);
         }
       }
 
+      /* We have removed all the processes on the interval timer, so its
+      semaphore should be reset to 0 */
       (*semAdd) = 0;
 
+      /* Acknowledge the interval timer interrupt by storing another interval
+      value (100ms) in the timer */
       LDIT(INTERVAL);
       break;
 
-    /* Given the line number (3-7), determine which instance
-    of that device is generating the interrupt
-        - from this, should be able to determine the device's device
-        register
-        - and the index of the seme4 for that device. */
+    /* Handle an interrupt on a device line */
     default:
-      devNo = findDevNo(regArea->interrupt_dev[lineNo-3]);
+
+      /* Grab all the register information at the base of RAM. This will contain
+      information on which device caused the interrupt - which we can find by
+      accessing the interrupt_dev array in regArea */
+      regArea = (devregarea_t *) RAMBASEADDR;
+      devNo = findDevNo(regArea->interrupt_dev[lineNo-DEVINTOFFSET]);
 
       /* We should be able to determine the device number. If we cannot, we will
       consider this an error */
@@ -111,65 +145,103 @@ void ioTrapHandler(){
         PANIC ();
       }
 
-      /* Calculate address of device register */
+      /* Calculate address of the device register */
       devReg = getDeviceReg(lineNo, devNo);
 
       /* Handle terminal interrupt */
       if(lineNo == TERMINT){
-        if((devReg->t_recv_status & 0xFF) == 1){
+
+        /* If the read status of the terminal device is READY, then we have a
+        write interrupt to handle */
+        if((devReg->t_recv_status & STATUSMASK) == READY){
+
+          /* Grab the status of the terminal device, acknowledge the given
+          interrupt, and set read to FALSE for indexing purposes */
           status = devReg->t_transm_status;
           devReg->t_transm_command = ACK;
           read = FALSE;
         }
+
+        /* If the read status of the terminal is not READY, then we have a read
+        interrupt to handle */
         else{
+
+          /* Grab the status of the terminal device, acknowledge the given
+          interrupt, and set read to TRUE for indexing purposes */
           status = devReg->t_recv_status;
           devReg->t_recv_command = ACK;
           read = TRUE;
         }
 
-        index = (8*(lineNo-3)) + (2*devNo) + read;
+        /* Calculate the index of our device on our semDevArray. It is
+        imperative that this formula be identical to the formula found in the
+        waitio syscall function in our sysCallHandler */
+        index = (DEVCNT*(lineNo-DEVINTOFFSET)) + (TERMCNT*devNo) + read;
       }
 
-      /* Non-terminal device */
+      /* Handle non-terminal device interrupt */
       else{
+
+        /* Grab the status of our non-terminal device register and acknowledge
+        the given interrupt */
         status = devReg->d_status;
         devReg->d_command = ACK;
 
-        index = (8*(lineNo-3)) + devNo;
+        /* Calculate the index of our device on our semDevArray. Once again,
+        this formula needs to be consistent with non-terminal devices waited on
+        in our sysCallHandler */
+        index = (DEVCNT*(lineNo-DEVINTOFFSET)) + devNo;
       }
 
+      /* Find the location of our semaphore and increment its value as an
+      interrupt is considered a V operation on device semaphores */
       semAdd = &(semDevArray[index]);
       (*semAdd)++;
+
+      /* If we have processes blocked on our device semaphore, handle unblocking
+      them */
       if((*semAdd) <= 0){
         blockedProc = removeBlocked(semAdd);
+
+        /* If we have successfully unblocked a process, decrement the number of
+        blocked processes, store the device status value in our newly unblocked
+        process, and insert this process into the readyQue */
         if(blockedProc != NULL){
           sftBlkCnt--;
-          (blockedProc->p_s).s_v0 = (status & 0xFF);
+          (blockedProc->p_s).s_v0 = (status & STATUSMASK);
           insertProcQ(&readyQue, blockedProc);
         }
       }
+
+      /* If we did not have any processes blocked on this semaphore, return the
+      status value of the device register in the previously running state */
       else{
-        oldInt->s_v0 = (status & 0xFF);
+        oldInt->s_v0 = (status & STATUSMASK);
       }
       break;
     }
 
+  /* If the system is in the process of waiting, we do not want to load oldInt
+  as this will return us to waiting even though we may have newly unblocked
+  processes on the readyQue */
   if(waiting){
     scheduler();
   }
 
+  /* Calculate the total time spent in the interrupt handler before continuing
+  execution of prior process - this time will later be deducted from the total
+  time the process was active */
   STCK(timeEnd);
   ioProcTime = ioProcTime + (timeStart - timeEnd);
 
+  /* Return to the process running before the interrupt */
   LDST(oldInt);
 }
 
 /******************************************************************************/
 
 
-
 /***************************HELPER FUNCTIONS***********************************/
-
 
 /* Find interrupt line number */
 HIDDEN int findLineNo(unsigned int cause){
@@ -199,7 +271,7 @@ HIDDEN int findLineNo(unsigned int cause){
 }
 
 
-/* Find interrupt device number */
+/* Find interrupt device number using the interrupting line's device bitMap */
 HIDDEN int findDevNo(unsigned int bitMap){
   if((bitMap & DEV0) == DEV0){
     return 0;
@@ -227,10 +299,10 @@ HIDDEN int findDevNo(unsigned int bitMap){
   }
   /* devNo should be determinable, if not this is an error */
   return -1;
-
 }
 
 
+/* A simple helper function for copying the fields of one state to another */
 HIDDEN void copyState(state_t *orig, state_t *curr){
   int i;
   /* Copy state values over to new state */
@@ -245,7 +317,14 @@ HIDDEN void copyState(state_t *orig, state_t *curr){
   }
 }
 
+
+/* Return the device register at the given lineNo and devNo */
 HIDDEN device_t* getDeviceReg(int lineNo, int devNo){
+  /* See pg. 32 of pops for a more detailed explanation on these magic numbers.
+  The formula essentially calculates the address based on the base address of
+  the device registers (0x100000050) and uses some offsets to move through low
+  order memory (still in the device register area) to find the requested device
+  register */
   return (device_t *) (0x10000050 + ((lineNo-3) * 0x80) + (devNo*0x10));
 }
 
