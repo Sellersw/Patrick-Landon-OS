@@ -14,11 +14,6 @@ AUTHORS: Patrick Sellers and Landon Clark
 HIDDEN semd_PTR semdActive_h, semdFree_h;
 
 
-void debugO(int a){
-  5+5;
-}
-
-
 /*******************************HELPER FUNCTIONS**********************************/
 
 
@@ -149,7 +144,6 @@ semaphore (p→ p_semAdd) on the ASL. If ProcBlk pointed to by p does not appear
 in the process queue associated with p’s semaphore, which is an error condition,
 return NULL; otherwise, return p. */
 pcb_PTR outBlocked(pcb_PTR p){
-  debugO(1);
   pcb_PTR p_return;
   int *s_add = p->p_semAdd;
   semd_PTR s_prev, s_current;
