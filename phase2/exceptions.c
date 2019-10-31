@@ -99,6 +99,7 @@ void sysCallHandler(){
     progTrapHandler();
   }
 
+  /***********************HANDLE GIVEN CALL************************************/
   switch(call){
     /* Syscall 1: Creates a new child process for the currentProc */
     case CREATEPROCESS:
@@ -179,6 +180,7 @@ HIDDEN void copyState(state_t *orig, state_t *curr){
   }
 }
 
+
 /* A method that handles three different types of exceptions beyond sys 1-8
 (TLB, ProgramTrap, and SYS/Breakpoint). This will either terminate the process
 and its children when the selected trap state is not empty, or will load it into
@@ -198,6 +200,7 @@ HIDDEN void passUpOrDie(int type){
       break;
   }
 }
+
 
 /* A method to generalize the pass up or die process. Takes the values
 currentProc holds for its new and old trap handler of a given type as parameters
