@@ -1,21 +1,43 @@
 /*******************************INTERRUPTS.C************************************
 
-Module to handle interrupts. More words to follow.
+The I/O Handler will determine how we process an interrupt on a given device
+line. We use the system's device interrupt bitmap to determine which line the
+interrupt is on. Each of these lines corresponds to a specific resource in our
+system. The handling of each line is as follows:
 
 Determine what line the interrupt is on:
-    line 0: multi-core
-    line 1 & 2: clocks
-    line 3: disk device (8)
-    line 4: tape device (8)
-    line 5: network devices (8)
-    line 6: printer devices (8)
-    line 7: terminal devices (8)
 
-    Given the line number (3-7), determine which instance
-    of that device is generating the interrupt
-        - from this, should be able to determine the device's device
-        register
-        - and the index of the seme4 for that device.
+  NON-DEVICE::
+    Line 0: multi-core
+    Line 1 & 2: clocks
+
+      - A line 0 interrupt should not occur in our implementation of Kaya, so
+      we will cause a kernel panic if this line causes an interrupt
+      - Line 1 is the processor local time, so if we detect an interrupt on this
+      line, we know that the currentProc's quantum is up and thus we handle
+      putting it back on the readyQue
+      - Line 2 is the interval timer, and we know there could be some processes
+      blocked on the interval timer semaphore. Thus, we unblock any processes
+      and continue execution as normal
+
+  DEVICES::
+    Line 3: disk device (8)
+    Line 4: tape device (8)
+    Line 5: network devices (8)
+    Line 6: printer devices (8)
+    Line 7: terminal devices (8)
+
+      - From this, should be able to determine the device number of the
+      corresponding line, the device's device register, and the index of the
+      semaphore for that device
+      - If an interrupt on a device occurs, we treat this as a V on the given
+      device's semaphore, unblocking the next process off the semaphore and
+      adding that process to the readyQue
+      - We then return the status of the device which was interrupting
+
+It should be noted that if we are in the waiting state, then we will return
+control to the scheduler instead of the previously executing state. This will
+allow us to pull a process off of the readyQue instead of continuing to wait.
 
 Written by: Patrick Sellers and Landon Clark
 
@@ -66,7 +88,7 @@ void ioTrapHandler(){
   cause = oldInt->s_cause;
   lineNo = findLineNo(cause);
 
-  /* Handle each device that may cause an interrupt */
+  /******************HANDLE INTERRUPT FOR GIVEN LINE***************************/
   switch(lineNo){
 
     /* We should be able to determine a valid line number. If we cannot, we will
@@ -78,7 +100,6 @@ void ioTrapHandler(){
     /* Process a processor local interrupt. This means that currentProc's time
     quantum is up, so we need to store it back on the readyQue */
     case PLOCINT:
-
       /* Find the time which we are (almost) done processing this interrupt */
       STCK(timeEnd);
       if(currentProc != NULL){
@@ -103,8 +124,9 @@ void ioTrapHandler(){
       scheduler();
       break;
 
+    /* Interval timer interrupt. We treat this as a V on the interval timer, so
+    we unblock any processes blocked on the interval timer semaphore */
     case IVTIMINT:
-
       /* Grab the semaphore address of the interval timer (the last semaphore
       on our semDevArray) */
       semAdd = &(semDevArray[DEVICECNT-1]);
@@ -132,7 +154,6 @@ void ioTrapHandler(){
 
     /* Handle an interrupt on a device line */
     default:
-
       /* Grab all the register information at the base of RAM. This will contain
       information on which device caused the interrupt - which we can find by
       accessing the interrupt_dev array in regArea */
@@ -150,7 +171,6 @@ void ioTrapHandler(){
 
       /* Handle terminal interrupt */
       if(lineNo == TERMINT){
-
         /* If the read status of the terminal device is READY, then we have a
         write interrupt to handle */
         if((devReg->t_recv_status & STATUSMASK) == READY){
@@ -181,7 +201,6 @@ void ioTrapHandler(){
 
       /* Handle non-terminal device interrupt */
       else{
-
         /* Grab the status of our non-terminal device register and acknowledge
         the given interrupt */
         status = devReg->d_status;

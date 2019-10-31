@@ -4,7 +4,10 @@ Handles Syscall and Breakpoint exceptions when a corresponding assembler
 instruction is executed on the CPU. Kaya Operating System provides a number
 of syscall operations that are necessary for control flow. This module will
 cover the operations of these 8 processes, as well as decide how to handle any
-instructions with codes 9 and above.
+instructions with codes 9 and above. As well as Syscalls, we define how to
+handle TLB traps and program traps. When these two types of traps occur, we will
+check for a trap handler in our process, and if there is none, we will kill the
+corresponding process.
 
 Written by: Patrick Sellers and Landon Clark
 
@@ -82,11 +85,6 @@ void sysCallHandler(){
   status = oldSys->s_status;
   call = oldSys->s_a0;
 
-  /* Handle syscalls that are not yet defined */
-  if(call >= 9){
-    passUpOrDie(SYSTRAP);
-  }
-
   /* Check the KUp bit to determine if we were working in Kernel mode */
   if(((status & KERNELOFF) == KERNELOFF) && (call <= 8)){
 
@@ -152,6 +150,11 @@ void sysCallHandler(){
     case WAITIO:
       waitio(oldSys);
       break;
+
+    /* Handle syscalls that are not yet defined */
+    default:
+      passUpOrDie(SYSTRAP);
+      break;
   }
 }
 
@@ -177,7 +180,7 @@ HIDDEN void copyState(state_t *orig, state_t *curr){
 
 /* A method that handles three different types of exceptions beyond sys 1-8
 (TLB, ProgramTrap, and SYS/Breakpoint). This will either terminate the process
-and its children when the selected trap state is not empty, or will load it onto
+and its children when the selected trap state is not empty, or will load it into
 the CPU. */
 HIDDEN void passUpOrDie(int type){
   switch(type){
@@ -227,8 +230,10 @@ HIDDEN void createprocess(state_t *state){
   if(p == NULL){
     state->s_v0 = FAIL;
   }
+
   /* Handle successfully intiailized process */
   else{
+
     /* copy the state passed in at a1 into the PCB's state var, make it a child
     of the current process, and then insert it onto the process queue. */
     copyState((state_t *) state->s_a1, &(p->p_s));
@@ -255,34 +260,47 @@ HIDDEN void terminateprocess(pcb_PTR p){
     terminateprocess(removeChild(p));
   }
 
-  /* Handle removing the given process: */
+  /* Handle removing the currentProc: */
   if(p == currentProc){
+
+    /* Remove currentProc from its parents and nullify it */
     outChild(p);
     currentProc = NULL;
   }
 
   else if(outProcQ(&readyQue, p) == NULL){
     if(outBlocked(p) != NULL){
+
       /* Check to see if p's semaphore was a device semaphore */
       if((semAdd >= firstDevice) && (semAdd <= lastDevice)){
         sftBlkCnt--;
       }
+
+      /* If not a device semaphore, we should increment the semaphore as this
+      will not be done in the interrupt handler */
       else{
         (*semAdd)++;
       }
     }
   }
+  /* Decrement the process count as we are killing off a process, then put it
+  back onto the PCB free list */
   procCnt--;
   freePcb(p);
 }
 
 
 /* SYSCALL 3 helper function */
-/* SIGNAL */
 HIDDEN void V(state_t *state){
   pcb_PTR temp;
+
+  /* Grab our semaphore address that is passed in the a1 register and increment
+  it as this is how we signal our resources are available */
   int *sem = (int *) state->s_a1;
   (*sem)++;
+
+  /* If a process has been blocked on the given semaphore, unblock it, add it to
+  the readyQue, and decrement the number of blocked processes */
   if((*sem) <= 0){
     temp = removeBlocked(sem);
     if(temp != NULL){
@@ -296,23 +314,36 @@ HIDDEN void V(state_t *state){
 
 
 /* SYSCALL 4 helper function */
-/* WAIT */
 HIDDEN void P(state_t *state){
   cpu_t currTime;
+
+  /* Grab our semaphore address that is passed in the a1 register and decrement
+  it as this is how we wait on our shared resources */
   int *sem = (int *) state->s_a1;
   (*sem)--;
+
+  /* If the semaphore's value is less than 0, the corresponding resources are
+  not available and the currentProc needs to be blocked on the semaphore */
   if((*sem) < 0){
+
     /* Calculate time taken up in current quantum minus any time spent handling
     IO interrupts */
     STCK(currTime);
     currentProc->p_time += (currTime - startTOD) - ioProcTime;
+
+    /* Copy the state our currentProc had prior to entering into the
+    sysCallHandler into the state value of the currentProc. Then block
+    currentProc on the given semaphore, increment the count of blocked
+    processes, and nullify our currentProc value - initializing our return to
+    the scheduler */
     copyState(state, &(currentProc->p_s));
     insertBlocked(sem, currentProc);
     sftBlkCnt++;
     currentProc = NULL;
     scheduler();
   }
-  /* Return control to state that called this syscall */
+  /* If the shared resources are available, we can return control to state that
+  called this syscall */
   LDST(state);
 }
 
@@ -320,6 +351,11 @@ HIDDEN void P(state_t *state){
 /* SYSCALL 5 helper function */
 HIDDEN void spectrapvec(state_t *state){
   unsigned int type = (unsigned int) state->s_a1;
+
+  /* Depending on which type of trap vector we are attempting to set, we check
+  to see if a previous sys5 has been called. If not, we set the new and old trap
+  states of the corresponding type with the new and old values passed in a3 and
+  a2 respectively */
   switch(type){
     case TLBTRAP:
       if(currentProc->p_newTlb == NULL){
@@ -348,6 +384,7 @@ HIDDEN void spectrapvec(state_t *state){
       }
       break;
   }
+
   /* If the given trap type was already specified, terminate the running
   process */
   terminateprocess(currentProc);
@@ -358,6 +395,11 @@ HIDDEN void spectrapvec(state_t *state){
 /* SYSCALL 6 helper function */
 HIDDEN void getcputime(state_t *state){
   cpu_t currTime;
+
+  /* Grab the current TOD, calculate the difference between this value and the
+  time the process started, remove time for how long this process has spent in
+  the ioTrapHandler this quantum, and return this value plus the time the
+  process has run cummulatively in previous quantums */
   STCK(currTime);
   state->s_v0 = currentProc->p_time + (currTime - startTOD) - ioProcTime;
 
@@ -369,14 +411,26 @@ HIDDEN void getcputime(state_t *state){
 /* SYSCALL 7 helper function */
 HIDDEN void waitforclock(state_t *state){
   cpu_t currTime;
+
+  /* Grab the address of the interval timer semaphore and decrement its value as
+  this is how we inform the OS we are waiting on a semaphore */
   int *clockAdd = &(semDevArray[DEVICECNT-1]);
   (*clockAdd)--;
+
+  /* If the semaphore's value is less than 0, the corresponding resources are
+  not available and the currentProc needs to be blocked on the interval timer */
   if((*clockAdd) < 0){
     /* Calculate time taken up in current quantum minus any time spent handling
     IO interrupts */
     STCK(currTime);
     currentProc->p_time += (currTime - startTOD) - ioProcTime;
-    copyState(state, (state_t *) &(currentProc->p_s));
+
+    /* Copy the state our currentProc had prior to entering into the
+    sysCallHandler into the state value of the currentProc. Then block
+    currentProc on the interval timer, increment the count of blocked processes,
+    and nullify our currentProc value - initializing our return to the
+    scheduler */
+    copyState(state, &(currentProc->p_s));
     insertBlocked(clockAdd, currentProc);
     sftBlkCnt++;
     currentProc = NULL;
@@ -392,6 +446,9 @@ HIDDEN void waitio(state_t *state){
   cpu_t currTime;
   unsigned int lineNo, devNo, read, index;
   int *semAdd;
+
+  /* The lineNo, devNo, and read/write values are passed in a1, a2, and a3
+  respectively */
   lineNo = state->s_a1;
   devNo = state->s_a2;
   read = state->s_a3;
@@ -402,8 +459,9 @@ HIDDEN void waitio(state_t *state){
     scheduler();
   }
 
-  /* Determine the index of the device semaphore in device semaphore array */
-  /* Kinda some magic math here... */
+  /* Determine the index of the device semaphore in semDevArray. This formula is
+  consistent with the formulas used in the interrupt handler, so our P operation
+  here corresponds to a complementary V operation in our ioTrapHandler */
   if(lineNo != TERMINT){
     index = (DEVCNT*(lineNo-DEVINTOFFSET)) + devNo;
   }
@@ -411,13 +469,25 @@ HIDDEN void waitio(state_t *state){
     index = (DEVCNT*(lineNo-DEVINTOFFSET)) + (TERMCNT*devNo) + read;
   }
 
+  /* Grab the semaphore address of the given device semaphore and decrement its
+  value as this is how we inform the OS we are waiting on a semaphore*/
   semAdd = &(semDevArray[index]);
   (*semAdd)--;
+
+  /* If the semaphore's value is less than 0, the corresponding resources are
+  not available and the currentProc needs to be blocked on the given device */
   if((*semAdd) < 0){
+
     /* Calculate time taken up in current quantum minus any time spent handling
     IO interrupts */
     STCK(currTime);
     currentProc->p_time += (currTime - startTOD) - ioProcTime;
+
+    /* Copy the state our currentProc had prior to entering into the
+    sysCallHandler into the state value of the currentProc. Then block
+    currentProc on the given device semaphore, increment the count of blocked
+    processes, and nullify our currentProc value - initializing our return to
+    the scheduler */
     copyState(state, &(currentProc->p_s));
     insertBlocked(semAdd, currentProc);
     sftBlkCnt++;
