@@ -212,11 +212,9 @@ HIDDEN void pUoDHelper(state_t * new, state_t * old, memaddr trapLoc){
       terminateprocess(currentProc);
       scheduler();
     }
-    else{
-      trap = (state_t *) trapLoc;
-      copyState(trap, old);
-      LDST(new);
-    }
+  trap = (state_t *) trapLoc;
+  copyState(trap, old);
+  LDST(new);
 }
 
 /******************************************************************************/
