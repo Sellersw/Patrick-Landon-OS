@@ -307,7 +307,6 @@ HIDDEN void V(state_t *state){
     temp = removeBlocked(sem);
     if(temp != NULL){
       insertProcQ(&readyQue, temp);
-      sftBlkCnt--;
     }
   }
   /* Return control to state that called this syscall */
