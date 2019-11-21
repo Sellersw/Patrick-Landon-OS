@@ -77,10 +77,6 @@ void sysCallHandler(){
   /* Grab the state which was responsible for calling the syscall */
   oldSys = (state_t *) SYSCALLOLD;
 
-  /* We need to make sure we do not return to the instruction that brought
-  about this syscall */
-  oldSys->s_pc = oldSys->s_pc + WORDLEN;
-
   /* Grab relevant information from oldSys registers about who is making the
   call and what the call is */
   status = oldSys->s_status;
@@ -98,6 +94,10 @@ void sysCallHandler(){
     oldPgm->s_cause = (oldPgm->s_cause & CAUSEREGMASK) | RESERVEDINSTR;
     progTrapHandler();
   }
+
+  /* We need to make sure we do not return to the instruction that brought
+  about this syscall */
+  oldSys->s_pc = oldSys->s_pc + WORDLEN;
 
   /***********************HANDLE GIVEN CALL************************************/
   switch(call){
@@ -340,7 +340,6 @@ HIDDEN void P(state_t *state){
     the scheduler */
     copyState(state, &(currentProc->p_s));
     insertBlocked(sem, currentProc);
-    sftBlkCnt++;
     currentProc = NULL;
     scheduler();
   }
