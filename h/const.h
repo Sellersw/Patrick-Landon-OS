@@ -152,6 +152,10 @@
 #define RESET		0
 #define ACK		1
 
+
+
+#define MAXUPROC 8
+
 /* operations */
 #define	MIN(A,B)	((A) < (B) ? A : B)
 #define MAX(A,B)	((A) < (B) ? B : A)
