@@ -93,6 +93,7 @@ typedef struct semd_t{
 
 #define KUSEGPTESIZE	32
 #define KSEGOSPTESIZE	64
+#define UPROCCNT 8
 #define TRAPTYPES 3
 
 
@@ -111,10 +112,11 @@ typedef struct pteOS_t{
 	pteEntry_t pteTable[KSEGOSPTESIZE];
 } pteOS_t;
 
+
 typedef struct segTable_t{
-	pteOS_t 	*ksegOS;
-	pte_t 		*kUseg2;
-	pte_t 		*kUseg3;
+	pteOS_t 	*st_ksegOS;
+	pte_t 		*st_kUseg2;
+	pte_t 		*st_kUseg3;
 } segTable_t;
 
 
