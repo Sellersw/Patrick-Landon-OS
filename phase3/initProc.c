@@ -20,6 +20,11 @@ extern void pager();
 extern void userProgTrapHandler();
 
 
+void diskIO(int sector, int cyl, int head, int *sem, device_t* disk, memaddr memBuf, int command);
+void tapeToDisk(int asid);
+void uProcInit();
+
+
 /* Global semaphore for phase 3. Initialize to 1 as they are for mutex */
 int swapPoolSem, devSemArray[DEVICECNT];
 
