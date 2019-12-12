@@ -99,7 +99,7 @@ void test(){
 
 
     segmentTable->st_ksegOS = &ksegOS;
-    segmentTable->st_kUseg2[i-1] = &(uProcs[i-1].t_pte);
+    segmentTable->st_kUseg2 = &(uProcs[i-1].t_pte);
     segmentTable->st_kUseg3 = &kUseg3;
 
 
