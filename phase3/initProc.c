@@ -20,6 +20,7 @@ extern void pager();
 extern void userProgTrapHandler();
 
 
+HIDDEN void copyState(state_t *orig, state_t *curr);
 void diskIO(int sector, int cyl, int head, int *sem, device_t* disk, memaddr memBuf, int command);
 void tapeToDisk(int asid);
 void uProcInit();
@@ -149,7 +150,7 @@ void uProcInit(){
         state.s_pc = state.s_t9 = (memaddr) userSyscallHandler;
         break;
     }
-    uProcs[asid-1].t_newTrap[i] = state;
+    copyState(&state, &(uProcs[asid-1].t_newTrap[i]));
     SYSCALL(SPECTRAPVEC, i, &(uProcs[asid-1].t_oldTrap[i]), &(uProcs[asid-1].t_newTrap[i]));
   }
 
@@ -242,5 +243,21 @@ HIDDEN void disableInts(int disable){
   else{
     status = getSTATUS() | (INTERON >> 2) + (INTERUNMASKED);
     setSTATUS(status);
+  }
+}
+
+
+/* A simple helper function for copying the fields of one state to another */
+HIDDEN void copyState(state_t *orig, state_t *curr){
+  int i;
+  /* Copy state values over to new state */
+  curr->s_asid = orig->s_asid;
+  curr->s_cause = orig->s_cause;
+  curr->s_status = orig->s_status;
+  curr->s_pc = orig->s_pc;
+
+  /* Copy previous register vaules to new state registers */
+  for(i = 0; i < STATEREGNUM; i++){
+    curr->s_reg[i] = orig->s_reg[i];
   }
 }

@@ -157,8 +157,8 @@ asl.o: ../phase1/asl.c $(DEFS)
 pcb.o: ../phase1/pcb.c $(DEFS)
 	$(CC) $(CFLAGS) ../phase1/pcb.c
 
-crti.o: crti.s
- 	$(AS) crti.s -o crti.o
+#crti.o: crti.s
+# 	$(AS) crti.s -o crti.o
 
 
 clean:
