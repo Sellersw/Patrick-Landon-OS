@@ -27,6 +27,9 @@ disk0.umps:
 disk1.umps:
 	$(UDEV) -d disk1.umps
 
+strConcatTape.umps: strConcat_t.aout.umps
+	$(UDEV) -t strConcatTape.umps strConcat_t.aout.umps
+
 readTape.umps: read_t.aout.umps
 	$(UDEV) -t readTape.umps read_t.aout.umps
 
