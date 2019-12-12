@@ -9,9 +9,9 @@ Authors: Landon Clark and Patrick Sellers
 
 */
 
-#include "/usr/local/include/umps2/umps/libumps.e"
 #include "../h/types.h"
 #include "../h/const.h"
+#include "/usr/local/include/umps2/umps/libumps.e"
 /*#include "../e/exception.e"*/
 
 
@@ -42,7 +42,7 @@ swapPool_t swapPool[POOLSIZE];
 
 /* Main process thread of Kaya OS */
 void test(){
-  int i, j;
+  int i, j, status;
   state_t state;
   segTable_t *segmentTable;
 
@@ -99,7 +99,7 @@ void test(){
 
 
     segmentTable->st_ksegOS = &ksegOS;
-    segmentTable->st_kUseg2[i-1] = &(uProcs[i-1].Tp_pte);
+    segmentTable->st_kUseg2[i-1] = &(uProcs[i-1].t_pte);
     segmentTable->st_kUseg3 = &kUseg3;
 
 
@@ -110,7 +110,11 @@ void test(){
     state.s_status = VMNOTON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELON;
 
 
-    status = SYSCALL(CREATEPROCESS, &state, 0, 0);
+    status = SYSCALL(CREATEPROCESS, (int) &state, 0, 0);
+
+    if(status != SUCCESS){
+      SYSCALL(TERMINATEPROCESS, 0, 0, 0);
+    }
   }
 
   for(i = 0; i < MAXUPROC; i++){
