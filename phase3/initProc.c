@@ -9,6 +9,7 @@ Authors: Landon Clark and Patrick Sellers
 
 */
 
+#include "/usr/local/include/umps2/umps/libumps.e"
 #include "../h/types.h"
 #include "../h/const.h"
 /*#include "../e/exception.e"*/
