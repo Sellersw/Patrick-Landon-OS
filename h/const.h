@@ -153,6 +153,16 @@
 #define ACK		1
 
 
+#define EOT 0
+#define EOF 1
+#define EOB 2
+
+
+#define SEEKCYL 2
+#define READBLK 3
+#define WRITEBLK 4
+
+
 #define MAXPAGES 32
 #define MAXUPROC 8
 #define POOLSIZE MAXUPROC*2

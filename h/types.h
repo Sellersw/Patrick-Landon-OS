@@ -121,11 +121,11 @@ typedef struct segTable_t{
 
 
 typedef struct Tproc_t {
-	int			Tp_sem;
-	pte_t		Tp_pte;
-	int			Tp_backStoreAddr;
-	state_t		Tnew_trap[TRAPTYPES];
-	state_t		Told_trap[TRAPTYPES];
+	int			t_sem;
+	pte_t		t_pte;
+	int			t_backStoreAddr;
+	state_t		t_newTrap[TRAPTYPES];
+	state_t		t_oldTrap[TRAPTYPES];
 } Tproc_t, *Tproc_PTR;
 
 typedef struct swapPool_t {

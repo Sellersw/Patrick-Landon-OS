@@ -14,6 +14,11 @@ Authors: Landon Clark and Patrick Sellers
 /*#include "../e/exception.e"*/
 
 
+extern void userSyscallHandler();
+extern void pager();
+extern void userProgTrapHandler();
+
+
 /* Global semaphore for phase 3. Initialize to 1 as they are for mutex */
 int swapPoolSem, devSemArray[DEVICECNT];
 
@@ -24,8 +29,6 @@ int masterSem;
 pteOS_t ksegOS;
 pte_t kUseg3;
 
-segTable_t *segmentTable;
-
 Tproc_t uProcs[MAXUPROC];
 
 swapPool_t swapPool[POOLSIZE];
@@ -35,9 +38,7 @@ swapPool_t swapPool[POOLSIZE];
 void test(){
   int i, j;
   state_t state;
-
-
-  segmentTable = (segTable_t *) SEGTABLESTART;
+  segTable_t *segmentTable;
 
 
   masterSem = 0;
@@ -58,14 +59,14 @@ void test(){
 
 
 
-  ksegOS.header = MAGNO;
-  kUseg3.header = MAGNO;
+  ksegOS.header = (MAGNO << 24) | KSEGOSPTESIZE;
+  kUseg3.header = (MAGNO << 24) | KUSEGPTESIZE;
 
 
 
   for(i = 0; i < KSEGOSPTESIZE; i++){
     ksegOS.pteTable[i].pte_entryHi = ((0x20000 + i) << 12);
-    ksegOS.pteTable[i].pte_entryLo = ((0x20000 + i) << 12) + (0x7 << 8);
+    ksegOS.pteTable[i].pte_entryLo = ((0x20000 + i) << 12) | (0x7 << 8);
   }
 
 
@@ -78,19 +79,22 @@ void test(){
 
 
   for(i = 1; i < MAXUPROC+1; i++){
-    uProcs[i-1].Tp_pte.header = MAGNO;
+    segmentTable = (segTable_t *) SEGTABLESTART + (i*12);
+
+    uProcs[i-1].t_pte.header = (MAGNO << 24) | KUSEGPTESIZE;
 
     for(j = 0; j < MAXPAGES; j++){
-      uProcs[i-1].Tp_pte.pteTable[j].pte_entryHi = ((0x80000 + j) << 12) + (i << 6);
-      uProcs[i-1].Tp_pte.pteTable[j].pte_entryLo = (0x1 << 10);
+      uProcs[i-1].t_pte.pteTable[j].pte_entryHi = ((0x80000 + j) << 12) | (i << 6);
+      uProcs[i-1].t_pte.pteTable[j].pte_entryLo = (0x1 << 10);
     }
 
-    uProcs[i-1].Tp_pte.pteTable[MAXPAGES-1].pte_entryHi = (0xBFFFF << 12) + (i << 6);
+    uProcs[i-1].t_pte.pteTable[MAXPAGES-1].pte_entryHi = (0xBFFFF << 12) | (i << 6);
+    uProcs[i-1].t_sem = 0;
 
 
-    segmentTable[i-1].st_ksegOS = &ksegOS;
-    segmentTable[i-1].st_kUseg2[i-1] = &(uProcs[i-1].Tp_pte);
-    segmentTable[i-1].st_kUseg3 = &kUseg3;
+    segmentTable->st_ksegOS = &ksegOS;
+    segmentTable->st_kUseg2[i-1] = &(uProcs[i-1].Tp_pte);
+    segmentTable->st_kUseg3 = &kUseg3;
 
 
 
@@ -135,9 +139,90 @@ void uProcInit(){
         state.s_pc = state.s_t9 = (memaddr) userSyscallHandler;
         break;
     }
-    uProcs[asid-1].Tnew_trap[i] = state;
-    SYSCALL(SPECTRAPVEC, i, &(uProcs[asid-1].Told_trap[i]), &(uProcs[asid-1].Tnew_trap[i]));
+    uProcs[asid-1].t_newTrap[i] = state;
+    SYSCALL(SPECTRAPVEC, i, &(uProcs[asid-1].t_oldTrap[i]), &(uProcs[asid-1].t_newTrap[i]));
   }
 
+  tapeToDisk(asid);
 
+
+  state.s_asid = asid;
+  state.s_sp = 0xC0000000;
+  state.s_status = VMON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELOFF;
+  state.s_pc = state.s_t9 = 0x800000B0;
+}
+
+
+
+HIDDEN device_t* getDeviceReg(int lineNo, int devNo){
+  /* See pg. 32 of pops for a more detailed explanation on these magic numbers.
+  The formula essentially calculates the address based on the base address of
+  the device registers (0x100000050) and uses some offsets to move through low
+  order memory (still in the device register area) to find the requested device
+  register */
+  return (device_t *) (0x10000050 + ((lineNo-3) * 0x80) + (devNo*0x10));
+}
+
+
+
+void tapeToDisk(int asid){
+  int status, i;
+  memaddr tapeBuf;
+
+  device_t *tapeReg = getDeviceReg(TAPEINT, asid-1);
+  device_t *diskReg = getDeviceReg(DISKINT, 0);
+
+  tapeBuf = TAPEDMABUFFER + ((asid-1)*PAGESIZE);
+
+  i = 0;
+
+  while((tapeReg->d_data1 != EOT) && (tapeReg->d_data1 != EOF)){
+
+    tapeReg->d_data0 = tapeBuf;
+    tapeReg->d_command = READBLK;
+
+    status = SYSCALL(WAITIO, TAPEINT, asid-1, 0);
+
+    if(status != SUCCESS){
+      SYSCALL(TERMINATEPROCESS, 0, 0, 0);
+    }
+
+    diskIO(asid-1, i, 0, &devSemArray[(DEVCNT*(DISKINT-DEVINTOFFSET))], diskReg, tapeBuf, WRITEBLK);
+    i++;
+  }
+}
+
+
+void diskIO(int sector, int cyl, int head, int *sem, device_t* disk, memaddr memBuf, int command){
+  int status;
+
+  SYSCALL(PASSEREN, sem, 0, 0);
+
+  disk->d_command = (cyl << 8) | SEEKCYL;
+
+  status = SYSCALL(WAITIO, DISKINT, sector-1, 0);
+
+  if(status != SUCCESS){
+    SYSCALL(TERMINATEPROCESS, 0, 0, 0);
+  }
+
+  disk->d_data0 = memBuf;
+  disk->d_command = (head << 16) | (sector << 8) | command;
+
+  SYSCALL(VERHOGEN, sem, 0, 0);
+}
+
+
+
+
+HIDDEN void disableInts(int disable){
+  unsigned int status;
+  if(disable == TRUE){
+    status = getSTATUS() & 0xFFFF00FE;
+    setSTATUS(status);
+  }
+  else{
+    status = getSTATUS() | (INTERON >> 2) + (INTERUNMASKED);
+    setSTATUS(status);
+  }
 }
