@@ -150,6 +150,8 @@ void uProcInit(){
   state.s_sp = 0xC0000000;
   state.s_status = VMON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELOFF;
   state.s_pc = state.s_t9 = 0x800000B0;
+
+  LDST(&state);
 }
 
 
@@ -208,6 +210,12 @@ void diskIO(int sector, int cyl, int head, int *sem, device_t* disk, memaddr mem
 
   disk->d_data0 = memBuf;
   disk->d_command = (head << 16) | (sector << 8) | command;
+
+  status = SYSCALL(WAITIO, DISKINT, sector-1, 0);
+
+  if(status != SUCCESS){
+    SYSCALL(TERMINATEPROCESS, 0, 0, 0);
+  }
 
   SYSCALL(VERHOGEN, sem, 0, 0);
 }

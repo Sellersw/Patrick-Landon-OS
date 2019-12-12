@@ -5,14 +5,14 @@ INCDIR = /usr/local/include/umps2/umps
 SUPDIR = /usr/local/share/umps2
 LIBDIR = /usr/local/lib/umps2
 
-DEFS = ../h/const.h ../h/types.h ../e/pcb.e ../e/asl.e ../e/initial.e ../e/interrupts.e ../e/scheduler.e ../e/exceptions.e ../e/adl.e ../e/initProc.e ../e/vmIOsupport.e ../e/avsl.e $(INCDIR)/libumps.e Makefile
+DEFS = ../h/const.h ../h/types.h ../e/pcb.e ../e/asl.e ../e/initial.e ../e/interrupts.e ../e/scheduler.e ../e/exceptions.e ../e/initProc.e ../e/vmIOsupport.e $(INCDIR)/libumps.e Makefile
 
 TDEFS = ./testers/print.e ./testers/h/tconst.h ../h/const.h ../h/types.h $(INCDIR)/libumps.e Makefile
 
 CFLAGS = -ansi -pedantic -Wall -c
 LDAOUTFLAGS = -T $(SUPDIR)/elf32ltsmip.h.umpsaout.x
 LDCOREFLAGS =  -T $(SUPDIR)/elf32ltsmip.h.umpscore.x
-CC = mipsel-linux-gcc 
+CC = mipsel-linux-gcc
 LD = mipsel-linux-ld
 AS = mipsel-linux-as -KPIC
 EF = umps2-elf2umps
@@ -131,7 +131,7 @@ kernel.core.umps: kernel
 	$(EF) -k kernel
 
 kernel: initial.o interrupts.o scheduler.o exceptions.o asl.o pcb.o adl.o avsl.o vmIOsupport.o initProc.o
-	$(LD) $(LDCOREFLAGS) $(LIBDIR)/crtso.o initial.o interrupts.o scheduler.o exceptions.o asl.o pcb.o adl.o avsl.o vmIOsupport.o initProc.o $(LIBDIR)/libumps.o -o kernel
+	$(LD) $(LDCOREFLAGS) $(LIBDIR)/crtso.o initial.o interrupts.o scheduler.o exceptions.o asl.o pcb.o vmIOsupport.o initProc.o $(LIBDIR)/libumps.o -o kernel
 
 initProc.o: initProc.c $(DEFS)
 	$(CC) $(CFLAGS) initProc.c
@@ -139,24 +139,18 @@ initProc.o: initProc.c $(DEFS)
 vmIOsupport.o: vmIOsupport.c $(DEFS)
 	$(CC) $(CFLAGS) vmIOsupport.c
 
-avsl.o: avsl.c $(DEFS)
-	$(CC) $(CFLAGS) avsl.c
-
-adl.o: adl.c $(DEFS)
-	$(CC) $(CFLAGS) adl.c
-
 initial.o: ../phase2/initial.c $(DEFS)
 	$(CC) $(CFLAGS) ../phase2/initial.c
 
 interrupts.o: ../phase2/interrupts.c $(DEFS)
 	$(CC) $(CFLAGS) ../phase2/interrupts.c
- 
+
 scheduler.o: ../phase2/scheduler.c $(DEFS)
 	$(CC) $(CFLAGS) ../phase2/scheduler.c
 
 exceptions.o: ../phase2/exceptions.c $(DEFS)
 	$(CC) $(CFLAGS) ../phase2/exceptions.c
- 
+
 asl.o: ../phase1/asl.c $(DEFS)
 	$(CC) $(CFLAGS) ../phase1/asl.c
 
