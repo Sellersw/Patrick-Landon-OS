@@ -131,7 +131,7 @@ kernel.core.umps: kernel
 	$(EF) -k kernel
 
 kernel: initial.o interrupts.o scheduler.o exceptions.o asl.o pcb.o vmIOsupport.o initProc.o
-	$(LD) $(LDCOREFLAGS) $(LIBDIR)/crtso.o initial.o interrupts.o scheduler.o exceptions.o asl.o pcb.o vmIOsupport.o initProc.o $(LIBDIR)/libumps.o -o kernel
+	$(CC) $(LDCOREFLAGS) $(LIBDIR)/crtso.o initial.o interrupts.o scheduler.o exceptions.o asl.o pcb.o vmIOsupport.o initProc.o $(LIBDIR)/libumps.o -o kernel
 
 initProc.o: initProc.c $(DEFS)
 	$(CC) $(CFLAGS) initProc.c
