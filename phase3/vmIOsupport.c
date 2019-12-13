@@ -1,7 +1,7 @@
 
 
-void debugOMICRON(){
-  return;
+void debugOMICRON(int a){
+  a + 5;
 }
 
 

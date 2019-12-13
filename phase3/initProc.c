@@ -19,7 +19,7 @@ extern void userSyscallHandler();
 extern void pager();
 extern void userProgTrapHandler();
 
-extern void debugOMICRON();
+extern void debugOMICRON(int a);
 
 void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf, int command);
 void tapeToDisk(int asid);
@@ -193,6 +193,8 @@ void tapeToDisk(int asid){
 
     tapeReg->d_data0 = tapeBuf;
     tapeReg->d_command = READBLK;
+
+    debugOMICRON(5);
     status = SYSCALL(WAITIO, TAPEINT, (asid-1), 0);
 
 
