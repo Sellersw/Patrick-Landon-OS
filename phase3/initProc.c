@@ -24,6 +24,7 @@ extern void debugOMICRON(int a);
 void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf, int command);
 void tapeToDisk(int asid);
 void uProcInit();
+void disableInts(int disable);
 
 
 /* Global semaphore for phase 3. Initialize to 1 as they are for mutex */
@@ -161,7 +162,6 @@ void uProcInit(){
   state.s_status = VMON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELOFF;
   state.s_pc = state.s_t9 = 0x800000B0;
 
-  debugOMICRON(asid);
   LDST(&state);
 }
 

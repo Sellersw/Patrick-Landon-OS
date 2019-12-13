@@ -42,6 +42,9 @@
 #define RESERVEDINSTR (10 << 2)
 #define CAUSEREGMASK 0xFFFFFF00
 
+#define TLBINVSW 2
+#define TLBINVLW 3
+
 /* exception pending line number mnemonics */
 #define LINE0 0x00000100
 #define LINE1 0x00000200
@@ -182,6 +185,10 @@
 #define UPROCSTACK KSEGOSEND-(((MAXUPROC*3)-1)*PAGESIZE)
 #define DISKDMABUFFER UPROCSTACK-(DISKFRAMES*PAGESIZE)
 #define TAPEDMABUFFER DISKDMABUFFER-(TAPEFRAMES*PAGESIZE)
+
+
+#define KUSEG2NO 0x10
+#define KUSEG3NO 0x11
 
 
 /* operations */
