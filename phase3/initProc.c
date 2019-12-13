@@ -56,6 +56,7 @@ void test(){
     devSemArray[i] = 1;
   }
 
+
   for(i = 0; i < POOLSIZE; i++){
     swapPool[i].asid = -1;
     swapPool[i].segNo = 0;
@@ -63,21 +64,28 @@ void test(){
     swapPool[i].pteEntry = NULL;
   }
 
+
   ksegOS.header = (MAGNO << 24) | KSEGOSPTESIZE;
   kUseg3.header = (MAGNO << 24) | KUSEGPTESIZE;
+
+
 
   for(i = 0; i < KSEGOSPTESIZE; i++){
     ksegOS.pteTable[i].pte_entryHi = ((0x20000 + i) << 12);
     ksegOS.pteTable[i].pte_entryLo = ((0x20000 + i) << 12) | (0x7 << 8);
   }
 
+
+
   for(i = 0; i < KUSEGPTESIZE; i++){
     kUseg3.pteTable[i].pte_entryHi = ((0xC0000 + i) << 12);
     kUseg3.pteTable[i].pte_entryLo = (0x5 << 8);
   }
 
+
+
   for(i = 1; i < MAXUPROC+1; i++){
-    segmentTable = (segTable_t *) SEGTABLESTART + (i*12);
+    segmentTable = (segTable_t *) SEGTABLESTART + ((i-1)*12);
 
     uProcs[i-1].t_pte.header = (MAGNO << 24) | KUSEGPTESIZE;
 
@@ -111,6 +119,10 @@ void test(){
 
   SYSCALL(TERMINATEPROCESS, 0, 0, 0);
 }
+
+
+
+
 
 void uProcInit(){
   int asid, i;
