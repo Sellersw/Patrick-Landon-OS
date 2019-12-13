@@ -131,6 +131,8 @@ void uProcInit(){
   int asid, i;
   state_t state;
 
+  debugOMICRON(asid);
+
   asid = getENTRYHI();
   asid = (asid << 20);
   asid = (asid >> 26);
