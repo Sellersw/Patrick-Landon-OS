@@ -224,6 +224,7 @@ void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf
   SYSCALL(VERHOGEN, sem, 0, 0);
 }
 
+/* A helper function to disable interrupts at important points in VM functions.*/
 void disableInts(int disable){
   unsigned int status;
   if(disable == TRUE){
