@@ -21,7 +21,6 @@ extern void userProgTrapHandler();
 
 extern void debugOMICRON(int a);
 
-HIDDEN void copyState(state_t *orig, state_t *curr);
 void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf, int command);
 void tapeToDisk(int asid);
 void uProcInit();
@@ -131,7 +130,9 @@ void uProcInit(){
   int asid, i;
   state_t state, *newState;
 
-  debugOMICRON(asid);
+  debugOMICRON((memaddr) pager);
+  debugOMICRON((memaddr) userProgTrapHandler);
+  debugOMICRON((memaddr) userSyscallHandler);
 
   asid = getENTRYHI();
   asid = (asid << 20);
@@ -197,10 +198,13 @@ void tapeToDisk(int asid){
 
   while((tapeReg->d_data1 != EOT) && (tapeReg->d_data1 != EOF)){
 
+    disableInts(TRUE);
+
     tapeReg->d_data0 = tapeBuf;
     tapeReg->d_command = READBLK;
-
     status = SYSCALL(WAITIO, TAPEINT, asid-1, 0);
+
+    disableInts(FALSE);
 
     if(status != SUCCESS){
       SYSCALL(TERMINATEPROCESS, 0, 0, 0);
@@ -257,21 +261,5 @@ HIDDEN void disableInts(int disable){
   else{
     status = getSTATUS() | (INTERON >> 2) | (INTERUNMASKED);
     setSTATUS(status);
-  }
-}
-
-
-/* A simple helper function for copying the fields of one state to another */
-HIDDEN void copyState(state_t *orig, state_t *curr){
-  int i;
-  /* Copy state values over to new state */
-  curr->s_asid = orig->s_asid;
-  curr->s_cause = orig->s_cause;
-  curr->s_status = orig->s_status;
-  curr->s_pc = orig->s_pc;
-
-  /* Copy previous register vaules to new state registers */
-  for(i = 0; i < STATEREGNUM; i++){
-    curr->s_reg[i] = orig->s_reg[i];
   }
 }
