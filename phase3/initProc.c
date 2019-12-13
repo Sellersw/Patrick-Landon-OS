@@ -65,27 +65,25 @@ void test(){
   }
 
 
+
+
   ksegOS.header = (MAGNO << 24) | KSEGOSPTESIZE;
-  kUseg3.header = (MAGNO << 24) | KUSEGPTESIZE;
-
-
-
   for(i = 0; i < KSEGOSPTESIZE; i++){
     ksegOS.pteTable[i].pte_entryHi = ((0x20000 + i) << 12);
     ksegOS.pteTable[i].pte_entryLo = ((0x20000 + i) << 12) | (0x7 << 8);
   }
 
-
-
+/*
+  kUseg3.header = (MAGNO << 24) | KUSEGPTESIZE;
   for(i = 0; i < KUSEGPTESIZE; i++){
     kUseg3.pteTable[i].pte_entryHi = ((0xC0000 + i) << 12);
     kUseg3.pteTable[i].pte_entryLo = (0x5 << 8);
   }
-
+*/
 
 
   for(i = 1; i < MAXUPROC+1; i++){
-    segmentTable = (segTable_t *) SEGTABLESTART + ((i-1)*12);
+    segmentTable = (segTable_t *) (SEGTABLESTART + (i*12));
 
     uProcs[i-1].t_pte.header = (MAGNO << 24) | KUSEGPTESIZE;
 
@@ -99,7 +97,7 @@ void test(){
 
     segmentTable->st_ksegOS = &ksegOS;
     segmentTable->st_kUseg2 = &(uProcs[i-1].t_pte);
-    segmentTable->st_kUseg3 = &kUseg3;
+    /*segmentTable->st_kUseg3 = &kUseg3;*/
 
     state.s_asid = i << 6;
     state.s_sp = UPROCSTACK + (((i-1)*TRAPTYPES)*PAGESIZE);
@@ -154,9 +152,9 @@ void uProcInit(){
   tapeToDisk(asid);
 
   state.s_asid = asid << 6;
-  state.s_sp = 0xC0000000;
+  state.s_sp = (memaddr) 0xC0000000;
   state.s_status = VMON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELOFF;
-  state.s_pc = state.s_t9 = 0x800000B0;
+  state.s_pc = state.s_t9 = (memaddr) 0x800000B0;
 
   LDST(&state);
 }

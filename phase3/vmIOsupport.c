@@ -1,12 +1,12 @@
 /*********************************VMIOSUPPORT*********************************
- * 
+ *
  * This module is a handler for supporting Translation Lookaside Buffer
  * (TLB) page fault exceptions caused by the implementation of Virtual Memory.
  * Additionally, it handles user-level syscalls that comprise syscodes
  * 9 and above.
- * 
- * Written by: Landon Clark and Patrick Sellers 
- * 
+ *
+ * Written by: Landon Clark and Patrick Sellers
+ *
  * **************************************************************************/
 
 #include "../h/types.h"
@@ -75,12 +75,14 @@ void pager(){
     vPageNo = KUSEGPTESIZE - 1;
   }
 
+/*
   if(segment == KUSEG3NO){
     if(kUseg3.pteTable[vPageNo].pte_entryLo & (0x2 << 8) == (0x2 << 8)){
       SYSCALL(VERHOGEN, (int) &swapPoolSem, 0, 0);
       LDST(oldTLB);
     }
   }
+*/
 
   debugOMICRON(15);
 
@@ -139,7 +141,7 @@ void pager(){
 
 
 void userProgTrapHandler(){
-
+  SYSCALL(TERMINATEPROCESS, 0, 0, 0);
 }
 
 
