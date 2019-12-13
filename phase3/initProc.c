@@ -188,7 +188,7 @@ void tapeToDisk(int asid){
 
   i = 0;
 
-  debugOMICRON(4);
+  debugOMICRON(tapeReg->d_data1);
   while((tapeReg->d_data1 != EOT) && (tapeReg->d_data1 != EOF)){
 
 
