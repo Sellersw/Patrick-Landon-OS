@@ -7,7 +7,7 @@
 
 
 
-HIDDEN int getFrame()
+HIDDEN int getFrame();
 
 
 
@@ -93,8 +93,6 @@ void pager(){
 
     diskIO((swapPool[frameNo].asid)-1, swapPageNo, 0, disk0sem, swapLoc, WRITEBLK);
   }
-
-  debugOMICRON(3);
 
   diskIO(asid-1, vPageNo, 0, disk0sem, swapLoc, READBLK);
 
