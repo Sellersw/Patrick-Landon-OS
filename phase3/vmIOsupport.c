@@ -15,7 +15,7 @@ void userSyscallHandler(){
 
 void pager(){
 
-  debugOMICRON();
+  debugOMICRON(3);
 
 }
 
