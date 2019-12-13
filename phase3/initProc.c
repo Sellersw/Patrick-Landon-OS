@@ -218,7 +218,7 @@ void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf
   int status;
   device_t *disk = getDeviceReg(DISKINT, diskNum);
 
-  debugOMICRON(2);
+  debugOMICRON(sector);
 
   SYSCALL(PASSEREN, sem, 0, 0);
 
