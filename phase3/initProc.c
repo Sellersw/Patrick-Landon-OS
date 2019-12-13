@@ -240,11 +240,11 @@ void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf
 
   disableInts(FALSE);
 
+  debugOMICRON(status);
   if(status != READY){
     SYSCALL(TERMINATEPROCESS, 0, 0, 0);
   }
 
-  debugOMICRON(7);
   SYSCALL(VERHOGEN, sem, 0, 0);
 }
 
