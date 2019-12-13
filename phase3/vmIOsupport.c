@@ -85,6 +85,9 @@ void pager(){
   vPageNo = missingPage = (oldTLB->s_asid & 0x3FFFF000) >> 12;
 
 
+  debugOMICRON(segment);
+
+
   if(missingPage >= KUSEGPTESIZE){
     vPageNo = KUSEGPTESIZE - 1;
   }
@@ -134,7 +137,6 @@ void pager(){
   swapPool[frameNo].pteEntry = &(pTable->pteTable[vPageNo]);
   swapPool[frameNo].pteEntry->pte_entryLo = (swapLoc & 0xFFFFF000) | (0x6 << 8);
 
-  debugOMICRON((swapLoc & 0xFFFFF000));
 
   TLBCLR();
   disableInts(FALSE);
