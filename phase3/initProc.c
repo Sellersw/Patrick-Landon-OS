@@ -19,7 +19,7 @@ extern void userSyscallHandler();
 extern void pager();
 extern void userProgTrapHandler();
 
-extern void debugOMICRON(int a);
+extern void debugOMICRON();
 
 void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf, int command);
 void tapeToDisk(int asid);
@@ -130,15 +130,11 @@ void uProcInit(){
   int asid, i;
   state_t state, *newState;
 
-  debugOMICRON((memaddr) pager);
-  debugOMICRON((memaddr) userProgTrapHandler);
-  debugOMICRON((memaddr) userSyscallHandler);
-
   asid = getENTRYHI();
   asid = (asid << 20);
   asid = (asid >> 26);
 
-  debugOMICRON(asid);
+  debugOMICRON();
 
 
   for(i = 0; i < TRAPTYPES; i++){
@@ -167,7 +163,7 @@ void uProcInit(){
   state.s_status = VMON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELOFF;
   state.s_pc = state.s_t9 = 0x800000B0;
 
-  debugOMICRON(asid+25);
+  debugOMICRON();
 
   LDST(&state);
 }
@@ -200,7 +196,7 @@ void tapeToDisk(int asid){
 
     tapeReg->d_data0 = tapeBuf;
     tapeReg->d_command = READBLK;
-    debugOMICRON(10);
+    debugOMICRON();
     status = SYSCALL(WAITIO, TAPEINT, (asid-1), 0);
 
 
@@ -210,7 +206,7 @@ void tapeToDisk(int asid){
 
 
     diskIO(asid-1, i, 0, &devSemArray[(DEVCNT*(DISKINT-DEVINTOFFSET))], 0, tapeBuf, WRITEBLK);
-    debugOMICRON(i);
+    debugOMICRON();
     i++;
   }
 }
@@ -220,7 +216,7 @@ void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf
   int status;
   device_t *disk = getDeviceReg(DISKINT, diskNum);
 
-  debugOMICRON(sector);
+  debugOMICRON();
 
   SYSCALL(PASSEREN, sem, 0, 0);
 
@@ -243,7 +239,7 @@ void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf
 
   disableInts(FALSE);
 
-  debugOMICRON(status);
+  debugOMICRON();
   if(status != READY){
     SYSCALL(TERMINATEPROCESS, 0, 0, 0);
   }

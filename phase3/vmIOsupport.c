@@ -1,7 +1,7 @@
 
 
-void debugOMICRON(int a){
-  a+5;
+void debugOMICRON(){
+  return;
 }
 
 
@@ -15,7 +15,7 @@ void userSyscallHandler(){
 
 void pager(){
 
-  debugOMICRON(5);
+  debugOMICRON();
 
 }
 
