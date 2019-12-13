@@ -45,7 +45,7 @@ void pager(){
   cause = cause << 25;
   cause = cause >> 27;
 
-  debugOMICRON(12);
+  debugOMICRON(cause);
 
   if((cause != TLBINVLW) && (cause != TLBINVSW)){
     SYSCALL(VERHOGEN, (int) &swapPoolSem, 0, 0);
