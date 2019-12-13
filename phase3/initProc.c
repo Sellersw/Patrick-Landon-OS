@@ -226,7 +226,7 @@ void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf
   disableInts(TRUE);
 
   disk->d_command = (cyl << 8) | SEEKCYL;
-  status = SYSCALL(WAITIO, DISKINT, sector-1, 0);
+  status = SYSCALL(WAITIO, DISKINT, sector, 0);
 
   disableInts(FALSE);
 
@@ -238,7 +238,7 @@ void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf
 
   disk->d_data0 = memBuf;
   disk->d_command = (head << 16) | (sector << 8) | command;
-  status = SYSCALL(WAITIO, DISKINT, sector-1, 0);
+  status = SYSCALL(WAITIO, DISKINT, sector, 0);
 
   disableInts(FALSE);
 
