@@ -106,7 +106,7 @@ void test(){
 
 
     state.s_asid = i << 6;
-    state.s_sp = UPROCSTACK + ((i-1)*TRAPTYPES*PAGESIZE);
+    state.s_sp = UPROCSTACK + (24*PAGESIZE);
     state.s_pc = state.s_t9 = (memaddr) uProcInit;
     state.s_status = VMNOTON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELON;
 
