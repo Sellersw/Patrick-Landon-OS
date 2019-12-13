@@ -1,4 +1,13 @@
-
+/*********************************VMIOSUPPORT*********************************
+ * 
+ * This module is a handler for supporting Translation Lookaside Buffer
+ * (TLB) page fault exceptions caused by the implementation of Virtual Memory.
+ * Additionally, it handles user-level syscalls that comprise syscodes
+ * 9 and above.
+ * 
+ * Written by: Landon Clark and Patrick Sellers 
+ * 
+ * **************************************************************************/
 
 #include "../h/types.h"
 #include "../h/const.h"
