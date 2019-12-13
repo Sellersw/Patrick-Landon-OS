@@ -106,7 +106,7 @@ void test(){
 
 
     state.s_asid = i << 6;
-    state.s_sp = UPROCSTACK + (((i-1)*TRAPTYPES)*PAGESIZE);
+    state.s_sp = (UPROCSTACK + (((i-1)*TRAPTYPES)*PAGESIZE));
     state.s_pc = state.s_t9 = (memaddr) uProcInit;
     state.s_status = VMNOTON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELON;
 
@@ -138,7 +138,7 @@ void uProcInit(){
   for(i = 0; i < TRAPTYPES; i++){
     newState = &(uProcs[asid-1].t_newTrap[i]);
     newState->s_asid = getENTRYHI();
-    newState->s_sp = UPROCSTACK + ((((asid-1)*TRAPTYPES)+i)*PAGESIZE);
+    newState->s_sp = (UPROCSTACK + ((((asid-1)*TRAPTYPES)+i)*PAGESIZE));
     newState->s_status = VMON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELON;
     switch(i){
       case TLBTRAP:
@@ -185,7 +185,7 @@ void tapeToDisk(int asid){
 
   device_t *tapeReg = getDeviceReg(TAPEINT, asid-1);
 
-  tapeBuf = TAPEDMABUFFER + ((asid-1)*PAGESIZE);
+  tapeBuf = (TAPEDMABUFFER + ((asid-1)*PAGESIZE));
 
   i = 0;
 
