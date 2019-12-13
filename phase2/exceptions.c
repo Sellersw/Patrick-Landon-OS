@@ -209,9 +209,9 @@ given trap. */
 HIDDEN void pUoDHelper(state_t * new, state_t * old, memaddr trapLoc){
   state_t *trap;
   if(new == NULL){
-      terminateprocess(currentProc);
-      scheduler();
-    }
+    terminateprocess(currentProc);
+    scheduler();
+  }
   trap = (state_t *) trapLoc;
   copyState(trap, old);
   LDST(new);

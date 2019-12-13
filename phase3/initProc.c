@@ -141,9 +141,9 @@ void uProcInit(){
 
 
   for(i = 0; i < TRAPTYPES; i++){
-    state.s_asid = asid << 6;
+    state.s_asid = getENTRYHI();
     state.s_sp = UPROCSTACK + ((((asid-1)*TRAPTYPES)+i)*PAGESIZE);
-    state.s_status = VMON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELON;
+    state.s_status = VMON | INTEROFF | INTERUNMASKED | PLOCTIMEON | KERNELON;
     switch(i){
       case TLBTRAP:
         state.s_pc = state.s_t9 = (memaddr) pager;
@@ -162,7 +162,7 @@ void uProcInit(){
   tapeToDisk(asid);
 
 
-  state.s_asid = asid << 6;
+  state.s_asid = getENTRYHI();
   state.s_sp = 0xC0000000;
   state.s_status = VMON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELOFF;
   state.s_pc = state.s_t9 = 0x800000B0;
@@ -190,7 +190,6 @@ void tapeToDisk(int asid){
   memaddr tapeBuf;
 
   device_t *tapeReg = getDeviceReg(TAPEINT, asid-1);
-  device_t *diskReg = getDeviceReg(DISKINT, 0);
 
   tapeBuf = TAPEDMABUFFER + ((asid-1)*PAGESIZE);
 
@@ -207,29 +206,37 @@ void tapeToDisk(int asid){
       SYSCALL(TERMINATEPROCESS, 0, 0, 0);
     }
 
-    diskIO(asid-1, i, 0, &devSemArray[(DEVCNT*(DISKINT-DEVINTOFFSET))], diskReg, tapeBuf, WRITEBLK);
+    diskIO(asid-1, i, 0, &devSemArray[(DEVCNT*(DISKINT-DEVINTOFFSET))], 0, tapeBuf, WRITEBLK);
     i++;
   }
 }
 
 
-void diskIO(int sector, int cyl, int head, int *sem, device_t* disk, memaddr memBuf, int command){
+void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf, int command){
   int status;
+  device_t *disk = getDeviceReg(DISKINT, diskNum);
+
 
   SYSCALL(PASSEREN, sem, 0, 0);
 
-  disk->d_command = (cyl << 8) | SEEKCYL;
+  disableInts(TRUE);
 
+  disk->d_command = (cyl << 8) | SEEKCYL;
   status = SYSCALL(WAITIO, DISKINT, sector-1, 0);
+
+  disableInts(FALSE);
 
   if(status != SUCCESS){
     SYSCALL(TERMINATEPROCESS, 0, 0, 0);
   }
 
+  disableInts(TRUE);
+
   disk->d_data0 = memBuf;
   disk->d_command = (head << 16) | (sector << 8) | command;
-
   status = SYSCALL(WAITIO, DISKINT, sector-1, 0);
+
+  disableInts(FALSE);
 
   if(status != SUCCESS){
     SYSCALL(TERMINATEPROCESS, 0, 0, 0);
@@ -248,7 +255,7 @@ HIDDEN void disableInts(int disable){
     setSTATUS(status);
   }
   else{
-    status = getSTATUS() | (INTERON >> 2) + (INTERUNMASKED);
+    status = getSTATUS() | (INTERON >> 2) | (INTERUNMASKED);
     setSTATUS(status);
   }
 }
