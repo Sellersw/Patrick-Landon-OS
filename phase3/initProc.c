@@ -206,8 +206,7 @@ void tapeToDisk(int asid){
 
     disableInts(FALSE);
 
-    if(status != SUCCESS){
-      debugOMICRON(status);
+    if(status != READY){
       SYSCALL(TERMINATEPROCESS, 0, 0, 0);
     }
 
@@ -231,7 +230,7 @@ void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf
 
   disableInts(FALSE);
 
-  if(status != SUCCESS){
+  if(status != READY){
     SYSCALL(TERMINATEPROCESS, 0, 0, 0);
   }
 
@@ -243,7 +242,7 @@ void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf
 
   disableInts(FALSE);
 
-  if(status != SUCCESS){
+  if(status != READY){
     SYSCALL(TERMINATEPROCESS, 0, 0, 0);
   }
 
