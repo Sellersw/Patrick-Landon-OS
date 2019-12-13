@@ -154,6 +154,7 @@ void uProcInit(){
     SYSCALL(SPECTRAPVEC, i, &(uProcs[asid-1].t_oldTrap[i]), &(uProcs[asid-1].t_newTrap[i]));
   }
 
+  debugOMICRON(asid);
   tapeToDisk(asid);
 
   state.s_asid = asid << 6;
