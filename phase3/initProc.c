@@ -182,7 +182,6 @@ void tapeToDisk(int asid){
   int status, i;
   memaddr tapeBuf;
 
-
   device_t *tapeReg = getDeviceReg(TAPEINT, asid-1);
 
   tapeBuf = TAPEDMABUFFER + ((asid-1)*PAGESIZE);
