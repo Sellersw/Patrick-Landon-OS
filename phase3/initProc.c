@@ -140,8 +140,6 @@ void uProcInit(){
 
   debugOMICRON(asid);
 
-  tapeToDisk(asid);
-
 
   for(i = 0; i < TRAPTYPES; i++){
     newState = &(uProcs[asid-1].t_newTrap[i]);
@@ -162,6 +160,7 @@ void uProcInit(){
     SYSCALL(SPECTRAPVEC, i, &(uProcs[asid-1].t_oldTrap[i]), &(uProcs[asid-1].t_newTrap[i]));
   }
 
+  tapeToDisk(asid);
 
   state.s_asid = getENTRYHI();
   state.s_sp = 0xC0000000;
@@ -199,14 +198,18 @@ void tapeToDisk(int pid){
   tapeBuf = TAPEDMABUFFER + ((asid-1)*PAGESIZE);
 
   i = 0;
+  debugOMICRON(asid);
 
   while((tapeReg->d_data1 != EOT) && (tapeReg->d_data1 != EOF)){
 
-
+    debugOMICRON(asid);
     tapeReg->d_data0 = tapeBuf;
+    debugOMICRON(asid);
     tapeReg->d_command = READBLK;
+    debugOMICRON(asid);
     status = SYSCALL(WAITIO, TAPEINT, (asid-1), 0);
 
+    debugOMICRON(asid);
 
     if(status != READY){
       SYSCALL(TERMINATEPROCESS, 0, 0, 0);
