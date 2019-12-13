@@ -158,7 +158,7 @@ void uProcInit(){
 
   state.s_asid = asid << 6;
   state.s_sp = 0xC0000000;
-  state.s_status = VMON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELOFF;
+  state.s_status = VMON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELON;
   state.s_pc = state.s_t9 = 0x800000B0;
 
   debugOMICRON(asid);
