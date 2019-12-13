@@ -138,8 +138,7 @@ void uProcInit(){
   for(i = 0; i < TRAPTYPES; i++){
     newState = &(uProcs[asid-1].t_newTrap[i]);
     newState->s_asid = getENTRYHI();
-    /*newState->s_sp = UPROCSTACK + ((((asid-1)*TRAPTYPES)+i)*PAGESIZE);*/
-    newState->s_sp = DISKDMABUFFER + ((((asid-1)*TRAPTYPES)+i)*PAGESIZE);
+    newState->s_sp = UPROCSTACK + ((((asid-1)*TRAPTYPES)+i)*PAGESIZE);
     newState->s_status = VMON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELON;
     switch(i){
       case TLBTRAP:
