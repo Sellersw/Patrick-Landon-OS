@@ -132,7 +132,7 @@ typedef struct swapPool_t {
 	int			asid;
 	int			segNo;
 	int			pageNo;
-	pteEntry_t	*pte;
+	pteEntry_t	*pteEntry;
 } swapPool_t;
 
 

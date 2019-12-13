@@ -62,7 +62,7 @@ void test(){
     swapPool[i].asid = -1;
     swapPool[i].segNo = 0;
     swapPool[i].pageNo = 0;
-    swapPool[i].pte = NULL;
+    swapPool[i].pteEntry = NULL;
   }
 
 
@@ -87,7 +87,7 @@ void test(){
 
 
   for(i = 1; i < MAXUPROC+1; i++){
-    segmentTable = (segTable_t *) SEGTABLESTART + ((i-1)*12);
+    segmentTable = (segTable_t *) SEGTABLESTART + (i*12);
 
     uProcs[i-1].t_pte.header = (MAGNO << 24) | KUSEGPTESIZE;
 
@@ -181,6 +181,7 @@ HIDDEN device_t* getDeviceReg(int lineNo, int devNo){
 void tapeToDisk(int asid){
   int status, i;
   memaddr tapeBuf;
+  int *disk0sem = &devSemArray[(DEVCNT*(DISKINT-DEVINTOFFSET))];
 
   device_t *tapeReg = getDeviceReg(TAPEINT, asid-1);
 
@@ -202,7 +203,7 @@ void tapeToDisk(int asid){
     }
 
 
-    diskIO(asid-1, i, 0, &devSemArray[(DEVCNT*(DISKINT-DEVINTOFFSET))], 0, tapeBuf, WRITEBLK);
+    diskIO(asid-1, i, 0, disk0sem, 0, tapeBuf, WRITEBLK);
     i++;
   }
 }
