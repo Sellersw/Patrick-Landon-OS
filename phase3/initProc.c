@@ -243,8 +243,7 @@ void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf
 
 
 
-
-HIDDEN void disableInts(int disable){
+void disableInts(int disable){
   unsigned int status;
   if(disable == TRUE){
     status = getSTATUS() & 0xFFFF00FE;
