@@ -203,12 +203,14 @@ void tapeToDisk(int asid){
 
     tapeReg->d_data0 = tapeBuf;
     tapeReg->d_command = READBLK;
-    status = SYSCALL(WAITIO, TAPEINT, asid-1, 0);
+    status = SYSCALL(WAITIO, TAPEINT, (asid-1), 0);
 
 
     if(status != READY){
       SYSCALL(TERMINATEPROCESS, 0, 0, 0);
     }
+
+    debugOMICRON(asid);
 
     diskIO(asid, i, 0, &devSemArray[(DEVCNT*(DISKINT-DEVINTOFFSET))], 0, tapeBuf, WRITEBLK);
     i++;
