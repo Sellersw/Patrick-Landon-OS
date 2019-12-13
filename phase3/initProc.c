@@ -185,11 +185,9 @@ HIDDEN device_t* getDeviceReg(int lineNo, int devNo){
 
 
 
-void tapeToDisk(int pid){
+void tapeToDisk(int asid){
   int status, i, asid;
   memaddr tapeBuf;
-
-  asid = pid;
 
   device_t *tapeReg = getDeviceReg(TAPEINT, asid-1);
 
@@ -209,9 +207,7 @@ void tapeToDisk(int pid){
       SYSCALL(TERMINATEPROCESS, 0, 0, 0);
     }
 
-    debugOMICRON(pid);
-
-    diskIO(asid, i, 0, &devSemArray[(DEVCNT*(DISKINT-DEVINTOFFSET))], 0, tapeBuf, WRITEBLK);
+    diskIO(asid-1, i, 0, &devSemArray[(DEVCNT*(DISKINT-DEVINTOFFSET))], 0, tapeBuf, WRITEBLK);
     i++;
   }
 }
@@ -223,16 +219,12 @@ void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf
 
   debugOMICRON(sector);
 
-  sector = sector - 1;
-
   SYSCALL(PASSEREN, sem, 0, 0);
 
   disableInts(TRUE);
 
   disk->d_command = (cyl << 8) | SEEKCYL;
-  debugOMICRON(3);
   status = SYSCALL(WAITIO, DISKINT, sector, 0);
-  debugOMICRON(4);
 
   disableInts(FALSE);
 
@@ -241,14 +233,12 @@ void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf
   }
 
   disableInts(TRUE);
-  debugOMICRON(5);
 
   disk->d_data0 = memBuf;
   disk->d_command = (head << 16) | (sector << 8) | command;
   status = SYSCALL(WAITIO, DISKINT, sector, 0);
 
   disableInts(FALSE);
-  debugOMICRON(6);
 
   if(status != READY){
     SYSCALL(TERMINATEPROCESS, 0, 0, 0);
