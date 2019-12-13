@@ -180,7 +180,7 @@ HIDDEN device_t* getDeviceReg(int lineNo, int devNo){
 
 
 void tapeToDisk(int asid){
-  int status, i, asid;
+  int status, i;
   memaddr tapeBuf;
 
   debugOMICRON(asid-1);
