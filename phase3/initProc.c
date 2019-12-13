@@ -186,10 +186,12 @@ HIDDEN device_t* getDeviceReg(int lineNo, int devNo){
 
 
 
-void tapeToDisk(int asid){
-  int status, i;
+void tapeToDisk(int pid){
+  int status, i, asid;
   memaddr tapeBuf;
 
+  asid = pid;
+  
   debugOMICRON(asid);
 
   device_t *tapeReg = getDeviceReg(TAPEINT, asid-1);
