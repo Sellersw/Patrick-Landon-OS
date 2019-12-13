@@ -11,7 +11,7 @@
 
 #include "../h/types.h"
 #include "../h/const.h"
-#include "./h/tconst.h"
+#include "./testers/h/tconst.h"
 #include "../e/initProc.e"
 #include "/usr/local/include/umps2/umps/libumps.e"
 
