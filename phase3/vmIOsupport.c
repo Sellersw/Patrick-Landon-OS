@@ -65,7 +65,7 @@ void pager(){
   debugOMICRON(4);
 
   RAMTOP = devReg->rambase + devReg->ramsize;
-  swapLoc = RAMTOP - (3*PAGESIZE);
+  swapLoc = RAMTOP - (4*PAGESIZE);
 
   segment = (oldTLB->s_asid >> 30);
   vPageNo = missingPage = (oldTLB->s_asid & 0x3FFFF000) >> 12;
