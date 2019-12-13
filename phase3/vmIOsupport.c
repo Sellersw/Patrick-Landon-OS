@@ -14,7 +14,7 @@
 #include "../e/initProc.e"
 #include "/usr/local/include/umps2/umps/libumps.e"
 
-
+static int frameNo = POOLSIZE-1;
 
 HIDDEN int getFrame();
 
@@ -32,7 +32,7 @@ void userSyscallHandler(){
 
 void pager(){
   state_t *oldTLB;
-  unsigned int asid, cause, segment, vPageNo, frameNo, missingPage, swapPageNo;
+  unsigned int asid, cause, segment, vPageNo, missingPage, swapPageNo;
   memaddr swapLoc, RAMTOP;
   int *disk0sem = &devSemArray[(DEVCNT*(DISKINT-DEVINTOFFSET))];
   pte_t *pTable;
@@ -76,6 +76,8 @@ void pager(){
   if(missingPage >= KUSEGPTESIZE){
     vPageNo = KUSEGPTESIZE - 1;
   }
+
+  debugOMICRON(vPageNo);
 
 /*
   if(segment == KUSEG3NO){
@@ -153,13 +155,11 @@ void userProgTrapHandler(){
 
 
 HIDDEN int getFrame(){
-	static int frameNo = 0;
+  frameNo++;
 
 	if(frameNo >= POOLSIZE){
 		frameNo = 0;
 	}
-
-  frameNo++;
 
 	return(frameNo);
 }
