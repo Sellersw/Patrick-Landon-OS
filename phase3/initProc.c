@@ -162,7 +162,7 @@ void uProcInit(){
 
   tapeToDisk(asid);
 
-  state.s_asid = getENTRYHI();
+  state.s_asid = asid << 6;
   state.s_sp = 0xC0000000;
   state.s_status = VMON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELOFF;
   state.s_pc = state.s_t9 = 0x800000B0;
@@ -244,8 +244,8 @@ void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf
     SYSCALL(TERMINATEPROCESS, 0, 0, 0);
   }
 
-  SYSCALL(VERHOGEN, sem, 0, 0);
   debugOMICRON(7);
+  SYSCALL(VERHOGEN, sem, 0, 0);
 }
 
 
