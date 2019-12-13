@@ -191,31 +191,25 @@ void tapeToDisk(int pid){
 
   asid = pid;
 
-  debugOMICRON(asid);
-
   device_t *tapeReg = getDeviceReg(TAPEINT, asid-1);
 
   tapeBuf = TAPEDMABUFFER + ((asid-1)*PAGESIZE);
 
   i = 0;
-  debugOMICRON(asid);
 
   while((tapeReg->d_data1 != EOT) && (tapeReg->d_data1 != EOF)){
 
-    debugOMICRON(asid);
+
     tapeReg->d_data0 = tapeBuf;
-    debugOMICRON(asid);
     tapeReg->d_command = READBLK;
-    debugOMICRON(asid);
     status = SYSCALL(WAITIO, TAPEINT, (asid-1), 0);
 
-    debugOMICRON(asid);
 
     if(status != READY){
       SYSCALL(TERMINATEPROCESS, 0, 0, 0);
     }
 
-    debugOMICRON(asid);
+    debugOMICRON(pid);
 
     diskIO(asid, i, 0, &devSemArray[(DEVCNT*(DISKINT-DEVINTOFFSET))], 0, tapeBuf, WRITEBLK);
     i++;
