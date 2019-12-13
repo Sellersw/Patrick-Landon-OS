@@ -86,7 +86,7 @@ void test(){
 
 
   for(i = 1; i < MAXUPROC+1; i++){
-    segmentTable = (segTable_t *) SEGTABLESTART + (i*12);
+    segmentTable = (segTable_t *) SEGTABLESTART + ((i-1)*12);
 
     uProcs[i-1].t_pte.header = (MAGNO << 24) | KUSEGPTESIZE;
 
@@ -106,7 +106,7 @@ void test(){
 
 
     state.s_asid = i << 6;
-    state.s_sp = UPROCSTACK + ((i-1)*PAGESIZE);
+    state.s_sp = UPROCSTACK + (((i-1)*TRAPTYPES)*PAGESIZE);
     state.s_pc = state.s_t9 = (memaddr) uProcInit;
     state.s_status = VMNOTON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELON;
 
@@ -239,7 +239,6 @@ void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf
   }
 
   SYSCALL(VERHOGEN, sem, 0, 0);
-  debugOMICRON(10);
 }
 
 
