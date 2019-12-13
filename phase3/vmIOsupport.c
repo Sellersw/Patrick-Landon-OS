@@ -30,6 +30,8 @@ void pager(){
 
   devregarea_t* devReg = (devregarea_t *) RAMBASEADDR;
 
+  debugOMICRON(10);
+
   SYSCALL(PASSEREN, (int) &swapPoolSem, 0, 0);
 
   asid = getENTRYHI();
@@ -47,6 +49,9 @@ void pager(){
     SYSCALL(VERHOGEN, (int) &swapPoolSem, 0, 0);
     SYSCALL(TERMINATEPROCESS, 0, 0, 0);
   }
+
+
+  debugOMICRON(4);
 
   RAMTOP = devReg->rambase + devReg->ramsize;
   swapLoc = RAMTOP - (3*PAGESIZE);
@@ -66,6 +71,8 @@ void pager(){
     }
   }
 
+  debugOMICRON(15);
+
   frameNo = getFrame();
   swapLoc = swapLoc - (frameNo*PAGESIZE);
 
@@ -84,14 +91,20 @@ void pager(){
     swapPool[frameNo].pageNo = 0;
     swapPool[frameNo].pteEntry = NULL;
 
+    debugOMICRON(20);
+
     TLBCLR();
 
     disableInts(FALSE);
 
     diskIO((swapPool[frameNo].asid)-1, swapPageNo, 0, disk0sem, swapLoc, WRITEBLK);
+
+    debugOMICRON(5);
   }
 
   diskIO(asid-1, vPageNo, 0, disk0sem, swapLoc, READBLK);
+
+  debugOMICRON(100);
 
   disableInts(TRUE);
 
