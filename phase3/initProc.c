@@ -20,7 +20,6 @@ extern void userSyscallHandler();
 extern void pager();
 extern void userProgTrapHandler();
 
-extern void debugOMICRON(int a);
 
 void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf, int command);
 void tapeToDisk(int asid);
