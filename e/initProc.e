@@ -10,6 +10,7 @@
 
 #include "../h/types.h"
 
+extern int masterSem;
 extern int swapPoolSem;
 extern int devSemArray[DEVICECNT];
 
