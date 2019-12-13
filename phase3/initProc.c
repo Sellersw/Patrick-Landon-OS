@@ -73,13 +73,13 @@ void test(){
     ksegOS.pteTable[i].pte_entryLo = ((0x20000 + i) << 12) | (0x7 << 8);
   }
 
-/*
+
   kUseg3.header = (MAGNO << 24) | KUSEGPTESIZE;
   for(i = 0; i < KUSEGPTESIZE; i++){
     kUseg3.pteTable[i].pte_entryHi = ((0xC0000 + i) << 12);
     kUseg3.pteTable[i].pte_entryLo = (0x5 << 8);
   }
-*/
+
 
 
   for(i = 1; i < MAXUPROC+1; i++){
@@ -97,7 +97,7 @@ void test(){
 
     segmentTable->st_ksegOS = &ksegOS;
     segmentTable->st_kUseg2 = &(uProcs[i-1].t_pte);
-    /*segmentTable->st_kUseg3 = &kUseg3;*/
+    segmentTable->st_kUseg3 = &kUseg3;
 
     state.s_asid = i << 6;
     state.s_sp = UPROCSTACK + (((i-1)*TRAPTYPES)*PAGESIZE);
