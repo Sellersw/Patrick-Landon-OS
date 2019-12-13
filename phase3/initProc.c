@@ -20,6 +20,10 @@ extern void pager();
 extern void userProgTrapHandler();
 
 
+void debugOMICRON(int a){
+  a+5;
+}
+
 HIDDEN void copyState(state_t *orig, state_t *curr);
 void diskIO(int sector, int cyl, int head, int *sem, device_t* disk, memaddr memBuf, int command);
 void tapeToDisk(int asid);
@@ -86,6 +90,7 @@ void test(){
 
 
   for(i = 1; i < MAXUPROC+1; i++){
+    debugOMICRON(3);
     segmentTable = (segTable_t *) SEGTABLESTART + (i*12);
 
     uProcs[i-1].t_pte.header = (MAGNO << 24) | KUSEGPTESIZE;
@@ -118,6 +123,8 @@ void test(){
     }
   }
 
+  debugOMICRON(7);
+
   for(i = 0; i < MAXUPROC; i++){
     SYSCALL(PASSEREN, (int) &masterSem, 0, 0);
   }
@@ -127,6 +134,7 @@ void test(){
 
 
 void uProcInit(){
+  debugOMICRON(5);
   int asid, i;
   state_t state;
 
@@ -161,6 +169,8 @@ void uProcInit(){
   state.s_sp = 0xC0000000;
   state.s_status = VMON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELOFF;
   state.s_pc = state.s_t9 = 0x800000B0;
+
+  debugOMICRON(10);
 
   LDST(&state);
 }
