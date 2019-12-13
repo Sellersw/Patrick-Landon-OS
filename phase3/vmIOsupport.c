@@ -98,14 +98,13 @@ void pager(){
 
   debugOMICRON(vPageNo);
 
-/*
+
   if(segment == KUSEG3NO){
     if(kUseg3.pteTable[vPageNo].pte_entryLo & (0x2 << 8) == (0x2 << 8)){
       SYSCALL(VERHOGEN, (int) &swapPoolSem, 0, 0);
       LDST(oldTLB);
     }
   }
-*/
 
   frameNo = getFrame();
   swapLoc = swapLoc - (frameNo*PAGESIZE);
