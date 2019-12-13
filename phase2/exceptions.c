@@ -40,9 +40,6 @@ HIDDEN void waitio(state_t *state);
 /******************************************************************************/
 
 
-extern void debugOMICRON(int a);
-
-
 /************************PROGRAM TRAP HANDLER**********************************/
 
 /* A publically available function for handling a program trap. It simply
@@ -217,8 +214,6 @@ HIDDEN void pUoDHelper(state_t * new, state_t * old, memaddr trapLoc){
   }
   trap = (state_t *) trapLoc;
   copyState(trap, old);
-  debugOMICRON((int) new->s_pc);
-  setSTATUS(getSTATUS()&0xFFFFFFF5);
   LDST(new);
 }
 
