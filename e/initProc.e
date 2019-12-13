@@ -1,9 +1,9 @@
-#ifndef INITPROCS
-#define INITPROCS
+#ifndef INITPROC
+#define INITPROC
 
-/************************** INITPROCS.E ******************************
+/************************** INITPROC.E ******************************
 *
-*  The externals declaration file for the INITPROCS.c module
+*  The externals declaration file for the INITPROC.c module
 *
 *  Written by Patrick and Landon
 */
