@@ -71,6 +71,8 @@ void pager(){
   vPageNo = missingPage = (oldTLB->s_asid & 0x3FFFF000) >> 12;
   vPageNo = (vPageNo & MAXPAGES);
 
+  debugOMICRON(vPageNo);
+
   if(missingPage >= KUSEGPTESIZE){
     vPageNo = KUSEGPTESIZE - 1;
   }
@@ -89,6 +91,8 @@ void pager(){
 
   if(swapPool[frameNo].asid != -1){
     disableInts(TRUE);
+
+    debugOMICRON(frameNo);
 
     swapPool[frameNo].pteEntry->pte_entryLo = swapPool[frameNo].pteEntry->pte_entryLo & (0xD << 8);
     swapPageNo = swapPool[frameNo].pageNo;
@@ -115,7 +119,7 @@ void pager(){
 
   debugOMICRON(swapLoc);
   debugOMICRON(asid);
-  debugOMICRON(disk0sem);
+  debugOMICRON(frameNo);
 
   diskIO(asid-1, vPageNo, 0, disk0sem, 0, swapLoc, READBLK);
 
