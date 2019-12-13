@@ -46,7 +46,7 @@ void userSyscallHandler(){
           swapPool[i].asid = -1;
           swapPool[i].pageNo = 0;
           swapPool[i].segNo = 0;
-          swapPool[i].pte = NULL;
+          swapPool[i].pteEntry = NULL;
         }
       }
       TLBCLR();
