@@ -28,12 +28,12 @@ void main() {
 		print(WRITETERMINAL, "todTest error: did not delay one second\n");
 	else
 		print(WRITETERMINAL, "todTest ok: one second delay\n");
-		
+
 	print(WRITETERMINAL, "todTest completed\n");
-		
+
 	/* Try to execute nucleys system call. Should cause termination */
-	now1 = SYSCALL(GETTIME, 0, 0, 0);
-	
+	now1 = SYSCALL(GETCPUTIME, 0, 0, 0);
+
 	print(WRITETERMINAL, "todTest error: SYS6 did not terminate\n");
 	SYSCALL(TERMINATE, 0, 0, 0);
 }
