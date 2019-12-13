@@ -84,8 +84,6 @@ void pager(){
   }
 */
 
-  debugOMICRON(vPageNo);
-
   frameNo = getFrame();
   swapLoc = swapLoc - (frameNo*PAGESIZE);
 
@@ -114,6 +112,10 @@ void pager(){
 
     debugOMICRON(5);
   }
+
+  debugOMICRON(swapLoc);
+  debugOMICRON(asid);
+  debugOMICRON(disk0sem);
 
   diskIO(asid-1, vPageNo, 0, disk0sem, swapLoc, READBLK);
 
