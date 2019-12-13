@@ -210,7 +210,7 @@ void tapeToDisk(int asid){
       SYSCALL(TERMINATEPROCESS, 0, 0, 0);
     }
 
-    diskIO(asid-1, i, 0, &devSemArray[(DEVCNT*(DISKINT-DEVINTOFFSET))], 0, tapeBuf, WRITEBLK);
+    diskIO(asid, i, 0, &devSemArray[(DEVCNT*(DISKINT-DEVINTOFFSET))], 0, tapeBuf, WRITEBLK);
     i++;
   }
 }
@@ -221,6 +221,8 @@ void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf
   device_t *disk = getDeviceReg(DISKINT, diskNum);
 
   debugOMICRON(sector);
+
+  sector = sector - 1;
 
   SYSCALL(PASSEREN, sem, 0, 0);
 
