@@ -113,6 +113,8 @@ void pager(){
       swapPageNo = KUSEGPTESIZE - 1;
     }
 
+    debugOMICRON(swapPool[frameNo].pageNo);
+
     swapPool[frameNo].asid = -1;
     swapPool[frameNo].segNo = 0;
     swapPool[frameNo].pageNo = 0;
@@ -123,7 +125,11 @@ void pager(){
 
     disableInts(FALSE);
 
+    debugOMICRON(swapPageNo);
+
     diskIO((swapPool[frameNo].asid)-1, swapPageNo, 0, disk0sem, 0, swapLoc, WRITEBLK);
+
+    debugOMICRON(-1);
   }
 
   debugOMICRON(vPageNo);
