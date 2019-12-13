@@ -110,7 +110,7 @@ void test(){
 
 
 
-    state.s_asid = i;
+    state.s_asid = i << 6;
     state.s_sp = UPROCSTACK + ((i-1)*TRAPTYPES*PAGESIZE);
     state.s_pc = state.s_t9 = (memaddr) uProcInit;
     state.s_status = VMNOTON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELON;
@@ -146,7 +146,7 @@ void uProcInit(){
 
 
   for(i = 0; i < TRAPTYPES; i++){
-    state.s_asid = asid;
+    state.s_asid = asid << 6;
     state.s_sp = UPROCSTACK + ((((asid-1)*TRAPTYPES)+i)*PAGESIZE);
     state.s_status = VMON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELON;
     switch(i){
@@ -167,7 +167,7 @@ void uProcInit(){
   tapeToDisk(asid);
 
 
-  state.s_asid = asid;
+  state.s_asid = asid << 6;
   state.s_sp = 0xC0000000;
   state.s_status = VMON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELOFF;
   state.s_pc = state.s_t9 = 0x800000B0;
