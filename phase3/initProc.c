@@ -207,6 +207,7 @@ void tapeToDisk(int asid){
     disableInts(FALSE);
 
     if(status != SUCCESS){
+      debugOMICRON(status);
       SYSCALL(TERMINATEPROCESS, 0, 0, 0);
     }
 
