@@ -200,8 +200,9 @@ void tapeToDisk(int asid){
 
     tapeReg->d_data0 = tapeBuf;
     tapeReg->d_command = READBLK;
+    debugOMICRON(10);
     status = SYSCALL(WAITIO, TAPEINT, (asid-1), 0);
-    debugOMICRON(status);
+
 
     if(status != READY){
       SYSCALL(TERMINATEPROCESS, 0, 0, 0);
