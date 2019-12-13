@@ -1,13 +1,14 @@
-/*
+/*********************************INITPROC********************************
 
-Entry point of user processes in Kaya. Handles initial user proc setups and
-basic paging setup as well. Not sure how accurate that is though... More to
-follow...
-
+Entry point of user processes in Kaya. This will initialize a set of processes
+according to the size of constant [MAXPROC] in const.h (currently set to 1 for
+testing purposes). It sets up the necessary global data structures to support
+virtual memory, copies all the processes into a backing store disk drive (disk0)
+and then waits on a master semephore for all new processes to terminate.
 
 Authors: Landon Clark and Patrick Sellers
 
-*/
+****************************************************************************/
 
 #include "../h/types.h"
 #include "../h/const.h"
@@ -56,8 +57,6 @@ void test(){
     devSemArray[i] = 1;
   }
 
-
-
   for(i = 0; i < POOLSIZE; i++){
     swapPool[i].asid = -1;
     swapPool[i].segNo = 0;
@@ -65,30 +64,26 @@ void test(){
     swapPool[i].pteEntry = NULL;
   }
 
-
-
   ksegOS.header = (MAGNO << 24) | KSEGOSPTESIZE;
   kUseg3.header = (MAGNO << 24) | KUSEGPTESIZE;
-
-
 
   for(i = 0; i < KSEGOSPTESIZE; i++){
     ksegOS.pteTable[i].pte_entryHi = ((0x20000 + i) << 12);
     ksegOS.pteTable[i].pte_entryLo = ((0x20000 + i) << 12) | (0x7 << 8);
   }
 
-
-
   for(i = 0; i < KUSEGPTESIZE; i++){
     kUseg3.pteTable[i].pte_entryHi = ((0xC0000 + i) << 12);
     kUseg3.pteTable[i].pte_entryLo = (0x5 << 8);
   }
 
-
-
   for(i = 1; i < MAXUPROC+1; i++){
+<<<<<<< HEAD
     segmentTable = (segTable_t *) SEGTABLESTART + (i*12);
 
+=======
+    segmentTable = (segTable_t *) SEGTABLESTART + ((i-1)*12);
+>>>>>>> 780d030eae5d3d7e94df66562386b7d0ff477d3c
     uProcs[i-1].t_pte.header = (MAGNO << 24) | KUSEGPTESIZE;
 
     for(j = 0; j < MAXPAGES; j++){
@@ -99,18 +94,14 @@ void test(){
     uProcs[i-1].t_pte.pteTable[MAXPAGES-1].pte_entryHi = (0xBFFFF << 12) | (i << 6);
     uProcs[i-1].t_sem = 0;
 
-
     segmentTable->st_ksegOS = &ksegOS;
     segmentTable->st_kUseg2 = &(uProcs[i-1].t_pte);
     segmentTable->st_kUseg3 = &kUseg3;
-
-
 
     state.s_asid = i << 6;
     state.s_sp = UPROCSTACK + (((i-1)*TRAPTYPES)*PAGESIZE);
     state.s_pc = state.s_t9 = (memaddr) uProcInit;
     state.s_status = VMNOTON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELON;
-
 
     status = SYSCALL(CREATEPROCESS, (int) &state, 0, 0);
 
@@ -126,7 +117,6 @@ void test(){
   SYSCALL(TERMINATEPROCESS, 0, 0, 0);
 }
 
-
 void uProcInit(){
   int asid, i;
   state_t state, *newState;
@@ -134,7 +124,6 @@ void uProcInit(){
   asid = getENTRYHI();
   asid = (asid << 20);
   asid = (asid >> 26);
-
 
   for(i = 0; i < TRAPTYPES; i++){
     newState = &(uProcs[asid-1].t_newTrap[i]);
@@ -177,7 +166,8 @@ HIDDEN device_t* getDeviceReg(int lineNo, int devNo){
 }
 
 
-
+/* Our method of taking everything (.data and .text) off of the tape and writing
+it to our backing store. This is an essential operation for VM support. */
 void tapeToDisk(int asid){
   int status, i;
   memaddr tapeBuf;
@@ -208,7 +198,7 @@ void tapeToDisk(int asid){
   }
 }
 
-
+/* A function for handling both read and write disk operations. */
 void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf, int command){
   int status;
   device_t *disk = getDeviceReg(DISKINT, diskNum);
@@ -241,8 +231,7 @@ void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf
   SYSCALL(VERHOGEN, sem, 0, 0);
 }
 
-
-
+/* A helper function to disable interrupts at important points in VM functions.*/
 void disableInts(int disable){
   unsigned int status;
   if(disable == TRUE){
