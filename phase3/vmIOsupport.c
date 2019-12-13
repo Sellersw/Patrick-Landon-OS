@@ -40,10 +40,10 @@ void userSyscallHandler(){
   switch(call){
 
     case TERMINATE:
-      terminate(asid);
+      terminateUserProc(asid);
 
     default:
-      terminate(asid);
+      terminateUserProc(asid);
   }
 }
 
@@ -186,7 +186,7 @@ HIDDEN int getFrame(){
 
 
 
-HIDDEN void terminate(int asid){
+HIDDEN void terminateUserProc(int asid){
   int i;
 
   SYSCALL(PASSEREN, (int)&swapPoolSem, 0, 0);
