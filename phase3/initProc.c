@@ -25,7 +25,6 @@ HIDDEN void copyState(state_t *orig, state_t *curr);
 void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf, int command);
 void tapeToDisk(int asid);
 void uProcInit();
-HIDDEN disableInts(int disable);
 
 
 /* Global semaphore for phase 3. Initialize to 1 as they are for mutex */
