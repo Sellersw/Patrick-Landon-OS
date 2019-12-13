@@ -119,8 +119,7 @@ void pager(){
     debugOMICRON(5);
   }
 
-  debugOMICRON(swapLoc);
-  debugOMICRON(asid);
+
   debugOMICRON(frameNo);
 
   diskIO(asid-1, vPageNo, 0, disk0sem, 0, swapLoc, READBLK);
