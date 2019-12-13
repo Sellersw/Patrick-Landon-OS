@@ -144,6 +144,10 @@
 #define TRANSTATUS      2
 #define TRANCOMMAND     3
 
+#define TRANSMCHAR 2
+#define CHARTRANSMD 5
+
+
 #define STATUSMASK 0xFF
 
 /* device common STATUS codes */

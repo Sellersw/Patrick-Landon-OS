@@ -25,6 +25,7 @@ void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf
 void tapeToDisk(int asid);
 void uProcInit();
 void disableInts(int disable);
+device_t* getDeviceReg(int lineNo, int devNo);
 
 
 /* Global semaphore for phase 3. Initialize to 1 as they are for mutex */
@@ -161,16 +162,6 @@ void uProcInit(){
 
 
 
-HIDDEN device_t* getDeviceReg(int lineNo, int devNo){
-  /* See pg. 32 of pops for a more detailed explanation on these magic numbers.
-  The formula essentially calculates the address based on the base address of
-  the device registers (0x100000050) and uses some offsets to move through low
-  order memory (still in the device register area) to find the requested device
-  register */
-  return (device_t *) (0x10000050 + ((lineNo-3) * 0x80) + (devNo*0x10));
-}
-
-
 /* Our method of taking everything (.data and .text) off of the tape and writing
 it to our backing store. This is an essential operation for VM support. */
 void tapeToDisk(int asid){
@@ -250,4 +241,14 @@ void disableInts(int disable){
     status = getSTATUS() | (INTERON >> 2) | (INTERUNMASKED);
     setSTATUS(status);
   }
+}
+
+
+device_t* getDeviceReg(int lineNo, int devNo){
+  /* See pg. 32 of pops for a more detailed explanation on these magic numbers.
+  The formula essentially calculates the address based on the base address of
+  the device registers (0x100000050) and uses some offsets to move through low
+  order memory (still in the device register area) to find the requested device
+  register */
+  return (device_t *) (0x10000050 + ((lineNo-3) * 0x80) + (devNo*0x10));
 }
