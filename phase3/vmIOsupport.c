@@ -84,7 +84,7 @@ void pager(){
   }
 */
 
-  debugOMICRON(15);
+  debugOMICRON(vPageNo);
 
   frameNo = getFrame();
   swapLoc = swapLoc - (frameNo*PAGESIZE);
