@@ -19,8 +19,6 @@ Authors: Landon Clark and Patrick Sellers
 extern void userSyscallHandler();
 extern void pager();
 extern void userProgTrapHandler();
-
-
 void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf, int command);
 void tapeToDisk(int asid);
 void uProcInit();
@@ -36,11 +34,8 @@ int masterSem;
 
 pteOS_t ksegOS;
 pte_t kUseg3;
-
 Tproc_t uProcs[MAXUPROC];
-
 swapPool_t swapPool[POOLSIZE];
-
 
 /* Main process thread of Kaya OS */
 void test(){
@@ -48,15 +43,15 @@ void test(){
   state_t state;
   segTable_t *segmentTable;
 
-
   masterSem = 0;
   swapPoolSem = 1;
 
+/* Initialize a semephore for each device and set it to 1 for mutex*/
   for(i = 0; i < DEVICECNT; i++){
     devSemArray[i] = 1;
   }
 
-
+/* Initialize the swap pool*/
   for(i = 0; i < POOLSIZE; i++){
     swapPool[i].asid = -1;
     swapPool[i].segNo = 0;
@@ -64,24 +59,21 @@ void test(){
     swapPool[i].pteEntry = NULL;
   }
 
-
-
-
+/* Initialize the OS segment's page table entries and headers. */
   ksegOS.header = (MAGNO << 24) | KSEGOSPTESIZE;
   for(i = 0; i < KSEGOSPTESIZE; i++){
     ksegOS.pteTable[i].pte_entryHi = ((0x20000 + i) << 12);
     ksegOS.pteTable[i].pte_entryLo = ((0x20000 + i) << 12) | (0x7 << 8);
   }
 
-
+/* Initialize the shared segment's page table entries and headers. */
   kUseg3.header = (MAGNO << 24) | KUSEGPTESIZE;
   for(i = 0; i < KUSEGPTESIZE; i++){
     kUseg3.pteTable[i].pte_entryHi = ((0xC0000 + i) << 12);
     kUseg3.pteTable[i].pte_entryLo = (0x5 << 8);
   }
 
-
-
+/* Initialize  */
   for(i = 1; i < MAXUPROC+1; i++){
     segmentTable = (segTable_t *) (SEGTABLESTART + (i*12));
 
