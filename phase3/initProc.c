@@ -198,13 +198,11 @@ void tapeToDisk(int asid){
 
   while((tapeReg->d_data1 != EOT) && (tapeReg->d_data1 != EOF)){
 
-    disableInts(TRUE);
 
     tapeReg->d_data0 = tapeBuf;
     tapeReg->d_command = READBLK;
     status = SYSCALL(WAITIO, TAPEINT, asid-1, 0);
 
-    disableInts(FALSE);
 
     if(status != READY){
       SYSCALL(TERMINATEPROCESS, 0, 0, 0);
@@ -220,13 +218,16 @@ void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf
   int status;
   device_t *disk = getDeviceReg(DISKINT, diskNum);
 
+  debugOMICRON(2);
 
   SYSCALL(PASSEREN, sem, 0, 0);
 
   disableInts(TRUE);
 
   disk->d_command = (cyl << 8) | SEEKCYL;
+  debugOMICRON(3);
   status = SYSCALL(WAITIO, DISKINT, sector, 0);
+  debugOMICRON(4);
 
   disableInts(FALSE);
 
@@ -235,18 +236,21 @@ void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf
   }
 
   disableInts(TRUE);
+  debugOMICRON(5);
 
   disk->d_data0 = memBuf;
   disk->d_command = (head << 16) | (sector << 8) | command;
   status = SYSCALL(WAITIO, DISKINT, sector, 0);
 
   disableInts(FALSE);
+  debugOMICRON(6);
 
   if(status != READY){
     SYSCALL(TERMINATEPROCESS, 0, 0, 0);
   }
 
   SYSCALL(VERHOGEN, sem, 0, 0);
+  debugOMICRON(7);
 }
 
 
