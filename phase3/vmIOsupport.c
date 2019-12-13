@@ -28,9 +28,9 @@ void debugOMICRON(int a){
 
 void userSyscallHandler(){
   state_t *state;
-  int i, call;
+  int call, asid;
 
-  unsigned int asid =  getENTRYHI();
+  asid =  getENTRYHI();
   asid = (asid << 20);
   asid = (asid >> 26);
 
@@ -187,6 +187,8 @@ HIDDEN int getFrame(){
 
 
 HIDDEN void terminate(int asid){
+  int i;
+
   SYSCALL(PASSEREN, (int)&swapPoolSem, 0, 0);
 
   for(i = 0; i < POOLSIZE; i++){
