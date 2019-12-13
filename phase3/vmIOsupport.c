@@ -76,7 +76,7 @@ void pager(){
 
   if((cause != TLBINVLW) && (cause != TLBINVSW)){
     SYSCALL(VERHOGEN, (int) &swapPoolSem, 0, 0);
-    SYSCALL(TERMINATEPROCESS, 0, 0, 0);
+    SYSCALL(TERMINATE, 0, 0, 0);
   }
 
 
@@ -87,7 +87,6 @@ void pager(){
 
   segment = (oldTLB->s_asid >> 30);
   vPageNo = missingPage = (oldTLB->s_asid & 0x3FFFF000) >> 12;
-  vPageNo = (vPageNo & MAXPAGES);
 
   debugOMICRON(segment);
   debugOMICRON(vPageNo);
