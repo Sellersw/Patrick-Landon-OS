@@ -161,7 +161,8 @@ HIDDEN device_t* getDeviceReg(int lineNo, int devNo){
 }
 
 
-
+/* Our method of taking everything (.data and .text) off of the tape and writing
+it to our backing store. This is an essential operation for VM support. */
 void tapeToDisk(int asid){
   int status, i;
   memaddr tapeBuf;
@@ -191,7 +192,7 @@ void tapeToDisk(int asid){
   }
 }
 
-
+/* A function for handling both read and write disk operations. */
 void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf, int command){
   int status;
   device_t *disk = getDeviceReg(DISKINT, diskNum);
