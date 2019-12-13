@@ -126,6 +126,9 @@ void pager(){
     diskIO((swapPool[frameNo].asid)-1, swapPageNo, 0, disk0sem, 0, swapLoc, WRITEBLK);
   }
 
+  debugOMICRON(vPageNo);
+  debugOMICRON(asid-1);
+
   diskIO(asid-1, vPageNo, 0, disk0sem, 0, swapLoc, READBLK);
 
 
