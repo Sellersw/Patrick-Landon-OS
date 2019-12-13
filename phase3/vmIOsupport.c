@@ -10,6 +10,10 @@
 HIDDEN int getFrame();
 
 
+void debugOMICRON(int a){
+  a+5;
+}
+
 
 void userSyscallHandler(){
 
@@ -101,6 +105,9 @@ void pager(){
   disableInts(FALSE);
 
   SYSCALL(VERHOGEN, (int) &swapPoolSem, 0, 0);
+
+  debugOMICRON(1);
+
   LDST(oldTLB);
 }
 
