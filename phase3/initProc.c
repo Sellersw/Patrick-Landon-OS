@@ -78,12 +78,8 @@ void test(){
   }
 
   for(i = 1; i < MAXUPROC+1; i++){
-<<<<<<< HEAD
     segmentTable = (segTable_t *) SEGTABLESTART + (i*12);
 
-=======
-    segmentTable = (segTable_t *) SEGTABLESTART + ((i-1)*12);
->>>>>>> 780d030eae5d3d7e94df66562386b7d0ff477d3c
     uProcs[i-1].t_pte.header = (MAGNO << 24) | KUSEGPTESIZE;
 
     for(j = 0; j < MAXPAGES; j++){
