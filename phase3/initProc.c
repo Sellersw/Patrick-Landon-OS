@@ -19,6 +19,7 @@ extern void userSyscallHandler();
 extern void pager();
 extern void userProgTrapHandler();
 
+extern void debugOMICRON(int a);
 
 HIDDEN void copyState(state_t *orig, state_t *curr);
 void diskIO(int sector, int cyl, int head, int *sem, device_t* disk, memaddr memBuf, int command);
@@ -130,10 +131,11 @@ void uProcInit(){
   int asid, i;
   state_t state;
 
-
   asid = getENTRYHI();
   asid = (asid << 20);
   asid = (asid >> 26);
+
+  debugOMICRON(asid);
 
 
   for(i = 0; i < TRAPTYPES; i++){
@@ -162,6 +164,8 @@ void uProcInit(){
   state.s_sp = 0xC0000000;
   state.s_status = VMON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELOFF;
   state.s_pc = state.s_t9 = 0x800000B0;
+
+  debugOMICRON(asid+25);
 
   LDST(&state);
 }
