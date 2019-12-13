@@ -11,6 +11,7 @@
 
 #include "../h/types.h"
 #include "../h/const.h"
+#include "./h/tconst.h"
 #include "../e/initProc.e"
 #include "/usr/local/include/umps2/umps/libumps.e"
 
@@ -25,8 +26,38 @@ void debugOMICRON(int a){
 
 
 void userSyscallHandler(){
+  state_t *state;
+  int i, call;
 
+  unsigned int asid =  getENTRYHI();
+  asid = (asid << 20);
+  asid = (asid >> 26);
 
+  state = &(uProcs[asid-1].t_oldTrap[SYSTRAP]);
+  call = state->s_a0;
+
+  switch(call){
+
+    case TERMINATE:
+      SYSCALL(PASSEREN, (int)&swapPoolSem, 0, 0);
+
+      for(i = 0; i < POOLSIZE; i++){
+        if(swapPool[i].asid == asid){
+          swapPool[i].asid = -1;
+          swapPool[i].pageNo = 0;
+          swapPool[i].segNo = 0;
+          swapPool[i].pte = NULL;
+        }
+      }
+      TLBCLR();
+
+      SYSCALL(VERHOGEN, (int) &swapPoolSem, 0, 0);
+      SYSCALL(VERHOGEN, (int) &masterSem, 0, 0);
+      SYSCALL(TERMINATEPROCESS, 0, 0, 0);
+
+    default:
+      SYSCALL(TERMINATE, 0, 0, 0);
+  }
 }
 
 
@@ -71,6 +102,7 @@ void pager(){
   vPageNo = missingPage = (oldTLB->s_asid & 0x3FFFF000) >> 12;
   vPageNo = (vPageNo & MAXPAGES);
 
+  debugOMICRON(segment);
   debugOMICRON(vPageNo);
 
   if(missingPage >= KUSEGPTESIZE){
@@ -148,7 +180,7 @@ void pager(){
 
 
 void userProgTrapHandler(){
-  SYSCALL(TERMINATEPROCESS, 0, 0, 0);
+  SYSCALL(TERMINATE, 0, 0, 0);
 }
 
 
