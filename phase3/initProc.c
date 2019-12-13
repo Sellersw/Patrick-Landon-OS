@@ -129,7 +129,7 @@ void test(){
 
 void uProcInit(){
   int asid, i;
-  state_t state;
+  state_t state, *newState;
 
   debugOMICRON(asid);
 
@@ -141,21 +141,21 @@ void uProcInit(){
 
 
   for(i = 0; i < TRAPTYPES; i++){
-    state.s_asid = getENTRYHI();
-    state.s_sp = UPROCSTACK + ((((asid-1)*TRAPTYPES)+i)*PAGESIZE);
-    state.s_status = VMON | INTEROFF | INTERUNMASKED | PLOCTIMEON | KERNELON;
+    newState = &(uProcs[asid-1].t_newTrap[i]);
+    newState->s_asid = getENTRYHI();
+    newState->s_sp = UPROCSTACK + ((((asid-1)*TRAPTYPES)+i)*PAGESIZE);
+    newState->s_status = VMON | INTEROFF | INTERUNMASKED | PLOCTIMEON | KERNELON;
     switch(i){
       case TLBTRAP:
-        state.s_pc = state.s_t9 = (memaddr) pager;
+        newState->s_pc = newState->s_t9 = (memaddr) pager;
         break;
       case PROGTRAP:
-        state.s_pc = state.s_t9 = (memaddr) userProgTrapHandler;
+        newState->s_pc = newState->s_t9 = (memaddr) userProgTrapHandler;
         break;
       case SYSTRAP:
-        state.s_pc = state.s_t9 = (memaddr) userSyscallHandler;
+        newState->s_pc = newState->s_t9 = (memaddr) userSyscallHandler;
         break;
     }
-    copyState(&state, &(uProcs[asid-1].t_newTrap[i]));
     SYSCALL(SPECTRAPVEC, i, &(uProcs[asid-1].t_oldTrap[i]), &(uProcs[asid-1].t_newTrap[i]));
   }
 
