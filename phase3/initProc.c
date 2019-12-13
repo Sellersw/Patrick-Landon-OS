@@ -197,7 +197,7 @@ void tapeToDisk(int asid){
       SYSCALL(TERMINATEPROCESS, 0, 0, 0);
     }
 
-    if((tapeReg->d_data1 != EOT) || (tapeReg->d_data1 != EOF)){
+    if((tapeReg->d_data1 == EOT) || (tapeReg->d_data1 == EOF)){
       i = 31;
     }
 
