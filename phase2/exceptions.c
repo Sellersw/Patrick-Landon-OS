@@ -40,11 +40,19 @@ HIDDEN void waitio(state_t *state);
 /******************************************************************************/
 
 
+
+void debugOMICRON(int a){
+  a+5;
+}
+
+
+
 /************************PROGRAM TRAP HANDLER**********************************/
 
 /* A publically available function for handling a program trap. It simply
 triggers a pass up or die with the call code for a program trap. */
 void progTrapHandler(){
+  debugOMICRON(69);
   passUpOrDie(PROGTRAP);
 }
 
@@ -56,6 +64,7 @@ void progTrapHandler(){
 /* A publically available function for handling a TLB trap. It simply triggers a
 pass up or die with the call code for a TLB trap.*/
 void tlbTrapHandler(){
+  debugOMICRON(420);
   passUpOrDie(TLBTRAP);
 }
 
@@ -73,6 +82,10 @@ void sysCallHandler(){
   unsigned int call, status;
   state_t *oldSys, *oldPgm;
   /*******************************************/
+
+
+  debugOMICRON(1);
+
 
   /* Grab the state which was responsible for calling the syscall */
   oldSys = (state_t *) SYSCALLOLD;
