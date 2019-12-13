@@ -41,9 +41,7 @@ HIDDEN void waitio(state_t *state);
 
 
 
-void debugOMICRON(int a){
-  a+5;
-}
+extern void debugOMICRON(int a);
 
 
 
