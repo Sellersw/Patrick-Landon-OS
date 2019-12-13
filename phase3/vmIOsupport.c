@@ -18,6 +18,7 @@
 static int frameNo = POOLSIZE-1;
 
 HIDDEN int getFrame();
+HIDDEN void terminate(state_t *state);
 
 
 void debugOMICRON(int a){
@@ -39,24 +40,10 @@ void userSyscallHandler(){
   switch(call){
 
     case TERMINATE:
-      SYSCALL(PASSEREN, (int)&swapPoolSem, 0, 0);
-
-      for(i = 0; i < POOLSIZE; i++){
-        if(swapPool[i].asid == asid){
-          swapPool[i].asid = -1;
-          swapPool[i].pageNo = 0;
-          swapPool[i].segNo = 0;
-          swapPool[i].pteEntry = NULL;
-        }
-      }
-      TLBCLR();
-
-      SYSCALL(VERHOGEN, (int) &swapPoolSem, 0, 0);
-      SYSCALL(VERHOGEN, (int) &masterSem, 0, 0);
-      SYSCALL(TERMINATEPROCESS, 0, 0, 0);
+      terminate(asid);
 
     default:
-      SYSCALL(TERMINATE, 0, 0, 0);
+      terminate(asid);
   }
 }
 
@@ -193,4 +180,26 @@ HIDDEN int getFrame(){
 	}
 
 	return(frameNo);
+}
+
+
+
+
+
+HIDDEN void terminate(int asid){
+  SYSCALL(PASSEREN, (int)&swapPoolSem, 0, 0);
+
+  for(i = 0; i < POOLSIZE; i++){
+    if(swapPool[i].asid == asid){
+      swapPool[i].asid = -1;
+      swapPool[i].pageNo = 0;
+      swapPool[i].segNo = 0;
+      swapPool[i].pteEntry = NULL;
+    }
+  }
+  TLBCLR();
+
+  SYSCALL(VERHOGEN, (int) &swapPoolSem, 0, 0);
+  SYSCALL(VERHOGEN, (int) &masterSem, 0, 0);
+  SYSCALL(TERMINATEPROCESS, 0, 0, 0);
 }
