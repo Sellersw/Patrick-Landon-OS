@@ -127,6 +127,7 @@ void pager(){
   }
 
   debugOMICRON(vPageNo);
+  debugOMICRON(missingPage);
   debugOMICRON(asid-1);
 
   diskIO(asid-1, vPageNo, 0, disk0sem, 0, swapLoc, READBLK);
