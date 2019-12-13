@@ -86,7 +86,7 @@ void test(){
 
 
   for(i = 1; i < MAXUPROC+1; i++){
-    segmentTable = (segTable_t *) SEGTABLESTART + ((i-1)*12);
+    segmentTable = (segTable_t *) SEGTABLESTART + (i*12);
 
     uProcs[i-1].t_pte.header = (MAGNO << 24) | KUSEGPTESIZE;
 
