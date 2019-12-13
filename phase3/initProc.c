@@ -207,7 +207,9 @@ void tapeToDisk(int asid){
       SYSCALL(TERMINATEPROCESS, 0, 0, 0);
     }
 
+    debugOMICRON(asid);
     diskIO(asid-1, i, 0, &devSemArray[(DEVCNT*(DISKINT-DEVINTOFFSET))], 0, tapeBuf, WRITEBLK);
+    debugOMICRON(i);
     i++;
   }
 }
