@@ -50,7 +50,7 @@ void userSyscallHandler(){
 
 void pager(){
   state_t *oldTLB;
-  unsigned int asid, cause, segment, vPageNo, missingPage, swapPageNo;
+  unsigned int asid, cause, segment, vPageNo, missingPage, swapPageNo, swapId;
   memaddr swapLoc, RAMTOP;
   int *disk0sem = &devSemArray[(DEVCNT*(DISKINT-DEVINTOFFSET))];
   pte_t *pTable;
@@ -85,6 +85,9 @@ void pager(){
   vPageNo = missingPage = (oldTLB->s_asid & 0x3FFFF000) >> 12;
 
 
+  debugOMICRON(segment);
+
+
   if(missingPage >= KUSEGPTESIZE){
     vPageNo = KUSEGPTESIZE - 1;
   }
@@ -105,10 +108,13 @@ void pager(){
 
     swapPool[frameNo].pteEntry->pte_entryLo = swapPool[frameNo].pteEntry->pte_entryLo & (0xD << 8);
     swapPageNo = swapPool[frameNo].pageNo;
+    swapId = swapPool[frameNo].asid;
 
     if(swapPageNo >= KUSEGPTESIZE){
       swapPageNo = KUSEGPTESIZE - 1;
     }
+
+    debugOMICRON(swapPool[frameNo].pageNo);
 
     swapPool[frameNo].asid = -1;
     swapPool[frameNo].segNo = 0;
@@ -120,8 +126,16 @@ void pager(){
 
     disableInts(FALSE);
 
-    diskIO((swapPool[frameNo].asid)-1, swapPageNo, 0, disk0sem, 0, swapLoc, WRITEBLK);
+    debugOMICRON(swapPageNo);
+
+    diskIO(swapId-1, swapPageNo, 0, disk0sem, 0, swapLoc, WRITEBLK);
+
+    debugOMICRON(-1);
   }
+
+  debugOMICRON(vPageNo);
+  debugOMICRON(missingPage);
+  debugOMICRON(asid-1);
 
   diskIO(asid-1, vPageNo, 0, disk0sem, 0, swapLoc, READBLK);
 
@@ -134,7 +148,6 @@ void pager(){
   swapPool[frameNo].pteEntry = &(pTable->pteTable[vPageNo]);
   swapPool[frameNo].pteEntry->pte_entryLo = (swapLoc & 0xFFFFF000) | (0x6 << 8);
 
-  debugOMICRON((swapLoc & 0xFFFFF000));
 
   TLBCLR();
   disableInts(FALSE);
