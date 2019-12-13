@@ -90,7 +90,7 @@ void test(){
 
 
   for(i = 1; i < MAXUPROC+1; i++){
-    debugOMICRON(3);
+    debugOMICRON(UPROCSTACK + ((i-1)*TRAPTYPES*PAGESIZE));
     segmentTable = (segTable_t *) SEGTABLESTART + (i*12);
 
     uProcs[i-1].t_pte.header = (MAGNO << 24) | KUSEGPTESIZE;
