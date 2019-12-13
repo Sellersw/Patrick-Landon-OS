@@ -57,7 +57,6 @@ void pager(){
 
   devregarea_t* devReg = (devregarea_t *) RAMBASEADDR;
 
-  debugOMICRON(10);
 
   SYSCALL(PASSEREN, (int) &swapPoolSem, 0, 0);
 
@@ -72,7 +71,6 @@ void pager(){
   cause = cause << 25;
   cause = cause >> 27;
 
-  debugOMICRON(cause);
 
   if((cause != TLBINVLW) && (cause != TLBINVSW)){
     SYSCALL(VERHOGEN, (int) &swapPoolSem, 0, 0);
@@ -80,22 +78,16 @@ void pager(){
   }
 
 
-  debugOMICRON(4);
-
   RAMTOP = devReg->rambase + devReg->ramsize;
   swapLoc = RAMTOP - (4*PAGESIZE);
 
   segment = (oldTLB->s_asid >> 30);
   vPageNo = missingPage = (oldTLB->s_asid & 0x3FFFF000) >> 12;
 
-  debugOMICRON(segment);
-  debugOMICRON(vPageNo);
 
   if(missingPage >= KUSEGPTESIZE){
     vPageNo = KUSEGPTESIZE - 1;
   }
-
-  debugOMICRON(vPageNo);
 
 
   if(segment == KUSEG3NO){
@@ -111,8 +103,6 @@ void pager(){
   if(swapPool[frameNo].asid != -1){
     disableInts(TRUE);
 
-    debugOMICRON(frameNo);
-
     swapPool[frameNo].pteEntry->pte_entryLo = swapPool[frameNo].pteEntry->pte_entryLo & (0xD << 8);
     swapPageNo = swapPool[frameNo].pageNo;
 
@@ -125,23 +115,16 @@ void pager(){
     swapPool[frameNo].pageNo = 0;
     swapPool[frameNo].pteEntry = NULL;
 
-    debugOMICRON(20);
 
     TLBCLR();
 
     disableInts(FALSE);
 
     diskIO((swapPool[frameNo].asid)-1, swapPageNo, 0, disk0sem, 0, swapLoc, WRITEBLK);
-
-    debugOMICRON(5);
   }
-
-
-  debugOMICRON(frameNo);
 
   diskIO(asid-1, vPageNo, 0, disk0sem, 0, swapLoc, READBLK);
 
-  debugOMICRON(100);
 
   disableInts(TRUE);
 
@@ -151,12 +134,13 @@ void pager(){
   swapPool[frameNo].pteEntry = &(pTable->pteTable[vPageNo]);
   swapPool[frameNo].pteEntry->pte_entryLo = (swapLoc & 0xFFFFF000) | (0x6 << 8);
 
+  debugOMICRON((swapLoc & 0xFFFFF000));
+
   TLBCLR();
   disableInts(FALSE);
 
   SYSCALL(VERHOGEN, (int) &swapPoolSem, 0, 0);
 
-  debugOMICRON(1);
 
   LDST(oldTLB);
 }
