@@ -50,7 +50,7 @@ void userSyscallHandler(){
 
 void pager(){
   state_t *oldTLB;
-  unsigned int asid, cause, segment, vPageNo, missingPage, swapPageNo;
+  unsigned int asid, cause, segment, vPageNo, missingPage, swapPageNo, swapId;
   memaddr swapLoc, RAMTOP;
   int *disk0sem = &devSemArray[(DEVCNT*(DISKINT-DEVINTOFFSET))];
   pte_t *pTable;
@@ -108,6 +108,7 @@ void pager(){
 
     swapPool[frameNo].pteEntry->pte_entryLo = swapPool[frameNo].pteEntry->pte_entryLo & (0xD << 8);
     swapPageNo = swapPool[frameNo].pageNo;
+    swapId = swapPool[frameNo].asid;
 
     if(swapPageNo >= KUSEGPTESIZE){
       swapPageNo = KUSEGPTESIZE - 1;
@@ -127,7 +128,7 @@ void pager(){
 
     debugOMICRON(swapPageNo);
 
-    diskIO((swapPool[frameNo].asid)-1, swapPageNo, 0, disk0sem, 0, swapLoc, WRITEBLK);
+    diskIO(swapId-1, swapPageNo, 0, disk0sem, 0, swapLoc, WRITEBLK);
 
     debugOMICRON(-1);
   }
