@@ -108,7 +108,7 @@ void pager(){
 
     disableInts(FALSE);
 
-    diskIO((swapPool[frameNo].asid)-1, swapPageNo, 0, disk0sem, swapLoc, WRITEBLK);
+    diskIO((swapPool[frameNo].asid)-1, swapPageNo, 0, disk0sem, 0, swapLoc, WRITEBLK);
 
     debugOMICRON(5);
   }
@@ -117,7 +117,7 @@ void pager(){
   debugOMICRON(asid);
   debugOMICRON(disk0sem);
 
-  diskIO(asid-1, vPageNo, 0, disk0sem, swapLoc, READBLK);
+  diskIO(asid-1, vPageNo, 0, disk0sem, 0, swapLoc, READBLK);
 
   debugOMICRON(100);
 
