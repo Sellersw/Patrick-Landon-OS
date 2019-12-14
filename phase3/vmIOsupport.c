@@ -57,7 +57,7 @@ void userSyscallHandler(){
   }
 }
 
-
+/* The primary TLB trap handler for Virtual Memory. This is what we  */
 void pager(){
   state_t *oldTLB;
   unsigned int asid, cause, segment, vPageNo, missingPage, swapPageNo, swapId;
@@ -81,7 +81,7 @@ void pager(){
   cause = cause << 25;
   cause = cause >> 27;
 
-
+/* If it is not a invalid store word or load word, terminate the process. */
   if((cause != TLBINVLW) && (cause != TLBINVSW)){
     SYSCALL(VERHOGEN, (int) &swapPoolSem, 0, 0);
     SYSCALL(TERMINATE, 0, 0, 0);
