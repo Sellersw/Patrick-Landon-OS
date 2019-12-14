@@ -203,7 +203,6 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
   int i, status, index;
   char *virtAddr = (char *) state->s_a1;
   int len = (int) state->s_a2;
-  device_t *termReg = getDeviceReg(TERMINT, asid-1);
 
   if(len < 0 || len > 128 || virtAddr < KSEGOSEND){
     terminateUserProc(asid);
@@ -218,9 +217,10 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
     disableInts(TRUE);
 
     getDeviceReg(TERMINT, asid-1)->t_transm_command = (virtAddr[i] << 8) | TRANSMCHAR;
-    debugOMICRON(getDeviceReg(TERMINT, asid-1));
 
     status = SYSCALL(WAITIO, TERMINT, asid-1, 0);
+
+    debugOMICRON(getDeviceReg(TERMINT, asid-1));
 
     disableInts(FALSE);
 
