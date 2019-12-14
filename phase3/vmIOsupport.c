@@ -69,7 +69,7 @@ void userSyscallHandler(){
 /* The primary TLB trap handler for Virtual Memory. This is what we  */
 void pager(){
   state_t *oldTLB;
-  unsigned int asid, cause, segment, vPageNo, missingPage, swapPageNo, swapId;
+  unsigned int asid, cause, segment, vPageNo, missingPage, swapPageNo, swapId, fNo;
   memaddr swapLoc, RAMTOP;
   int *disk0sem = &devSemArray[(DEVCNT*(DISKINT-DEVINTOFFSET))];
   pte_t *pTable;
@@ -119,25 +119,27 @@ void pager(){
     }
   }
 
-  frameNo = getFrame();
-  swapLoc = swapLoc - (frameNo*PAGESIZE);
+  fNo = getFrame();
+  swapLoc = swapLoc - (fNo*PAGESIZE);
 
 
-  if(swapPool[frameNo].asid != -1){
+  if(swapPool[fNo].asid != -1){
     disableInts(TRUE);
 
-    swapPool[frameNo].pteEntry->pte_entryLo = swapPool[frameNo].pteEntry->pte_entryLo & (0xD << 8);
-    swapPageNo = swapPool[frameNo].pageNo;
-    swapId = swapPool[frameNo].asid;
+    swapPool[fNo].pteEntry->pte_entryLo = swapPool[fNo].pteEntry->pte_entryLo & (0xD << 8);
+    swapPageNo = swapPool[fNo].pageNo;
+    swapId = swapPool[fNo].asid;
 
     if(swapPageNo >= KUSEGPTESIZE){
       swapPageNo = KUSEGPTESIZE - 1;
     }
 
+/*
     swapPool[frameNo].asid = -1;
     swapPool[frameNo].segNo = 0;
     swapPool[frameNo].pageNo = 0;
     swapPool[frameNo].pteEntry = NULL;
+*/
 
 
     TLBCLR();
@@ -146,25 +148,25 @@ void pager(){
 
     debugOMICRON(swapId);
     debugOMICRON(swapPageNo);
-    debugOMICRON(frameNo);
+    debugOMICRON(fNo);
 
     diskIO(swapId-1, swapPageNo, 0, disk0sem, 0, swapLoc, WRITEBLK);
   }
 
   debugOMICRON(asid);
   debugOMICRON(vPageNo);
-  debugOMICRON(frameNo);
+  debugOMICRON(fNo);
 
   diskIO(asid-1, vPageNo, 0, disk0sem, 0, swapLoc, READBLK);
 
 
   disableInts(TRUE);
 
-  swapPool[frameNo].asid = asid;
-  swapPool[frameNo].segNo = segment;
-  swapPool[frameNo].pageNo = missingPage;
-  swapPool[frameNo].pteEntry = &(pTable->pteTable[vPageNo]);
-  swapPool[frameNo].pteEntry->pte_entryLo = (swapLoc & 0xFFFFF000) | (0x6 << 8);
+  swapPool[fNo].asid = asid;
+  swapPool[fNo].segNo = segment;
+  swapPool[fNo].pageNo = missingPage;
+  swapPool[fNo].pteEntry = &(pTable->pteTable[vPageNo]);
+  swapPool[fNo].pteEntry->pte_entryLo = (swapLoc & 0xFFFFF000) | (0x6 << 8);
 
 
   TLBCLR();
