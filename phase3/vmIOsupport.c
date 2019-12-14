@@ -211,7 +211,7 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
   int i, status, index;
   char *virtAddr = (char *) state->s_a1;
   int len = (int) state->s_a2;
-  device_t *termReg = getDeviceReg(TERMINT, asid-1);
+  device_t *termReg = (device_t *) (0x10000050 + ((TERMINT-3) * 0x80) + ((asid-1)*0x10)));
 
   if(len < 0 || len > 128 || virtAddr < KSEGOSEND){
     terminateUserProc(asid);
