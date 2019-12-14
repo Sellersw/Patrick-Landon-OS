@@ -107,8 +107,6 @@ void pager(){
 
 
 
-
-
   if(missingPage >= KUSEGPTESIZE){
     vPageNo = KUSEGPTESIZE - 1;
   }

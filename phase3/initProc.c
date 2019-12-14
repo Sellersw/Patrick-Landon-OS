@@ -13,13 +13,7 @@ Authors: Landon Clark and Patrick Sellers
 #include "../h/types.h"
 #include "../h/const.h"
 #include "/usr/local/include/umps2/umps/libumps.e"
-/*#include "../e/exception.e"*/
 
-
-
-void debugOMICRONs(int a){
-  a+5;
-}
 
 
 extern void userSyscallHandler();
@@ -150,7 +144,7 @@ void uProcInit(){
 
   tapeToDisk(asid);
 
-  state.s_asid = asid << 6;
+  state.s_asid = getENTRYHI();
   state.s_sp = (memaddr) 0xC0000000;
   state.s_status = VMON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELOFF;
   state.s_pc = state.s_t9 = (memaddr) 0x800000B0;
@@ -183,14 +177,12 @@ void tapeToDisk(int asid){
 
 
     if(status != READY){
-      SYSCALL(TERMINATEPROCESS, 0, 0, 0);
+      SYSCALL(TERMINATE, 0, 0, 0);
     }
 
     if((tapeReg->d_data1 == EOT) || (tapeReg->d_data1 == EOF)){
       i = 31;
     }
-
-    debugOMICRONs(i);
 
     diskIO(asid-1, i, 0, disk0sem, 0, tapeBuf, WRITEBLK);
     i++;
@@ -212,7 +204,7 @@ void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf
   disableInts(FALSE);
 
   if(status != READY){
-    SYSCALL(TERMINATEPROCESS, 0, 0, 0);
+    SYSCALL(TERMINATE, 0, 0, 0);
   }
 
   disableInts(TRUE);
@@ -224,11 +216,12 @@ void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf
   disableInts(FALSE);
 
   if(status != READY){
-    SYSCALL(TERMINATEPROCESS, 0, 0, 0);
+    SYSCALL(TERMINATE, 0, 0, 0);
   }
 
   SYSCALL(VERHOGEN, sem, 0, 0);
 }
+
 
 /* A helper function to disable interrupts at important points in VM functions.*/
 void disableInts(int disable){
