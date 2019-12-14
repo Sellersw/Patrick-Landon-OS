@@ -146,12 +146,14 @@ void pager(){
 
     debugOMICRON(swapId);
     debugOMICRON(swapPageNo);
+    debugOMICRON(frameNo);
 
     diskIO(swapId-1, swapPageNo, 0, disk0sem, 0, swapLoc, WRITEBLK);
   }
 
   debugOMICRON(asid);
   debugOMICRON(vPageNo);
+  debugOMICRON(frameNo);
 
   diskIO(asid-1, vPageNo, 0, disk0sem, 0, swapLoc, READBLK);
 
