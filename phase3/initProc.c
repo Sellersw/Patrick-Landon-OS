@@ -28,7 +28,6 @@ void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf
 void tapeToDisk(int asid);
 void uProcInit();
 void disableInts(int disable);
-void disableVM(int disable);
 device_t* getDeviceReg(int lineNo, int devNo);
 
 
@@ -196,13 +195,13 @@ void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf
   int status;
   device_t *disk = getDeviceReg(DISKINT, diskNum);
 
-  SYSCALL(PASSEREN, sem, 0, 0);
+  SYSCALL(PASSEREN, (int) sem, 0, 0);
 
   disableInts(TRUE);
 
   disk->d_command = (cyl << 8) | SEEKCYL;
 
-  status = SYSCALL(WAITIO, DISKINT, sector, 0);
+  status = SYSCALL(WAITIO, DISKINT, diskNum, 0);
 
   disableInts(FALSE);
 
@@ -215,7 +214,7 @@ void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf
   disk->d_data0 = memBuf;
   disk->d_command = (head << 16) | (sector << 8) | command;
 
-  status = SYSCALL(WAITIO, DISKINT, sector, 0);
+  status = SYSCALL(WAITIO, DISKINT, diskNum, 0);
 
   disableInts(FALSE);
 
@@ -223,7 +222,7 @@ void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf
     SYSCALL(TERMINATE, 0, 0, 0);
   }
 
-  SYSCALL(VERHOGEN, sem, 0, 0);
+  SYSCALL(VERHOGEN, (int) sem, 0, 0);
 }
 
 
