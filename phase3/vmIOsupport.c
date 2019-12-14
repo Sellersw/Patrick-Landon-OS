@@ -146,16 +146,10 @@ void pager(){
 
     disableInts(FALSE);
 
-    debugOMICRON(swapId);
-    debugOMICRON(swapPageNo);
-    debugOMICRON(fNo);
 
     diskIO(swapId-1, swapPageNo, 0, disk0sem, 0, swapLoc, WRITEBLK);
   }
 
-  debugOMICRON(asid);
-  debugOMICRON(vPageNo);
-  debugOMICRON(fNo);
 
   diskIO(asid-1, vPageNo, 0, disk0sem, 0, swapLoc, READBLK);
 
@@ -174,6 +168,8 @@ void pager(){
   disableInts(FALSE);
 
   SYSCALL(VERHOGEN, (int) &swapPoolSem, 0, 0);
+
+  debugOMICRON(fNo);
 
   LDST(oldTLB);
 }
