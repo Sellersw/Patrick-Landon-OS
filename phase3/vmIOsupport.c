@@ -124,7 +124,7 @@ void pager(){
   if(swapPool[fNo].asid != -1){
     disableInts(TRUE);
 
-    swapPool[fNo].pteEntry->pte_entryLo = swapPool[fNo].pteEntry->pte_entryLo & 0xD00;
+    swapPool[fNo].pteEntry->pte_entryLo = swapPool[fNo].pteEntry->pte_entryLo & 0xFFFFFCFF;
     swapPageNo = swapPool[fNo].pageNo;
     swapId = swapPool[fNo].asid;
 
