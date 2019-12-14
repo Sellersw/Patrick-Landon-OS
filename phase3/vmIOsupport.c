@@ -44,7 +44,6 @@ void userSyscallHandler(){
 
   state = &(uProcs[asid-1].t_oldTrap[SYSTRAP]);
   call = state->s_a0;
-  state->s_pc = state->s_pc + WORDLEN;
 
   switch(call){
 
