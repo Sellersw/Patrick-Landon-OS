@@ -65,7 +65,7 @@ void scheduler(){
     setTIMER(QUANTUM);
     STCK(startTOD);
 
-    debugF((int) currentProc.p_s->s_pc);
+    debugF((int) currentProc.p_s.s_pc);
 
     /* loads our new process into our CPU registers */
     LDST(&(currentProc->p_s));
