@@ -16,6 +16,12 @@ Authors: Landon Clark and Patrick Sellers
 /*#include "../e/exception.e"*/
 
 
+
+void debugOMICRON(int a){
+  a+5;
+}
+
+
 extern void userSyscallHandler();
 extern void pager();
 extern void userProgTrapHandler();
@@ -183,6 +189,8 @@ void tapeToDisk(int asid){
     if((tapeReg->d_data1 == EOT) || (tapeReg->d_data1 == EOF)){
       i = 31;
     }
+
+    debugOMICRON(i);
 
     diskIO(asid-1, i, 0, disk0sem, 0, tapeBuf, WRITEBLK);
     i++;
