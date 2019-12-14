@@ -167,6 +167,8 @@ void pager(){
 
   SYSCALL(VERHOGEN, (int) &swapPoolSem, 0, 0);
 
+  debugOMICRON(swapLoc);
+
   LDST(oldTLB);
 }
 
