@@ -19,7 +19,7 @@ EF = umps2-elf2umps
 UDEV = umps2-mkdev
 
 #main target
-all: kernel.core.umps readTape.umps fibTape.umps swapTape.umps todTape.umps diskTape.umps pvATape.umps pvBTape.umps printerTape.umps disk0.umps disk1.umps
+all: kernel.core.umps readTape.umps fibTape.umps fibTape1.umps swapTape.umps todTape.umps diskTape.umps pvATape.umps pvBTape.umps printerTape.umps disk0.umps disk1.umps
 
 disk0.umps:
 	$(UDEV) -d disk0.umps
@@ -32,6 +32,9 @@ readTape.umps: read_t.aout.umps
 
 fibTape.umps: fib_t.aout.umps
 	$(UDEV) -t fibTape.umps fib_t.aout.umps
+
+fibTape1.umps: fib_t.aout.umps
+	$(UDEV) -t fibTape1.umps fib_t.aout.umps
 
 swapTape.umps: swap_t.aout.umps
 	$(UDEV) -t swapTape.umps swap_t.aout.umps
