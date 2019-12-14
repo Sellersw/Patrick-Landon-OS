@@ -111,9 +111,7 @@ void pager(){
 
 
   if(segment == KUSEG3NO){
-    debugOMICRON(12);
     if(kUseg3.pteTable[vPageNo].pte_entryLo & (0x2 << 8) == (0x2 << 8)){
-      debugOMICRON(13);
       SYSCALL(VERHOGEN, (int) &swapPoolSem, 0, 0);
       LDST(oldTLB);
     }
