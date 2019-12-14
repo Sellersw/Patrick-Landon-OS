@@ -129,6 +129,8 @@ void uProcInit(){
   asid = (asid << 20);
   asid = (asid >> 26);
 
+  tapeToDisk(asid);
+
   for(i = 0; i < TRAPTYPES; i++){
     newState = &(uProcs[asid-1].t_newTrap[i]);
     newState->s_asid = getENTRYHI();
@@ -147,8 +149,6 @@ void uProcInit(){
     }
     SYSCALL(SPECTRAPVEC, i, &(uProcs[asid-1].t_oldTrap[i]), &(uProcs[asid-1].t_newTrap[i]));
   }
-
-  tapeToDisk(asid);
 
   state.s_asid = getENTRYHI();
   state.s_sp = (memaddr) 0xC0000000;
