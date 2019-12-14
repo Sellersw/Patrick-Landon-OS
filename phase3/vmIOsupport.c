@@ -122,6 +122,8 @@ void pager(){
   frameNo = getFrame();
   swapLoc = swapLoc - (frameNo*PAGESIZE);
 
+  debugOMICRON(vPageNo);
+
   if(swapPool[frameNo].asid != -1){
     disableInts(TRUE);
 
@@ -215,7 +217,7 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
 
   for(i = 0; i < len; i++){
     disableInts(TRUE);
-    
+
     termReg->t_transm_command = (virtAddr[i] << 8) | TRANSMCHAR;
     status = SYSCALL(WAITIO, TERMINT, asid-1, 0);
 
