@@ -135,14 +135,6 @@ void pager(){
       swapPageNo = KUSEGPTESIZE - 1;
     }
 
-/*
-    swapPool[frameNo].asid = -1;
-    swapPool[frameNo].segNo = 0;
-    swapPool[frameNo].pageNo = 0;
-    swapPool[frameNo].pteEntry = NULL;
-*/
-
-
     TLBCLR();
 
     disableInts(FALSE);
@@ -223,10 +215,14 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
 
   for(i = 0; i < len; i++){
 
+    disableInts(TRUE);
+
     termReg->t_transm_command = (virtAddr[i] << 8) | TRANSMCHAR;
-    debugOMICRON(getSTATUS());
+    debugOMICRON(getDeviceReg(TERMINT, asid-1));
 
     status = SYSCALL(WAITIO, TERMINT, asid-1, 0);
+
+    disableInts(FALSE);
 
     if((status & STATUSMASK) != CHARTRANSMD){
       status = -status;
