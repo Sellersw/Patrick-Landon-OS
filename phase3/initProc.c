@@ -12,6 +12,7 @@ Authors: Landon Clark and Patrick Sellers
 
 #include "../h/types.h"
 #include "../h/const.h"
+#include "./testers/h/tconst.h"
 #include "/usr/local/include/umps2/umps/libumps.e"
 
 
