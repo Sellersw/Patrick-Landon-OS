@@ -17,7 +17,7 @@ Authors: Landon Clark and Patrick Sellers
 
 
 
-void debugOMICRON(int a){
+void debugOMICRONs(int a){
   a+5;
 }
 
@@ -190,7 +190,7 @@ void tapeToDisk(int asid){
       i = 31;
     }
 
-    debugOMICRON(i);
+    debugOMICRONs(i);
 
     diskIO(asid-1, i, 0, disk0sem, 0, tapeBuf, WRITEBLK);
     i++;
