@@ -204,7 +204,7 @@ HIDDEN int getFrame(){
 
 
 HIDDEN void writeToTerminal(state_t *state, int asid){
-  int i, status, *termSem;
+  int i, status;
   char *virtAddr = (char *) state->s_a1;
   int len = (int) state->s_a2;
   device_t *termReg = getDeviceReg(TERMINT, asid-1);
@@ -212,9 +212,6 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
   if(len < 0 || len > 128 || virtAddr < KSEGOSEND){
     terminateUserProc(asid);
   }
-
-  termSem = &devSemArray[(DEVCNT*(TERMINT-DEVINTOFFSET)) + (TERMCNT*(asid-1))];
-  SYSCALL(PASSEREN, (int) termSem, 0, 0);
 
   for(i = 0; i < len; i++){
     disableInts(TRUE);
@@ -224,8 +221,6 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
     termReg->t_transm_command = (virtAddr[i] << 8) | TRANSMCHAR;
     status = SYSCALL(WAITIO, TERMINT, asid-1, 0);
 
-    debugOMICRON(status);
-
     disableInts(FALSE);
 
     if((status & STATUSMASK) != CHARTRANSMD){
@@ -234,8 +229,6 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
     }
     status = i;
   }
-
-  SYSCALL(VERHOGEN, (int) termSem, 0, 0);
 
   state->s_v0 = status;
 
