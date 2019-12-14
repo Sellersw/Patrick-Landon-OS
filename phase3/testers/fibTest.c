@@ -19,14 +19,14 @@ int fib (int i) {
 void main() {
 	int i;
 
-	/*print(WRITETERMINAL, "Recursive Fibanaci Test starts\n");*/
+	print(WRITETERMINAL, "Recursive Fibanaci Test starts\n");
 
 	i = fib(7);
 
-	/*print(WRITETERMINAL, "Recursion Concluded\n");*/
+	print(WRITETERMINAL, "Recursion Concluded\n");
 
 	if (i == 13) {
-		print(WRITETERMINAL, "R"); /*ecursion Concluded Successfully\n");*/
+		print(WRITETERMINAL, "Recursion Concluded Successfully\n");
 	}
 	else
 		print(WRITETERMINAL, "ERROR: Recursion problems\n");
