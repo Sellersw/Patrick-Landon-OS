@@ -55,6 +55,11 @@ Written by: Patrick Sellers and Landon Clark
 /******************************************************************************/
 
 
+void debugF(int a){
+  a+5;
+}
+
+
 /***********************Localized (Private) Methods****************************/
 HIDDEN int findLineNo(unsigned int cause);
 HIDDEN int findDevNo(unsigned int bitMap);
@@ -177,9 +182,11 @@ void ioTrapHandler(){
 
           /* Grab the status of the terminal device, acknowledge the given
           interrupt, and set read to FALSE for indexing purposes */
+          debugF(1);
           status = devReg->t_transm_status;
           devReg->t_transm_command = ACK;
           read = FALSE;
+          debugF(status);
         }
 
         /* If the read status of the terminal is not READY, then we have a read
