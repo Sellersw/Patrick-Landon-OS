@@ -221,7 +221,6 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
     disableInts(TRUE);
 
     debugOMICRON(status);
-    debugOMICRON(&status++);
     status = 0;
     debugOMICRON(status);
 
