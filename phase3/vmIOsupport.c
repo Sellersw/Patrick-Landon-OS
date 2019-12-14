@@ -203,7 +203,7 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
 
   for(i = 0; i < len; i++){
 
-    disableInts(TRUE);
+    /*disableInts(TRUE);*/
 
     getDeviceReg(TERMINT, asid-1)->t_transm_command = (virtAddr[i] << 8) | TRANSMCHAR;
 
@@ -211,7 +211,7 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
     status = SYSCALL(WAITIO, TERMINT, asid-1, 0);
     debugOMICRON(status);
 
-    disableInts(FALSE);
+    /*disableInts(FALSE);*/
 
     if((status & STATUSMASK) != CHARTRANSMD){
       status = -status;
