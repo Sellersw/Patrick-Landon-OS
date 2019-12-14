@@ -189,7 +189,7 @@ HIDDEN int getFrame(){
 
 
 HIDDEN void writeToTerminal(state_t *state, int asid){
-  int i;
+  int i, status;
   char *virtAddr = (char *) state->s_a1;
   int len = (int) state->s_a2;
   device_t *termReg = getDeviceReg(TERMINT, asid-1);
@@ -199,15 +199,21 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
   }
 
   for(i = 0; i < len; i++){
-    termReg->t_transm_command = (*(virtAddr+(i*WORDLEN)) << 8) | TRANSMCHAR;
+    disableInts(TRUE);
+
+    termReg->t_transm_command = (virtAddr[i] << 8) | TRANSMCHAR;
     SYSCALL(WAITIO, TERMINT, asid-1, 0);
+
+    disableInts(FALSE);
+
+    status = i;
+
+    if(termReg->t_transm_status != CHARTRANSMD){
+      status = -(termReg->t_transm_status);
+    }
   }
 
-  state->s_v0 = i;
-
-  if(termReg->t_transm_status != CHARTRANSMD){
-    state->s_v0 = -(termReg->t_transm_status);
-  }
+  state->s_v0 = status;
 
   LDST(state);
 }
