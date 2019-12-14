@@ -20,7 +20,6 @@ extern swapPool_t swapPool[POOLSIZE];
 extern pte_t kUseg3;
 
 extern void disableInts(int disable);
-extern void disableVM(int disable);
 
 extern device_t* getDeviceReg(int lineNo, int devNo);
 

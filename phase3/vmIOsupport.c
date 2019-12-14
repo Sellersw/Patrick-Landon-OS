@@ -221,16 +221,11 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
 
   SYSCALL(PASSEREN, (int) &(devSemArray[index]), 0, 0);
 
+  disableInts(TRUE);
   for(i = 0; i < len; i++){
-    disableInts(TRUE);
 
     termReg->t_transm_command = (virtAddr[i] << 8) | TRANSMCHAR;
-
-    disableVM(TRUE);
     status = SYSCALL(WAITIO, TERMINT, asid-1, 0);
-    disableVM(FALSE);
-
-    disableInts(FALSE);
 
     if((status & STATUSMASK) != CHARTRANSMD){
       status = -status;
@@ -238,6 +233,8 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
     }
     status = i;
   }
+  disableInts(FALSE);
+
   SYSCALL(VERHOGEN, (int) &(devSemArray[index]), 0, 0);
 
   state->s_v0 = status;

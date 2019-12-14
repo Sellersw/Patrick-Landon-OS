@@ -202,9 +202,7 @@ void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf
 
   disk->d_command = (cyl << 8) | SEEKCYL;
 
-  disableVM(TRUE);
   status = SYSCALL(WAITIO, DISKINT, sector, 0);
-  disableVM(FALSE);
 
   disableInts(FALSE);
 
@@ -217,9 +215,7 @@ void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf
   disk->d_data0 = memBuf;
   disk->d_command = (head << 16) | (sector << 8) | command;
 
-  disableVM(TRUE);
   status = SYSCALL(WAITIO, DISKINT, sector, 0);
-  disableVM(FALSE);
 
   disableInts(FALSE);
 
@@ -244,17 +240,6 @@ void disableInts(int disable){
   }
 }
 
-void disableVM(int disable){
-  unsigned int status;
-  if(disable == TRUE){
-    status = getSTATUS() & 0xFEFFFFFF;
-    setSTATUS(status);
-  }
-  else{
-    status = getSTATUS() | (VMON >> 1) ;
-    setSTATUS(status);
-  }
-}
 
 
 device_t* getDeviceReg(int lineNo, int devNo){
