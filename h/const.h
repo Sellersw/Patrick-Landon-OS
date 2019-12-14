@@ -171,7 +171,7 @@
 
 
 #define MAXPAGES 32
-#define MAXUPROC 2
+#define MAXUPROC 1
 #define POOLSIZE MAXUPROC*2
 #define MAGNO 0x2A
 
