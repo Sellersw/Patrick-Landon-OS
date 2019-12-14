@@ -128,7 +128,7 @@ void uProcInit(){
     newState = &(uProcs[asid-1].t_newTrap[i]);
     newState->s_asid = getENTRYHI();
     newState->s_sp = UPROCSTACK + ((((asid-1)*TRAPTYPES)+i)*PAGESIZE);
-    newState->s_status = VMON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELON;
+    newState->s_status = VMNOTON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELON;
     switch(i){
       case TLBTRAP:
         newState->s_pc = newState->s_t9 = (memaddr) pager;
