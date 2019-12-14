@@ -241,6 +241,20 @@ void disableInts(int disable){
 }
 
 
+void disableVM(int disable){
+  unsigned int status;
+  if(disable == TRUE){
+    status = getSTATUS() & 0xFEFFFFFF;
+    setSTATUS(status);
+  }
+  else{
+    status = getSTATUS() | (VMON >> 1);
+    setSTATUS(status);
+  }
+}
+
+
+
 
 device_t* getDeviceReg(int lineNo, int devNo){
   /* See pg. 32 of pops for a more detailed explanation on these magic numbers.

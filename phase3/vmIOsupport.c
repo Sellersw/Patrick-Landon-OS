@@ -223,8 +223,11 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
 
   for(i = 0; i < len; i++){
 
+    disableVM(TRUE);
     termReg->t_transm_command = (virtAddr[i] << 8) | TRANSMCHAR;
     debugOMICRON((int)termReg);
+    disableVM(FALSE);
+
     status = SYSCALL(WAITIO, TERMINT, asid-1, 0);
 
     if((status & STATUSMASK) != CHARTRANSMD){
