@@ -29,6 +29,11 @@ void debugOMICRON(int a){
 }
 
 
+
+
+
+
+
 void userSyscallHandler(){
   state_t *state;
   int call, asid;
@@ -56,6 +61,10 @@ void userSyscallHandler(){
       break;
   }
 }
+
+
+
+
 
 /* The primary TLB trap handler for Virtual Memory. This is what we  */
 void pager(){
@@ -163,9 +172,17 @@ void pager(){
 
 
 
+
+
+
 void userProgTrapHandler(){
   SYSCALL(TERMINATE, 0, 0, 0);
 }
+
+
+
+
+
 
 
 
@@ -180,8 +197,14 @@ HIDDEN int getFrame(){
 }
 
 
+
+
+
+
+
+
 HIDDEN void writeToTerminal(state_t *state, int asid){
-  int i, status;
+  int i, status, *termSem;
   char *virtAddr = (char *) state->s_a1;
   int len = (int) state->s_a2;
   device_t *termReg = getDeviceReg(TERMINT, asid-1);
@@ -190,27 +213,35 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
     terminateUserProc(asid);
   }
 
+  termSem = &devSemArray[(DEVCNT*(TERMINT-DEVINTOFFSET)) + (TERMCNT*(asid-1))];
+  SYSCALL(PASSEREN, (int) termSem, 0, 0);
+
   for(i = 0; i < len; i++){
     disableInts(TRUE);
+
+    debugOMICRON((int) virtAddr);
 
     termReg->t_transm_command = (virtAddr[i] << 8) | TRANSMCHAR;
     status = SYSCALL(WAITIO, TERMINT, asid-1, 0);
 
+    debugOMICRON(status);
+
     disableInts(FALSE);
 
     if((status & STATUSMASK) != CHARTRANSMD){
-      status = -(termReg->t_transm_status);
+      status = -status;
       break;
     }
     status = i;
   }
 
-  state->s_v0 = status;
+  SYSCALL(VERHOGEN, (int) termSem, 0, 0);
 
-  debugOMICRON(status);
+  state->s_v0 = status;
 
   LDST(state);
 }
+
 
 
 HIDDEN void terminateUserProc(int asid){
