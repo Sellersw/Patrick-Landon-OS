@@ -144,9 +144,14 @@ void pager(){
 
     disableInts(FALSE);
 
+    debugOMICRON(swapId);
+    debugOMICRON(swapPageNo);
+
     diskIO(swapId-1, swapPageNo, 0, disk0sem, 0, swapLoc, WRITEBLK);
   }
 
+  debugOMICRON(asid);
+  debugOMICRON(vPageNo);
 
   diskIO(asid-1, vPageNo, 0, disk0sem, 0, swapLoc, READBLK);
 
