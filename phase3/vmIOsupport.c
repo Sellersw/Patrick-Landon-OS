@@ -199,7 +199,7 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
 
   index = (DEVCNT*(TERMINT-DEVINTOFFSET))+(TERMCNT*(asid-1));
 
-  /*SYSCALL(PASSEREN, (int) &(devSemArray[index]), 0, 0);*/
+  SYSCALL(PASSEREN, (int) &(devSemArray[index]), 0, 0);
 
   for(i = 0; i < len; i++){
 
@@ -208,6 +208,7 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
     getDeviceReg(TERMINT, asid-1)->t_transm_command = (virtAddr[i] << 8) | TRANSMCHAR;
 
     status = SYSCALL(WAITIO, TERMINT, asid-1, 0);
+    debugOMICRON(status);
 
     disableInts(FALSE);
 
@@ -218,7 +219,7 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
     status = i;
   }
 
-  /*SYSCALL(VERHOGEN, (int) &(devSemArray[index]), 0, 0);*/
+  SYSCALL(VERHOGEN, (int) &(devSemArray[index]), 0, 0);
 
   state->s_v0 = status;
 
