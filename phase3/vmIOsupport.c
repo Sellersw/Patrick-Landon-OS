@@ -200,7 +200,7 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
 
     disableInts(FALSE);
 
-    if(status != CHARTRANSMD){
+    if((status & STATUSMASK) != CHARTRANSMD){
       status = -(termReg->t_transm_status);
       break;
     }
