@@ -25,7 +25,7 @@ Written by: Patrick Sellers and Landon Clark
 /******************************************************************************/
 
 
-void debugF(int a){
+void debugG(int a){
   a+5;
 }
 
@@ -65,7 +65,7 @@ void scheduler(){
     setTIMER(QUANTUM);
     STCK(startTOD);
 
-    debugF((int) (currentProc->p_s).s_pc);
+    debugG((int) (currentProc->p_s).s_pc);
 
     /* loads our new process into our CPU registers */
     LDST(&(currentProc->p_s));
