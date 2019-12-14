@@ -18,7 +18,10 @@
 static int frameNo = POOLSIZE-1;
 
 HIDDEN int getFrame();
-HIDDEN void terminate(state_t *state);
+
+
+HIDDEN void writeToTerminal(state_t *state, int asid);
+HIDDEN void terminateUserProc(int asid);
 
 
 void debugOMICRON(int a){
@@ -36,14 +39,21 @@ void userSyscallHandler(){
 
   state = &(uProcs[asid-1].t_oldTrap[SYSTRAP]);
   call = state->s_a0;
+  state->s_pc = state->s_pc + WORDLEN;
 
   switch(call){
 
+    case WRITETERMINAL:
+      writeToTerminal(state, asid);
+      break;
+
     case TERMINATE:
       terminateUserProc(asid);
+      break;
 
     default:
       terminateUserProc(asid);
+      break;
   }
 }
 
@@ -178,7 +188,35 @@ HIDDEN int getFrame(){
 }
 
 
+HIDDEN void writeToTerminal(state_t *state, int asid){
+  int i, status;
+  char *virtAddr = (char *) state->s_a1;
+  int len = (int) state->s_a2;
+  device_t *termReg = getDeviceReg(TERMINT, asid-1);
 
+  if(len < 0 || len > 128 || virtAddr < KSEGOSEND){
+    terminateUserProc(asid);
+  }
+
+  for(i = 0; i < len; i++){
+    disableInts(TRUE);
+
+    termReg->t_transm_command = (virtAddr[i] << 8) | TRANSMCHAR;
+    SYSCALL(WAITIO, TERMINT, asid-1, 0);
+
+    disableInts(FALSE);
+
+    status = i;
+
+    if(termReg->t_transm_status != CHARTRANSMD){
+      status = -(termReg->t_transm_status);
+    }
+  }
+
+  state->s_v0 = status;
+
+  LDST(state);
+}
 
 
 HIDDEN void terminateUserProc(int asid){
