@@ -25,6 +25,10 @@ Written by: Patrick Sellers and Landon Clark
 /******************************************************************************/
 
 
+void debugF(int a){
+  a+5;
+}
+
 /* Wait flag that will allow our interrupt handler to make informed decisions
 based on whether or not our scheduler was previously waiting */
 int waiting;
@@ -61,6 +65,8 @@ void scheduler(){
     setTIMER(QUANTUM);
     STCK(startTOD);
 
+    debugF((int) currentProc->s_pc);
+
     /* loads our new process into our CPU registers */
     LDST(&(currentProc->p_s));
   }
@@ -81,7 +87,7 @@ void scheduler(){
   /* if the ready queue was empty, there are still processes somewhere, and
   processes that are soft blocked waiting for I/O is less than zero... */
   if(sftBlkCnt > 0){
-    
+
     /* We are about to begin waiting */
     waiting = TRUE;
 
