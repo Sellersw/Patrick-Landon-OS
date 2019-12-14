@@ -197,9 +197,9 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
     terminateUserProc(asid);
   }
 
-  /*index = (DEVCNT*(TERMINT-DEVINTOFFSET))+(TERMCNT*(asid-1));*/
+  index = (DEVCNT*(TERMINT-DEVINTOFFSET))+(TERMCNT*(asid-1));
 
-  SYSCALL(PASSEREN, (int) &(devSemArray[index]), 0, 0);
+  /*SYSCALL(PASSEREN, (int) &(devSemArray[index]), 0, 0);*/
 
   for(i = 0; i < len; i++){
 
