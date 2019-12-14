@@ -90,7 +90,6 @@ void pager(){
   cause = cause << 25;
   cause = cause >> 27;
 
-  debugOMICRON(cause);
 
 /* If it is not a invalid store word or load word, terminate the process. */
   if((cause != TLBINVLW) && (cause != TLBINVSW)){
@@ -168,8 +167,6 @@ void pager(){
   disableInts(FALSE);
 
   SYSCALL(VERHOGEN, (int) &swapPoolSem, 0, 0);
-
-  debugOMICRON(fNo);
 
   LDST(oldTLB);
 }
