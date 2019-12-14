@@ -225,8 +225,10 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
     disableInts(TRUE);
 
     termReg->t_transm_command = (virtAddr[i] << 8) | TRANSMCHAR;
-    
+
+    disableVM(TRUE);
     status = SYSCALL(WAITIO, TERMINT, asid-1, 0);
+    disableVM(FALSE);
 
     disableInts(FALSE);
 
