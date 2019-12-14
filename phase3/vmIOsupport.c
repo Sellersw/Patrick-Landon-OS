@@ -218,8 +218,6 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
 
     getDeviceReg(TERMINT, asid-1)->t_transm_command = (virtAddr[i] << 8) | TRANSMCHAR;
 
-    debugOMICRON(getDeviceReg(TERMINT, asid-1)->t_transm_status);
-
     status = SYSCALL(WAITIO, TERMINT, asid-1, 0);
 
     disableInts(FALSE);
