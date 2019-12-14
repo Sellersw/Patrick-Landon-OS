@@ -90,6 +90,8 @@ void pager(){
   cause = cause << 25;
   cause = cause >> 27;
 
+  debugOMICRON(cause);
+
 /* If it is not a invalid store word or load word, terminate the process. */
   if((cause != TLBINVLW) && (cause != TLBINVSW)){
     SYSCALL(VERHOGEN, (int) &swapPoolSem, 0, 0);
@@ -98,13 +100,13 @@ void pager(){
 
 
   RAMTOP = devReg->rambase + devReg->ramsize;
-  swapLoc = RAMTOP - (5*PAGESIZE);
+  swapLoc = RAMTOP - (4*PAGESIZE);
 
   segment = (oldTLB->s_asid >> 30);
   vPageNo = missingPage = (oldTLB->s_asid & 0x3FFFF000) >> 12;
 
 
-  debugOMICRON(segment);
+
 
 
   if(missingPage >= KUSEGPTESIZE){
@@ -122,7 +124,6 @@ void pager(){
   frameNo = getFrame();
   swapLoc = swapLoc - (frameNo*PAGESIZE);
 
-  debugOMICRON(vPageNo);
 
   if(swapPool[frameNo].asid != -1){
     disableInts(TRUE);
@@ -167,8 +168,6 @@ void pager(){
   disableInts(FALSE);
 
   SYSCALL(VERHOGEN, (int) &swapPoolSem, 0, 0);
-
-  debugOMICRON(missingPage);
 
   LDST(oldTLB);
 }
