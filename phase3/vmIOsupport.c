@@ -69,7 +69,7 @@ void userSyscallHandler(){
 /* The primary TLB trap handler for Virtual Memory. This is what we  */
 void pager(){
   state_t *oldTLB;
-  unsigned int asid, cause, segment, vPageNo, missingPage, swapPageNo, swapId, fNo;
+  unsigned int asid, cause, segment, vPageNo, missingPage, swapPageNo, swapId, fNo, entryLo;
   memaddr swapLoc, RAMTOP;
   int *disk0sem = &devSemArray[(DEVCNT*(DISKINT-DEVINTOFFSET))];
   pte_t *pTable;
@@ -125,7 +125,9 @@ void pager(){
   if(swapPool[fNo].asid != -1){
     disableInts(TRUE);
 
-    swapPool[fNo].pteEntry->pte_entryLo = swapPool[fNo].pteEntry->pte_entryLo & (0xD << 8);
+    entryLo = swapPool[fNo].pteEntry->pte_entryLo;
+    entryLo = entryLo & (0xD << 8);
+    swapPool[fNo].pteEntry->pte_entryLo = (swapPool[fNo].pteEntry->pte_entryLo & 0xFFFFF000) | entryLo;
     swapPageNo = swapPool[fNo].pageNo;
     swapId = swapPool[fNo].asid;
 
@@ -219,6 +221,7 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
     disableInts(TRUE);
 
     debugOMICRON(status);
+    debugOMICRON((int) virtAddr[i]);
 
     termReg->t_transm_command = (virtAddr[i] << 8) | TRANSMCHAR;
     status = SYSCALL(WAITIO, TERMINT, asid-1, 0);
