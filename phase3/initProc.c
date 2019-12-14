@@ -149,7 +149,7 @@ void uProcInit(){
 
   tapeToDisk(asid);
 
-  state.s_asid = (0x1 << 31) | getENTRYHI();
+  state.s_asid = getENTRYHI();
   state.s_sp = (memaddr) 0xC0000000;
   state.s_status = VMON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELOFF;
   state.s_pc = state.s_t9 = (memaddr) 0x800000B0;

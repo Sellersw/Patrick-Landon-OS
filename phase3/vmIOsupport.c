@@ -145,7 +145,6 @@ void pager(){
     disableInts(FALSE);
 
     diskIO(swapId-1, swapPageNo, 0, disk0sem, 0, swapLoc, WRITEBLK);
-
   }
 
 
@@ -166,8 +165,6 @@ void pager(){
   disableInts(FALSE);
 
   SYSCALL(VERHOGEN, (int) &swapPoolSem, 0, 0);
-
-  debugOMICRON(swapLoc);
 
   LDST(oldTLB);
 }
