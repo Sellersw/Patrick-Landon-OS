@@ -215,9 +215,7 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
 
   for(i = 0; i < len; i++){
     disableInts(TRUE);
-
-    debugOMICRON((int) virtAddr);
-
+    
     termReg->t_transm_command = (virtAddr[i] << 8) | TRANSMCHAR;
     status = SYSCALL(WAITIO, TERMINT, asid-1, 0);
 
