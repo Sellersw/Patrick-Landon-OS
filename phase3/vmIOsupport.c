@@ -202,15 +202,15 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
     disableInts(TRUE);
 
     termReg->t_transm_command = (virtAddr[i] << 8) | TRANSMCHAR;
-    SYSCALL(WAITIO, TERMINT, asid-1, 0);
+    status = SYSCALL(WAITIO, TERMINT, asid-1, 0);
 
     disableInts(FALSE);
 
-    status = i;
-
-    if(termReg->t_transm_status != CHARTRANSMD){
+    if(status != CHARTRANSMD){
       status = -(termReg->t_transm_status);
+      break;
     }
+    status = i;
   }
 
   state->s_v0 = status;
