@@ -185,10 +185,6 @@ void tapeToDisk(int asid){
       SYSCALL(TERMINATE, 0, 0, 0);
     }
 
-    if((tapeReg->d_data1 == EOT) || (tapeReg->d_data1 == EOF)){
-      i = 31;
-    }
-
     diskIO(asid-1, i, 0, disk0sem, 0, tapeBuf, WRITEBLK);
     i++;
   }
