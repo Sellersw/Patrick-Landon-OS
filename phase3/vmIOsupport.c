@@ -98,7 +98,7 @@ void pager(){
 
 
   RAMTOP = devReg->rambase + devReg->ramsize;
-  swapLoc = RAMTOP - (4*PAGESIZE);
+  swapLoc = RAMTOP - (5*PAGESIZE);
 
   segment = (oldTLB->s_asid >> 30);
   vPageNo = missingPage = (oldTLB->s_asid & 0x3FFFF000) >> 12;
@@ -163,10 +163,12 @@ void pager(){
 
 
   TLBCLR();
+
   disableInts(FALSE);
 
   SYSCALL(VERHOGEN, (int) &swapPoolSem, 0, 0);
 
+  debugOMICRON(missingPage);
 
   LDST(oldTLB);
 }
