@@ -220,7 +220,7 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
   for(i = 0; i < len; i++){
     disableInts(TRUE);
 
-    debugOMICRON(status);
+    debugOMICRON((int) &status);
     debugOMICRON((int) virtAddr);
     debugOMICRON((int) *virtAddr);
 
