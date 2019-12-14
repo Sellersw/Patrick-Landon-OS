@@ -224,11 +224,7 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
   for(i = 0; i < len; i++){
     disableInts(TRUE);
 
-    debugOMICRON(status);
-    debugOMICRON((int)virtAddr[i]);
-    debugOMICRON(asid);
-
-    termReg->t_transm_command = ((unsigned int) *virtAddr << 8) | TRANSMCHAR;
+    termReg->t_transm_command = (virtAddr[i] << 8) | TRANSMCHAR;
     status = SYSCALL(WAITIO, TERMINT, asid-1, 0);
 
     disableInts(FALSE);
@@ -237,7 +233,6 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
       status = -status;
       break;
     }
-    virtAddr++;
     status = i;
   }
   SYSCALL(VERHOGEN, (int) &(devSemArray[index]), 0, 0);
