@@ -19,6 +19,8 @@ extern swapPool_t swapPool[POOLSIZE];
 
 extern pte_t kUseg3;
 
+extern void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf, int command);
+
 extern void disableInts(int disable);
 
 extern device_t* getDeviceReg(int lineNo, int devNo);
