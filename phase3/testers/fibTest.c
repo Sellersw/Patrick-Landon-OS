@@ -17,19 +17,28 @@ int fib (int i) {
 
 
 void main() {
-	int i;
+	int i, j, k;
 
-	print(WRITETERMINAL, "Recursive Fibanaci Test starts\n");
+	/*print(WRITETERMINAL, "Recursive Fibanaci Test starts\n");*/
 
 	i = fib(7);
 
-	print(WRITETERMINAL, "Recursion Concluded\n");
+	/*print(WRITETERMINAL, "Recursion Concluded\n");*/
 
+	/*
 	if (i == 13) {
 		print(WRITETERMINAL, "Recursion Concluded Successfully\n");
 	}
 	else
 		print(WRITETERMINAL, "ERROR: Recursion problems\n");
+		*/
+
+	j = fib(7);
+	k = fib(7);
+
+	if(i == j && k == j){
+		print(WRITETERMINAL, "Only the O will print here :(");
+	}
 
 	/* Terminate normally */
 	SYSCALL(TERMINATE, 0, 0, 0);
