@@ -40,6 +40,7 @@ int waiting;
 on the readyQue and handling any other cases that may arise after dequeing the
 readyQue */
 void scheduler(){
+  int j;
 
   /**************LOCAL VARIABLES**************/
   pcb_PTR nextProc;
@@ -60,12 +61,19 @@ void scheduler(){
     /* Global currentProc is now the ready process we dequeued */
     currentProc = nextProc;
 
+    for(j = 0; j < 31; j++){
+      debugG((int) (currentProc->p_s).s_reg[0]);
+    }
+    debugG((int)(currentProc->p_s).s_asid);
+    debugG((int)(currentProc->p_s).s_cause);
+    debugG((int)(currentProc->p_s).s_status);
+    debugG((int)(currentProc->p_s).s_pc);
+
+
     /* Set our quantum value in the processor local time and store off the TOD
     value of when this process began */
     setTIMER(QUANTUM);
     STCK(startTOD);
-
-    debugG((int) (currentProc->p_s).s_pc);
 
     /* loads our new process into our CPU registers */
     LDST(&(currentProc->p_s));
