@@ -174,7 +174,6 @@ void tapeToDisk(int asid){
 
   while((tapeReg->d_data1 != EOT) && (tapeReg->d_data1 != EOF)){
 
-
     tapeReg->d_data0 = tapeBuf;
     tapeReg->d_command = READBLK;
 

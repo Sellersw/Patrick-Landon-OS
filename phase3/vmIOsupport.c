@@ -66,7 +66,11 @@ void pager(){
   pte_t *pTable;
   devregarea_t* devReg = (devregarea_t *) RAMBASEADDR;
 
+  debugOMICRON(1);
+
   SYSCALL(PASSEREN, (int) &swapPoolSem, 0, 0);
+
+  debugOMICRON(2);
 
   asid = getENTRYHI();
   asid = (asid << 20);
