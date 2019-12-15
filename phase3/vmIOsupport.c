@@ -29,11 +29,6 @@ void debugOMICRON(int a){
 }
 
 
-
-
-
-
-
 void userSyscallHandler(){
   state_t *state;
   int call, asid;
@@ -62,9 +57,6 @@ void userSyscallHandler(){
 }
 
 
-
-
-
 /* The primary TLB trap handler for Virtual Memory. This is what we  */
 void pager(){
   state_t *oldTLB;
@@ -72,9 +64,7 @@ void pager(){
   memaddr swapLoc, RAMTOP;
   int *disk0sem = &devSemArray[(DEVCNT*(DISKINT-DEVINTOFFSET))];
   pte_t *pTable;
-
   devregarea_t* devReg = (devregarea_t *) RAMBASEADDR;
-
 
   SYSCALL(PASSEREN, (int) &swapPoolSem, 0, 0);
 
@@ -136,7 +126,6 @@ void pager(){
 
     disableInts(FALSE);
 
-
     diskIO(swapId-1, swapPageNo, 0, disk0sem, 0, swapLoc, WRITEBLK);
   }
 
@@ -163,15 +152,9 @@ void pager(){
 }
 
 
-
-
-
 void userProgTrapHandler(){
   SYSCALL(TERMINATE, 0, 0, 0);
 }
-
-
-
 
 
 HIDDEN int getFrame(){
@@ -183,9 +166,6 @@ HIDDEN int getFrame(){
 
 	return(frameNo);
 }
-
-
-
 
 
 HIDDEN void writeToTerminal(state_t *state, int asid){
@@ -228,7 +208,6 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
 
   LDST(state);
 }
-
 
 
 HIDDEN void terminateUserProc(int asid){
