@@ -159,7 +159,7 @@ void userProgTrapHandler(){
 
 /* A helper function for user-level syscall 10. It handles the writing of chars to the
       umps2 terminals. */
-HIDDEN void writeToTerminal(state_t *state, int asid){
+HIDDEN void writeToTerminal(){
   int asid, i, status, index, len;
   state_t *state;
   char *virtAddr;

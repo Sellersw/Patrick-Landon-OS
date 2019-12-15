@@ -14,7 +14,7 @@ extern int masterSem;
 extern int swapPoolSem;
 extern int devSemArray[DEVICECNT];
 
-extern Tproc_t uProcs[MAXUPROC];
+extern uProc_t uProcs[MAXUPROC];
 extern swapPool_t swapPool[POOLSIZE];
 
 extern pte_t kUseg3;
