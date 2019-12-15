@@ -177,7 +177,7 @@ HIDDEN void writeToTerminal(){
   virtAddr = (char *) state->s_a1;
   len = (int) state->s_a2;
 
-  if(len < 0 || len > 128 || virtAddr < KSEGOSEND){
+  if(len < 0 || len > 128 || (int) virtAddr < KSEGOSEND){
     terminateUserProc(asid);
   }
 

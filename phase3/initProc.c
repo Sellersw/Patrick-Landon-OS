@@ -146,7 +146,7 @@ void uProcInit(){
         newState->s_pc = newState->s_t9 = (memaddr) userSyscallHandler;
         break;
     }
-    SYSCALL(SPECTRAPVEC, i, &(uProcs[asid-1].u_oldTrap[i]), &(uProcs[asid-1].u_newTrap[i]));
+    SYSCALL(SPECTRAPVEC, i, (int) &(uProcs[asid-1].u_oldTrap[i]), (int) &(uProcs[asid-1].u_newTrap[i]));
   }
 
   state.s_asid = getENTRYHI();
