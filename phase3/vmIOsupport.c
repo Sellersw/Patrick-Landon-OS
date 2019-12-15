@@ -153,12 +153,13 @@ void pager(){
   LDST(oldTLB);
 }
 
-
+/* All program traps triggered are terminated by the VM/IO handler in our current build. */
 void userProgTrapHandler(){
   SYSCALL(TERMINATE, 0, 0, 0);
 }
 
-
+/* A simple cycle that we use to get the frame that was most distantly brought into the
+      working set and return it to the pager. */
 HIDDEN int getFrame(){
   frameNo++;
 
@@ -170,6 +171,8 @@ HIDDEN int getFrame(){
 }
 
 
+/* A helper function for user-level syscall 10. It handles the writing of chars to the
+      umps2 terminals. */
 HIDDEN void writeToTerminal(state_t *state, int asid){
   int i, status, index;
   char *virtAddr = (char *) state->s_a1;
@@ -211,7 +214,9 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
   LDST(state);
 }
 
-
+/* A helper function for user-level syscall 18. This cleans up when a process is
+      either done or force killed by the OS. This will clean out the working set
+      RAM completely and decrement the master semephore. */
 HIDDEN void terminateUserProc(int asid){
   int i;
 
