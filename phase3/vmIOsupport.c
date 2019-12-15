@@ -164,7 +164,7 @@ void userProgTrapHandler(){
       umps2 terminals. */
 HIDDEN void writeToTerminal(){
   int asid, i, status, index, len;
-  state_t *state;
+  state_t *state, other;
   char *virtAddr;
 
   asid = getENTRYHI();
@@ -188,17 +188,16 @@ HIDDEN void writeToTerminal(){
 
     disableInts(TRUE);
 
-    debugOMICRON(i);
-    debugOMICRON(virtAddr[i]);
+    STST(&other);
+    debugOMICRON(other.s_sp);
 
     getDeviceReg(TERMINT, asid-1)->t_transm_command = (virtAddr[i] << 8) | TRANSMCHAR;
     status = SYSCALL(WAITIO, TERMINT, asid-1, 0);
 
-    disableInts(FALSE);
+    STST(&other);
+    debugOMICRON(other.s_sp);
 
-    debugOMICRON(status);
-    debugOMICRON(i);
-    debugOMICRON(len);
+    disableInts(FALSE);
 
     if(status != CHARTRANSMD){
       debugOMICRON(status);
