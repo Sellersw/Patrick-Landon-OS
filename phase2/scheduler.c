@@ -62,7 +62,7 @@ void scheduler(){
     currentProc = nextProc;
 
     for(j = 0; j < 31; j++){
-      debugG((int) (currentProc->p_s).s_reg[0]);
+      debugG((int) (currentProc->p_s).s_reg[j]);
     }
     debugG((int)(currentProc->p_s).s_asid);
     debugG((int)(currentProc->p_s).s_cause);
