@@ -130,15 +130,10 @@ void pager(){
 
     disableInts(FALSE);
 
-    debugOMICRON(10);
-    debugOMICRON(swapPageNo);
-
     diskIO(swapId-1, swapPageNo, 0, disk0sem, 0, swapLoc, WRITEBLK);
   }
 /* Next, read in the needed page from the backing store and place it into our reserved frame. */
 
-  debugOMICRON(11);
-  debugOMICRON(vPageNo);
   diskIO(asid-1, vPageNo, 0, disk0sem, 0, swapLoc, READBLK);
 
   disableInts(TRUE);
@@ -199,8 +194,6 @@ HIDDEN void writeToTerminal(){
     getDeviceReg(TERMINT, asid-1)->t_transm_command = (virtAddr[i] << 8) | TRANSMCHAR;
     status = SYSCALL(WAITIO, TERMINT, asid-1, 0);
 
-    debugOMICRON(status);
-
     disableInts(FALSE);
 
     if(status != CHARTRANSMD){
@@ -209,6 +202,8 @@ HIDDEN void writeToTerminal(){
     }
     status = i;
   }
+
+  debugOMICRON(status);
 
   SYSCALL(VERHOGEN, (int) &(devSemArray[index]), 0, 0);
 
