@@ -16,11 +16,6 @@ Written by: Landon Clark and Patrick Sellers
 #include "/usr/local/include/umps2/umps/libumps.e"
 
 
-void debugA(int a){
-  a+5;
-}
-
-
 extern void userSyscallHandler();
 extern void pager();
 extern void userProgTrapHandler();
