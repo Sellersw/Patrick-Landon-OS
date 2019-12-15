@@ -20,7 +20,7 @@ static int frameNo = POOLSIZE-1;
 HIDDEN int getFrame();
 
 
-HIDDEN void writeToTerminal();
+void writeToTerminal();
 HIDDEN void terminateUserProc();
 
 
@@ -167,7 +167,7 @@ void userProgTrapHandler(){
 
 /* A helper function for user-level syscall 10. It handles the writing of chars to the
       umps2 terminals. */
-HIDDEN void writeToTerminal(){
+void writeToTerminal(){
   int asid, i, status, index, len;
   state_t *state;
   char *virtAddr;
@@ -194,7 +194,6 @@ HIDDEN void writeToTerminal(){
     disableInts(TRUE);
 
     getDeviceReg(TERMINT, asid-1)->t_transm_command = (virtAddr[i] << 8) | TRANSMCHAR;
-
     status = SYSCALL(WAITIO, TERMINT, asid-1, 0);
 
     disableInts(FALSE);
