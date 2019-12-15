@@ -107,11 +107,12 @@ void pager(){
     }
   }
 
-
+/* Gets the next location in the swap pool (working memory) ready to be filled. */
   fNo = getFrame();
   swapLoc = swapLoc - (fNo*PAGESIZE);
 
-
+/* If that location in the swap pool is currently filled, write it to disk and remove it from 
+      the working set. */
   if(swapPool[fNo].asid != -1){
     disableInts(TRUE);
 
@@ -130,7 +131,7 @@ void pager(){
     diskIO(swapId-1, swapPageNo, 0, disk0sem, 0, swapLoc, WRITEBLK);
   }
 
-
+/* Next, read in the needed page from the backing store and place it into our reserved frame. */
   diskIO(asid-1, vPageNo, 0, disk0sem, 0, swapLoc, READBLK);
 
 
