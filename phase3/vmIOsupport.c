@@ -197,6 +197,8 @@ HIDDEN void writeToTerminal(){
     disableInts(FALSE);
 
     debugOMICRON(status);
+    debugOMICRON(i);
+    debugOMICRON(len);
 
     if(status != CHARTRANSMD){
       debugOMICRON(status);
