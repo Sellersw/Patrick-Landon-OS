@@ -25,10 +25,6 @@ Written by: Patrick Sellers and Landon Clark
 /******************************************************************************/
 
 
-void debugG(int a){
-  a+5;
-}
-
 /* Wait flag that will allow our interrupt handler to make informed decisions
 based on whether or not our scheduler was previously waiting */
 int waiting;
@@ -60,15 +56,6 @@ void scheduler(){
 
     /* Global currentProc is now the ready process we dequeued */
     currentProc = nextProc;
-
-    for(j = 0; j < 31; j++){
-      debugG((int) (currentProc->p_s).s_reg[j]);
-    }
-    debugG((int)(currentProc->p_s).s_asid);
-    debugG((int)(currentProc->p_s).s_cause);
-    debugG((int)(currentProc->p_s).s_status);
-    debugG((int)(currentProc->p_s).s_pc);
-
 
     /* Set our quantum value in the processor local time and store off the TOD
     value of when this process began */
