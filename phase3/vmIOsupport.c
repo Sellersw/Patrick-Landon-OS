@@ -1,13 +1,12 @@
-/*********************************VMIOSUPPORT*********************************
- *
- * This module is a handler for supporting Translation Lookaside Buffer
- * (TLB) page fault exceptions caused by the implementation of Virtual Memory.
- * Additionally, it handles user-level syscalls that comprise syscodes
- * 9 and above.
- *
- * Written by: Landon Clark and Patrick Sellers
- *
- * **************************************************************************/
+/*********************************VMIOSUPPORT.C*********************************
+
+This module is a handler for supporting Translation Lookaside Buffer (TLB) page
+fault exceptions caused by the implementation of Virtual Memory. Additionally,
+it handles user-level syscalls that comprise syscodes 9 and above.
+
+Written by: Landon Clark and Patrick Sellers
+
+*******************************************************************************/
 
 #include "../h/types.h"
 #include "../h/const.h"
@@ -24,11 +23,10 @@ HIDDEN void writeToTerminal();
 HIDDEN void terminateUserProc();
 
 
-void debugOMICRON(int a){
-  a+5;
-}
+/*******************************USER LEVEL SYSCALL*****************************/
 
-
+/* Handle determining which syscall was called and passes to appropriate helper
+function */
 void userSyscallHandler(){
   state_t *state;
   int call, asid;
@@ -55,9 +53,13 @@ void userSyscallHandler(){
       break;
   }
 }
+/******************************************************************************/
 
 
-/* The primary TLB trap handler for Virtual Memory. This is what we  */
+/****************************USER LEVEL TLB HANDLER****************************/
+
+/* The primary TLB trap handler for Virtual Memory. This is what will handle any
+TLB traps while VM is being utilized  */
 void pager(){
   state_t *oldTLB;
   unsigned int asid, cause, segment, vPageNo, missingPage, swapPageNo, swapId, fNo;
@@ -82,14 +84,16 @@ void pager(){
   cause = cause >> 27;
 
 
-/* If the cause of the TLB exception wasn't an invalid store word or load word, terminate the process. */
+/* If the cause of the TLB exception wasn't an invalid store word or load word,
+terminate the process. */
   if((cause != TLBINVLW) && (cause != TLBINVSW)){
     SYSCALL(VERHOGEN, (int) &swapPoolSem, 0, 0);
     SYSCALL(TERMINATE, 0, 0, 0);
   }
 
 
-/* If it is a paging issue, then we prepare some variables to perform a page fill. */
+/* If it is a paging issue, then we prepare to bring necessary data back into
+RAM */
   RAMTOP = devReg->rambase + devReg->ramsize;
   swapLoc = RAMTOP - (4*PAGESIZE);
   segment = (oldTLB->s_asid >> 30);
@@ -100,8 +104,7 @@ void pager(){
     vPageNo = KUSEGPTESIZE - 1;
   }
 
-/* Checks to see if the page was already filled in the shared segement while this process was waiting on
-      a semephore. */
+/* Handling kUseg3 page table, not implemented fully yet */
   if(segment == KUSEG3NO){
     if(kUseg3.pteTable[vPageNo].pte_entryLo & (0x2 << 8) == (0x2 << 8)){
       SYSCALL(VERHOGEN, (int) &swapPoolSem, 0, 0);
@@ -109,12 +112,12 @@ void pager(){
     }
   }
 
-/* Gets the next location in the swap pool (working memory) ready to be filled. */
+/* Gets the next location in the swap pool ready to be filled */
   fNo = getFrame();
   swapLoc = swapLoc - (fNo*PAGESIZE);
 
-/* If that location in the swap pool is currently filled, write it to disk and remove it from
-      the working set. */
+/* If that location in the swap pool is currently filled, write it to disk and
+remove it from the working set. */
   if(swapPool[fNo].sp_asid != -1){
     disableInts(TRUE);
 
@@ -132,8 +135,9 @@ void pager(){
 
     diskIO(swapId-1, swapPageNo, 0, disk0sem, 0, swapLoc, WRITEBLK);
   }
-/* Next, read in the needed page from the backing store and place it into our reserved frame. */
 
+/* Next, read in the needed page from the backing store and place it into our
+swap pool */
   diskIO(asid-1, vPageNo, 0, disk0sem, 0, swapLoc, READBLK);
 
   disableInts(TRUE);
@@ -153,15 +157,22 @@ void pager(){
 
   LDST(oldTLB);
 }
+/******************************************************************************/
 
-/* All program traps triggered are terminated by the VM/IO handler in our current build. */
+
+/*************************USER LEVEL PROGTRAP HANDLER**************************/
+
+/* All program traps triggered are terminated by the VM/IO handler */
 void userProgTrapHandler(){
   SYSCALL(TERMINATE, 0, 0, 0);
 }
+/******************************************************************************/
 
 
-/* A helper function for user-level syscall 10. It handles the writing of chars to the
-      umps2 terminals. */
+/*********************USER SYSCALL HELPER FUNCTIONS****************************/
+
+/* A helper function for user-level syscall 10. It handles the writing of chars
+to the umps2 terminals. */
 HIDDEN void writeToTerminal(){
   int asid, i, status, index, len;
   state_t *state, other;
@@ -188,12 +199,8 @@ HIDDEN void writeToTerminal(){
 
     disableInts(TRUE);
 
-    debugOMICRON((int) &i);
-
     getDeviceReg(TERMINT, asid-1)->t_transm_command = (virtAddr[i] << 8) | TRANSMCHAR;
     status = SYSCALL(WAITIO, TERMINT, asid-1, 0);
-
-    debugOMICRON((int) &i);
 
     disableInts(FALSE);
 
@@ -205,8 +212,6 @@ HIDDEN void writeToTerminal(){
     status = i;
   }
 
-  debugOMICRON(status);
-
   SYSCALL(VERHOGEN, (int) &(devSemArray[index]), 0, 0);
 
   state->s_v0 = status;
@@ -216,8 +221,8 @@ HIDDEN void writeToTerminal(){
 
 
 /* A helper function for user-level syscall 18. This cleans up when a process is
-      either done or force killed by the OS. This will clean out the working set
-      RAM completely and decrement the master semephore. */
+either done or force killed by the OS. This will clean out the working set RAM
+completely and decrement the master semephore. */
 HIDDEN void terminateUserProc(){
   int i, asid;
 
@@ -243,8 +248,10 @@ HIDDEN void terminateUserProc(){
 }
 
 
-/* A simple cycle that we use to get the frame that was most distantly brought into the
-      working set and return it to the pager. */
+/************************HELPER FUNCTIONS**************************************/
+
+/* A simple cycle that we use to get the frame that was most distantly brought
+into the working set and return it to the pager. */
 HIDDEN int getFrame(){
   frameNo++;
 
@@ -254,3 +261,4 @@ HIDDEN int getFrame(){
 
 	return(frameNo);
 }
+/******************************************************************************/

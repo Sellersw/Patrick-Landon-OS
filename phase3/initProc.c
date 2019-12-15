@@ -1,14 +1,14 @@
-/*********************************INITPROC********************************
+/******************************INITPROC.C*********************************
 
-Entry point of user processes in Kaya. This will initialize a set of processes
-according to the size of constant [MAXPROC] in const.h (currently set to 1 for
-testing purposes). It sets up the necessary global data structures to support
-virtual memory, copies all the processes into a backing store disk drive (disk0)
-and then waits on a master semephore for all new processes to terminate.
+Entry point of user processes in Kaya. This will initialize a set of
+processes according to the size of constant [MAXPROC] in const.h.
+It sets up the necessary global data structures to support virtual memory,
+copies all the processes into a backing store disk drive (disk0) and then
+waits on a master semephore for all new processes to terminate.
 
-Authors: Landon Clark and Patrick Sellers
+Written by: Landon Clark and Patrick Sellers
 
-****************************************************************************/
+*************************************************************************/
 
 #include "../h/types.h"
 #include "../h/const.h"
@@ -32,6 +32,8 @@ void disableInts(int disable);
 device_t* getDeviceReg(int lineNo, int devNo);
 
 
+/************************GLOBAL PHASE 3 VARIABLES************************/
+
 /* Global semaphore for phase 3. Initialize to 1 as they are for mutex */
 int swapPoolSem, devSemArray[DEVICECNT];
 
@@ -44,6 +46,10 @@ pte_t kUseg3;
 uProc_t uProcs[MAXUPROC];
 swapPool_t swapPool[POOLSIZE];
 
+/************************************************************************/
+
+
+/********************FIRST KAYA PROCESS ENTRY POINT**********************/
 
 /* Main process thread of Kaya OS */
 void test(){
@@ -117,9 +123,10 @@ void test(){
 
   SYSCALL(TERMINATEPROCESS, 0, 0, 0);
 }
+/************************************************************************/
 
 
-
+/************************USER PROCESS INITIALIZATION*********************/
 void uProcInit(){
   int asid, i;
   state_t state, *newState;
@@ -131,10 +138,12 @@ void uProcInit(){
   tapeToDisk(asid);
 
   for(i = 0; i < TRAPTYPES; i++){
+
     newState = &(uProcs[asid-1].u_newTrap[i]);
     newState->s_asid = getENTRYHI();
     newState->s_sp = UPROCSTACK + ((((asid-1)*TRAPTYPES)+i)*PAGESIZE);
     newState->s_status = VMON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELON;
+
     switch(i){
       case TLBTRAP:
         newState->s_pc = newState->s_t9 = (memaddr) pager;
@@ -157,7 +166,10 @@ void uProcInit(){
   LDST(&state);
 }
 
+/************************************************************************/
 
+
+/****************************HELPER FUNCTIONS****************************/
 
 /* Our method of taking everything (.data and .text) off of the tape and writing
 it to our backing store. This is an essential operation for VM support. */
@@ -188,6 +200,7 @@ void tapeToDisk(int asid){
     i++;
   }
 }
+
 
 /* A function for handling both read and write disk operations. */
 void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf, int command){
@@ -239,8 +252,8 @@ void disableInts(int disable){
 }
 
 
-
-
+/* Method that allows us to get a device register from only a line number
+and device number */
 device_t* getDeviceReg(int lineNo, int devNo){
   /* See pg. 32 of pops for a more detailed explanation on these magic numbers.
   The formula essentially calculates the address based on the base address of
