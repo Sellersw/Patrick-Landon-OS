@@ -66,11 +66,9 @@ void pager(){
   pte_t *pTable;
   devregarea_t* devReg = (devregarea_t *) RAMBASEADDR;
 
-  debugOMICRON(1);
 
   SYSCALL(PASSEREN, (int) &swapPoolSem, 0, 0);
 
-  debugOMICRON(2);
 
   asid = getENTRYHI();
   asid = (asid << 20);
@@ -132,9 +130,15 @@ void pager(){
 
     disableInts(FALSE);
 
+    debugOMICRON(10);
+    debugOMICRON(swapPageNo);
+
     diskIO(swapId-1, swapPageNo, 0, disk0sem, 0, swapLoc, WRITEBLK);
   }
 /* Next, read in the needed page from the backing store and place it into our reserved frame. */
+
+  debugOMICRON(11);
+  debugOMICRON(vPageNo);
   diskIO(asid-1, vPageNo, 0, disk0sem, 0, swapLoc, READBLK);
 
   disableInts(TRUE);
