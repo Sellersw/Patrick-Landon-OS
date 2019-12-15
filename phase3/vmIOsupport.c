@@ -80,32 +80,33 @@ void pager(){
   cause = cause >> 27;
 
 
-/* If it is not a invalid store word or load word, terminate the process. */
+/* If the cause of the TLB exception wasn't an invalid store word or load word, terminate the process. */
   if((cause != TLBINVLW) && (cause != TLBINVSW)){
     SYSCALL(VERHOGEN, (int) &swapPoolSem, 0, 0);
     SYSCALL(TERMINATE, 0, 0, 0);
   }
 
 
+/* If it is a paging issue, then we prepare some variables to perform a page fill. */
   RAMTOP = devReg->rambase + devReg->ramsize;
   swapLoc = RAMTOP - (4*PAGESIZE);
-
   segment = (oldTLB->s_asid >> 30);
   vPageNo = missingPage = (oldTLB->s_asid & 0x3FFFF000) >> 12;
-
 
 
   if(missingPage >= KUSEGPTESIZE){
     vPageNo = KUSEGPTESIZE - 1;
   }
 
-
+/* Checks to see if the page was already filled in the shared segement while this process was waiting on
+      a semephore. */
   if(segment == KUSEG3NO){
     if(kUseg3.pteTable[vPageNo].pte_entryLo & (0x2 << 8) == (0x2 << 8)){
       SYSCALL(VERHOGEN, (int) &swapPoolSem, 0, 0);
       LDST(oldTLB);
     }
   }
+
 
   fNo = getFrame();
   swapLoc = swapLoc - (fNo*PAGESIZE);
