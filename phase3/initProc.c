@@ -24,6 +24,7 @@ void debugA(int a){
 extern void userSyscallHandler();
 extern void pager();
 extern void userProgTrapHandler();
+
 void diskIO(int sector, int cyl, int head, int *sem, int diskNum, memaddr memBuf, int command);
 void tapeToDisk(int asid);
 void uProcInit();
@@ -40,8 +41,9 @@ int masterSem;
 
 pteOS_t ksegOS;
 pte_t kUseg3;
-Tproc_t uProcs[MAXUPROC];
+uProc_t uProcs[MAXUPROC];
 swapPool_t swapPool[POOLSIZE];
+
 
 /* Main process thread of Kaya OS */
 void test(){
@@ -59,10 +61,10 @@ void test(){
 
 /* Initialize the swap pool*/
   for(i = 0; i < POOLSIZE; i++){
-    swapPool[i].asid = -1;
-    swapPool[i].segNo = 0;
-    swapPool[i].pageNo = 0;
-    swapPool[i].pteEntry = NULL;
+    swapPool[i].sp_asid = -1;
+    swapPool[i].sp_segNo = 0;
+    swapPool[i].sp_pageNo = 0;
+    swapPool[i].sp_pteEntry = NULL;
   }
 
 /* Initialize the OS segment's page table entries and headers. */
@@ -83,18 +85,18 @@ void test(){
   for(i = 1; i < MAXUPROC+1; i++){
     segmentTable = (segTable_t *) (SEGTABLESTART + (i*12));
 
-    uProcs[i-1].t_pte.header = (MAGNO << 24) | KUSEGPTESIZE;
+    uProcs[i-1].u_pte.header = (MAGNO << 24) | KUSEGPTESIZE;
 
     for(j = 0; j < MAXPAGES; j++){
-      uProcs[i-1].t_pte.pteTable[j].pte_entryHi = ((0x80000 + j) << 12) | (i << 6);
-      uProcs[i-1].t_pte.pteTable[j].pte_entryLo = (0x1 << 10);
+      uProcs[i-1].u_pte.pteTable[j].pte_entryHi = ((0x80000 + j) << 12) | (i << 6);
+      uProcs[i-1].u_pte.pteTable[j].pte_entryLo = (0x1 << 10);
     }
 
-    uProcs[i-1].t_pte.pteTable[MAXPAGES-1].pte_entryHi = (0xBFFFF << 12) | (i << 6);
-    uProcs[i-1].t_sem = 0;
+    uProcs[i-1].u_pte.pteTable[MAXPAGES-1].pte_entryHi = (0xBFFFF << 12) | (i << 6);
+    uProcs[i-1].u_sem = 0;
 
     segmentTable->st_ksegOS = &ksegOS;
-    segmentTable->st_kUseg2 = &(uProcs[i-1].t_pte);
+    segmentTable->st_kUseg2 = &(uProcs[i-1].u_pte);
     segmentTable->st_kUseg3 = &kUseg3;
 
     state.s_asid = i << 6;
@@ -118,8 +120,6 @@ void test(){
 
 
 
-
-
 void uProcInit(){
   int asid, i;
   state_t state, *newState;
@@ -131,7 +131,7 @@ void uProcInit(){
   tapeToDisk(asid);
 
   for(i = 0; i < TRAPTYPES; i++){
-    newState = &(uProcs[asid-1].t_newTrap[i]);
+    newState = &(uProcs[asid-1].u_newTrap[i]);
     newState->s_asid = getENTRYHI();
     newState->s_sp = UPROCSTACK + ((((asid-1)*TRAPTYPES)+i)*PAGESIZE);
     newState->s_status = VMON | INTERON | INTERUNMASKED | PLOCTIMEON | KERNELON;
@@ -146,7 +146,7 @@ void uProcInit(){
         newState->s_pc = newState->s_t9 = (memaddr) userSyscallHandler;
         break;
     }
-    SYSCALL(SPECTRAPVEC, i, &(uProcs[asid-1].t_oldTrap[i]), &(uProcs[asid-1].t_newTrap[i]));
+    SYSCALL(SPECTRAPVEC, i, &(uProcs[asid-1].u_oldTrap[i]), &(uProcs[asid-1].u_newTrap[i]));
   }
 
   state.s_asid = getENTRYHI();

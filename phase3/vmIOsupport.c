@@ -20,8 +20,8 @@ static int frameNo = POOLSIZE-1;
 HIDDEN int getFrame();
 
 
-HIDDEN void writeToTerminal(state_t *state, int asid);
-HIDDEN void terminateUserProc(int asid);
+HIDDEN void writeToTerminal();
+HIDDEN void terminateUserProc();
 
 
 void debugOMICRON(int a){
@@ -37,21 +37,21 @@ void userSyscallHandler(){
   asid = (asid << 20);
   asid = (asid >> 26);
 
-  state = &(uProcs[asid-1].t_oldTrap[SYSTRAP]);
+  state = &(uProcs[asid-1].u_oldTrap[SYSTRAP]);
   call = state->s_a0;
 
   switch(call){
 
     case WRITETERMINAL:
-      writeToTerminal(state, asid);
+      writeToTerminal();
       break;
 
     case TERMINATE:
-      terminateUserProc(asid);
+      terminateUserProc();
       break;
 
     default:
-      terminateUserProc(asid);
+      terminateUserProc();
       break;
   }
 }
@@ -72,8 +72,8 @@ void pager(){
   asid = (asid << 20);
   asid = (asid >> 26);
 
-  pTable = &(uProcs[asid-1].t_pte);
-  oldTLB = &(uProcs[asid-1].t_oldTrap[TLBTRAP]);
+  pTable = &(uProcs[asid-1].u_pte);
+  oldTLB = &(uProcs[asid-1].u_oldTrap[TLBTRAP]);
 
   cause = oldTLB->s_cause;
   cause = cause << 25;
@@ -111,14 +111,14 @@ void pager(){
   fNo = getFrame();
   swapLoc = swapLoc - (fNo*PAGESIZE);
 
-/* If that location in the swap pool is currently filled, write it to disk and remove it from 
+/* If that location in the swap pool is currently filled, write it to disk and remove it from
       the working set. */
-  if(swapPool[fNo].asid != -1){
+  if(swapPool[fNo].sp_asid != -1){
     disableInts(TRUE);
 
-    swapPool[fNo].pteEntry->pte_entryLo = swapPool[fNo].pteEntry->pte_entryLo & 0xFFFFFCFF;
-    swapPageNo = swapPool[fNo].pageNo;
-    swapId = swapPool[fNo].asid;
+    swapPool[fNo].sp_pteEntry->pte_entryLo = swapPool[fNo].sp_pteEntry->pte_entryLo & 0xFFFFFCFF;
+    swapPageNo = swapPool[fNo].sp_pageNo;
+    swapId = swapPool[fNo].sp_asid;
 
     if(swapPageNo >= KUSEGPTESIZE){
       swapPageNo = KUSEGPTESIZE - 1;
@@ -130,18 +130,16 @@ void pager(){
 
     diskIO(swapId-1, swapPageNo, 0, disk0sem, 0, swapLoc, WRITEBLK);
   }
-
 /* Next, read in the needed page from the backing store and place it into our reserved frame. */
   diskIO(asid-1, vPageNo, 0, disk0sem, 0, swapLoc, READBLK);
 
-
   disableInts(TRUE);
 
-  swapPool[fNo].asid = asid;
-  swapPool[fNo].segNo = segment;
-  swapPool[fNo].pageNo = missingPage;
-  swapPool[fNo].pteEntry = &(pTable->pteTable[vPageNo]);
-  swapPool[fNo].pteEntry->pte_entryLo = (swapLoc & 0xFFFFF000) | (0x6 << 8);
+  swapPool[fNo].sp_asid = asid;
+  swapPool[fNo].sp_segNo = segment;
+  swapPool[fNo].sp_pageNo = missingPage;
+  swapPool[fNo].sp_pteEntry = &(pTable->pteTable[vPageNo]);
+  swapPool[fNo].sp_pteEntry->pte_entryLo = (swapLoc & 0xFFFFF000) | (0x6 << 8);
 
 
   TLBCLR();
@@ -158,25 +156,22 @@ void userProgTrapHandler(){
   SYSCALL(TERMINATE, 0, 0, 0);
 }
 
-/* A simple cycle that we use to get the frame that was most distantly brought into the
-      working set and return it to the pager. */
-HIDDEN int getFrame(){
-  frameNo++;
-
-	if(frameNo >= POOLSIZE){
-		frameNo = 0;
-	}
-
-	return(frameNo);
-}
-
 
 /* A helper function for user-level syscall 10. It handles the writing of chars to the
       umps2 terminals. */
 HIDDEN void writeToTerminal(state_t *state, int asid){
-  int i, status, index;
-  char *virtAddr = (char *) state->s_a1;
-  int len = (int) state->s_a2;
+  int asid, i, status, index, len;
+  state_t *state;
+  char *virtAddr;
+
+  asid = getENTRYHI();
+  asid = (asid << 20);
+  asid = (asid >> 26);
+
+  state = &(uProcs[asid-1].u_oldTrap[SYSTRAP]);
+
+  virtAddr = (char *) state->s_a1;
+  len = (int) state->s_a2;
 
   if(len < 0 || len > 128 || virtAddr < KSEGOSEND){
     terminateUserProc(asid);
@@ -214,20 +209,25 @@ HIDDEN void writeToTerminal(state_t *state, int asid){
   LDST(state);
 }
 
+
 /* A helper function for user-level syscall 18. This cleans up when a process is
       either done or force killed by the OS. This will clean out the working set
       RAM completely and decrement the master semephore. */
-HIDDEN void terminateUserProc(int asid){
-  int i;
+HIDDEN void terminateUserProc(){
+  int i, asid;
+
+  asid = getENTRYHI();
+  asid = (asid << 20);
+  asid = (asid >> 26);
 
   SYSCALL(PASSEREN, (int)&swapPoolSem, 0, 0);
 
   for(i = 0; i < POOLSIZE; i++){
-    if(swapPool[i].asid == asid){
-      swapPool[i].asid = -1;
-      swapPool[i].pageNo = 0;
-      swapPool[i].segNo = 0;
-      swapPool[i].pteEntry = NULL;
+    if(swapPool[i].sp_asid == asid){
+      swapPool[i].sp_asid = -1;
+      swapPool[i].sp_pageNo = 0;
+      swapPool[i].sp_segNo = 0;
+      swapPool[i].sp_pteEntry = NULL;
     }
   }
   TLBCLR();
@@ -235,4 +235,13 @@ HIDDEN void terminateUserProc(int asid){
   SYSCALL(VERHOGEN, (int) &swapPoolSem, 0, 0);
   SYSCALL(VERHOGEN, (int) &masterSem, 0, 0);
   SYSCALL(TERMINATEPROCESS, 0, 0, 0);
+}
+
+
+/* A simple cycle that we use to get the frame that was most distantly brought into the
+      working set and return it to the pager. */
+HIDDEN int getFrame(){
+  frameNo = (frameNo + 1) % POOLSIZE;
+
+	return(frameNo);
 }

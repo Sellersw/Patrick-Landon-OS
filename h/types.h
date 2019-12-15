@@ -93,7 +93,6 @@ typedef struct semd_t{
 
 #define KUSEGPTESIZE	32
 #define KSEGOSPTESIZE	64
-#define UPROCCNT 8
 #define TRAPTYPES 3
 
 
@@ -120,19 +119,19 @@ typedef struct segTable_t{
 } segTable_t;
 
 
-typedef struct Tproc_t {
-	int			t_sem;
-	pte_t		t_pte;
-	int			t_backStoreAddr;
-	state_t		t_newTrap[TRAPTYPES];
-	state_t		t_oldTrap[TRAPTYPES];
-} Tproc_t, *Tproc_PTR;
+typedef struct uProc_t {
+	int			u_sem;
+	pte_t		u_pte;
+	int			u_backStoreAddr;
+	state_t		u_newTrap[TRAPTYPES];
+	state_t		u_oldTrap[TRAPTYPES];
+} uProc_t, *uProc_PTR;
 
 typedef struct swapPool_t {
-	int			asid;
-	int			segNo;
-	int			pageNo;
-	pteEntry_t	*pteEntry;
+	int			sp_asid;
+	int			sp_segNo;
+	int			sp_pageNo;
+	pteEntry_t	*sp_pteEntry;
 } swapPool_t;
 
 
