@@ -188,14 +188,12 @@ HIDDEN void writeToTerminal(){
 
     disableInts(TRUE);
 
-    STST(&other);
-    debugOMICRON(other.s_sp);
+    debugOMICRON((int) &i);
 
     getDeviceReg(TERMINT, asid-1)->t_transm_command = (virtAddr[i] << 8) | TRANSMCHAR;
     status = SYSCALL(WAITIO, TERMINT, asid-1, 0);
 
-    STST(&other);
-    debugOMICRON(other.s_sp);
+    debugOMICRON((int) &i);
 
     disableInts(FALSE);
 
