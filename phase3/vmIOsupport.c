@@ -249,7 +249,11 @@ HIDDEN void terminateUserProc(){
 /* A simple cycle that we use to get the frame that was most distantly brought into the
       working set and return it to the pager. */
 HIDDEN int getFrame(){
-  frameNo = (frameNo + 1) % POOLSIZE;
+  frameNo++;
+
+  if(frameNo == POOLSIZE){
+    frameNo = 0;
+  }
 
 	return(frameNo);
 }
